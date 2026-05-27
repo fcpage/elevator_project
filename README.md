@@ -2,6 +2,8 @@
 
 ## Floor Controller SW
 
+### Building
+
 The floor controller SW is written in C and is built for the STM32F303RE with a HAL using
 STM32CubeMX for codegen, and CMake as the build system. 
 
@@ -24,4 +26,12 @@ The presets also prevent the need for defining the toolchain manually. If no pre
 cmake -B build/<name> -S . -DCMAKE_TOOLCHAIN_FILE=toolchainfile.cmake
 ```
 
+### Flashing
 
+The build process will output a `.elf` file. This cannot be directly flashed to the STM32
+because of metadata that ST-Link does not expect. It must first be converted to a `.bin`
+file using the toolchain specific `objcopy` (`arm-none-eabi-objcopy`). 
+
+```bash
+arm-none-eabi-objcopy -O binary FloorController.elf FloorController.bin
+```
