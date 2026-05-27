@@ -34,6 +34,11 @@ enable_language(C ASM)
 # Create an executable object type
 add_executable(${CMAKE_PROJECT_NAME})
 
+# Setting the correct file type for ST-Link utility (does not support .elf)
+set(CMAKE_EXECUTABLE_SUFFIX_ASM     ".bin")
+set(CMAKE_EXECUTABLE_SUFFIX_C       ".bin")
+set(CMAKE_EXECUTABLE_SUFFIX_CXX     ".bin")
+
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
 
