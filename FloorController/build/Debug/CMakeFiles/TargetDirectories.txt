@@ -1,4 +1,5 @@
 /home/nigel/Projects/school/ElevatorProject/FloorController/build/Debug/CMakeFiles/FloorController.dir
+/home/nigel/Projects/school/ElevatorProject/FloorController/build/Debug/CMakeFiles/flash.dir
 /home/nigel/Projects/school/ElevatorProject/FloorController/build/Debug/CMakeFiles/edit_cache.dir
 /home/nigel/Projects/school/ElevatorProject/FloorController/build/Debug/CMakeFiles/rebuild_cache.dir
 /home/nigel/Projects/school/ElevatorProject/FloorController/build/Debug/cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir

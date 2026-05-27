@@ -35,9 +35,19 @@ enable_language(C ASM)
 add_executable(${CMAKE_PROJECT_NAME})
 
 # Setting the correct file type for ST-Link utility (does not support .elf)
-set(CMAKE_EXECUTABLE_SUFFIX_ASM     ".bin")
-set(CMAKE_EXECUTABLE_SUFFIX_C       ".bin")
-set(CMAKE_EXECUTABLE_SUFFIX_CXX     ".bin")
+set(CMAKE_EXECUTABLE_SUFFIX_ASM     ".elf")
+set(CMAKE_EXECUTABLE_SUFFIX_C       ".elf")
+set(CMAKE_EXECUTABLE_SUFFIX_CXX     ".elf")
+
+set(CMAKE_FLASH_TOOL st-flash)
+set(CMAKE_FW_PATH "$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>/$<TARGET_FILE_BASE_NAME:${CMAKE_PROJECT_NAME}>.bin")
+set(CMAKE_FW_MEMORY_REGION 0x08000000)
+
+add_custom_target(flash 
+    COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${CMAKE_FW_PATH}
+    COMMAND ${CMAKE_FLASH_TOOL} --reset write ${CMAKE_FW_PATH} ${CMAKE_FW_MEMORY_REGION}
+    DEPENDS ${CMAKE_PROJECT_NAME}
+)
 
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)

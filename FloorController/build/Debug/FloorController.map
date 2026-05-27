@@ -3280,7 +3280,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
  libc.a:*(*)
  libm.a:*(*)
  libgcc.a:*(*)
-OUTPUT(FloorController.bin elf32-littlearm)
+OUTPUT(FloorController.elf elf32-littlearm)
 LOAD linker stubs
 
 .ARM.attributes

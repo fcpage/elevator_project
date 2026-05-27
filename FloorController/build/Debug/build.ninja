@@ -103,17 +103,23 @@ build CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj: ASM_COMPILER__Fl
 
 
 #############################################
-# Link the executable FloorController.bin
+# Link the executable FloorController.elf
 
-build FloorController.bin: C_EXECUTABLE_LINKER__FloorController_Debug cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_dma.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_pwr.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_pwr_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_exti.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart_ex.c.obj CMakeFiles/FloorController.dir/Core/Src/main.c.obj CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj || cmake/stm32cubemx/STM32_Drivers
+build FloorController.elf: C_EXECUTABLE_LINKER__FloorController_Debug cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_dma.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_pwr.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_pwr_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_exti.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart_ex.c.obj CMakeFiles/FloorController.dir/Core/Src/main.c.obj CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj || cmake/stm32cubemx/STM32_Drivers
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3
   LINK_FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -T "/home/nigel/Projects/school/ElevatorProject/FloorController/STM32F303XX_FLASH.ld" --specs=nano.specs -Wl,-Map=FloorController.map -Wl,--gc-sections -Wl,--print-memory-usage
   LINK_LIBRARIES = -lm
   OBJECT_DIR = CMakeFiles/FloorController.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_FILE = FloorController.bin
-  TARGET_PDB = FloorController.bin.dbg
+  TARGET_FILE = FloorController.elf
+  TARGET_PDB = FloorController.elf.dbg
+
+
+#############################################
+# Utility command for flash
+
+build flash: phony CMakeFiles/flash FloorController.elf
 
 
 #############################################
@@ -137,6 +143,13 @@ build CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
   restat = 1
 
 build rebuild_cache: phony CMakeFiles/rebuild_cache.util
+
+
+#############################################
+# Custom command for CMakeFiles/flash
+
+build CMakeFiles/flash | ${cmake_ninja_workdir}CMakeFiles/flash: CUSTOM_COMMAND FloorController.elf || FloorController.elf cmake/stm32cubemx/STM32_Drivers
+  COMMAND = cd /home/nigel/Projects/school/ElevatorProject/FloorController/build/Debug && arm-none-eabi-objcopy -O binary /home/nigel/Projects/school/ElevatorProject/FloorController/build/Debug/FloorController.elf /home/nigel/Projects/school/ElevatorProject/FloorController/build/Debug/FloorController.bin && st-flash --reset write /home/nigel/Projects/school/ElevatorProject/FloorController/build/Debug/FloorController.bin 0x08000000
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
@@ -321,7 +334,7 @@ build cmake/stm32cubemx/rebuild_cache: phony cmake/stm32cubemx/CMakeFiles/rebuil
 # =============================================================================
 # Target aliases.
 
-build FloorController: phony FloorController.bin
+build FloorController: phony FloorController.elf
 
 build STM32_Drivers: phony cmake/stm32cubemx/STM32_Drivers
 
@@ -333,7 +346,7 @@ build STM32_Drivers: phony cmake/stm32cubemx/STM32_Drivers
 #############################################
 # Folder: /home/nigel/Projects/school/ElevatorProject/FloorController/build/Debug
 
-build all: phony FloorController.bin cmake/stm32cubemx/all
+build all: phony FloorController.elf cmake/stm32cubemx/all
 
 # =============================================================================
 
