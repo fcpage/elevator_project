@@ -35,3 +35,18 @@ file using the toolchain specific `objcopy` (`arm-none-eabi-objcopy`).
 ```bash
 arm-none-eabi-objcopy -O binary FloorController.elf FloorController.bin
 ```
+
+There is a phony target to run the file conversion and the flash using `st-flash`. 
+
+```bash
+cmake --build build/Debug --target flash
+```
+
+Alternatively the flash can be done with the gui `ST-link` utility.
+
+#### References
+
+- [st-flash man page](https://man.archlinux.org/man/st-flash.1.en)
+- [STM32CubeMX CMake integration](https://community.st.com/t5/stm32-mcus/cmake-integration-in-stm32cubemx-and-usage-in-stm32cubeide-for/ta-p/849360)
+- [UART communications with HAL](https://controllerstech.com/stm32-uart-1-configure-uart-transmit-data/)
+- [VS Code setup](https://medium.com/@lixis630/getting-started-to-code-embedded-c-on-stm32-e90e7910b2c)
