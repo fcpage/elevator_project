@@ -27,15 +27,12 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typedef struct {
-    const char* data;
-    uint8_t     size;
-} String8;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define STRING8_LIT(str) (String8){ .data = (str), .size = sizeof(str) }
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -72,7 +69,7 @@ static void MX_CAN_Init(void);
  */
 int main(void)
 {
-    // String8 message = STRING8_LIT( "Hello there\n" );
+    uint8_t message[] = "Hello there\n";
     /* USER CODE BEGIN 1 */
 
 
@@ -106,9 +103,9 @@ int main(void)
     /* USER CODE BEGIN WHILE */
     while (1)
     {
-        // HAL_UART_Transmit(&huart2, (uint8_t*)message.data, message.size, 100);
         /* USER CODE END WHILE */
 
+        HAL_UART_Transmit(&huart2, message, sizeof(message), 100);
         HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
         HAL_Delay(1000);
 
