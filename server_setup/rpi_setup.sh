@@ -8,9 +8,13 @@ wait_fn()
 }
 
 ##Elevator Project RPi setup script 1.
-
+mkdir -p $HOME/elvitur
+chmod -R 777 $HOME/elvitur
+touch $HOME/elvitur/rpi_setup_progress.txt $HOME/elvitur/rpi_setup_log.txt
+cp rpi_setup.sh $HOME/elvitur
+chmod 777 $HOME/elvitur
 cp -u rpi_setup.sh $HOME/elvitur
-cd $HOME/elvitur
+cd $HOME/elvitur || return
 sudo chmod 777 $HOME/elvitur/rpi_setup.sh
 sudo apt-get update
 sudo apt-get upgrade
