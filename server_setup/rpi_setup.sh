@@ -10,12 +10,14 @@ wait_fn()
 ##Elevator Project RPi setup script 1.
 mkdir -p $HOME/elvitur
 chmod -R 777 $HOME/elvitur
-touch $HOME/elvitur/rpi_setup_progress.txt $HOME/elvitur/rpi_setup_log.txt
-cp rpi_setup.sh $HOME/elvitur
-chmod 777 $HOME/elvitur
 cp -u rpi_setup.sh $HOME/elvitur
+cp -u server_setup.sh $HOME/elvitur
+touch $HOME/elvitur/rpi_setup_progress.txt $HOME/elvitur/rpi_setup_log.txt
 cd $HOME/elvitur || return
 sudo chmod 777 $HOME/elvitur/rpi_setup.sh
+echo "$USER ALL=(ALL) NOPASSWD: $HOME/elvitur/rpi_setup.sh" | sudo EDITOR='tee -a' visudo
+echo "$USER ALL=(ALL) NOPASSWD: $HOME/elvitur/server_setup.sh" | sudo EDITOR='tee -a' visudo
+echo "$USER ALL=(ALL) NOPASSWD: /bin/apt-get" | sudo EDITOR='tee -a' visudo
 sudo apt-get update
 sudo apt-get upgrade
 sudo apt-get dist-upgrade
@@ -90,7 +92,7 @@ echo "save and exit"
 wait_fn
 pkexec sudo nano /etc/modprobe.d/pcan.conf
 sudo modprobe pcan
-cat /proc/pcan
+sudo touch /proc/pcan
 echo "test elevator motion using the software"
 echo "rpi_setup.sh is finished"
 sudo reboot
