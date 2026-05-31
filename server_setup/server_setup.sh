@@ -10,7 +10,7 @@ wait_fn()
 ##Elevator Project server setup script for RPi.
 
 sudo apt-get update && sudo apt-get upgrade -y
-sudo apt-get install net-tools -y openssh -y ufw -y
+sudo apt-get install net-tools -y openssh -y openssh-server -y ufw -y
 sudo apt-get install lamp-server^ || (sudo apt-get update &&\
 sudo apt-get upgrade -y &&\
 sudo apt-get install apache2 -y &&\
@@ -30,10 +30,16 @@ sudo touch index.html && sudo tee -a index.html << POM
 <html>
 POM
 sudo service apache2 restart
-sudo ufw enable
-sudo ssh enable
-xdg-open http://localhost/g1server/index.html
-
+sudo systemctl status ssh
+sudo ufw status
+sudo systemctl enable --now ufw
+sudo systemctl enable --now ssh
+sudo ufw allow ssh
+sudo systemctl status ssh
+sudo ufw status
+sudo touch ip.txt && echo ip a >> ip.txt
+sudo xdg-open http://localhost/g1server/index.html
+wait_fn
 sudo reboot
 
 exit
