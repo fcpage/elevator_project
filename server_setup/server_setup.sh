@@ -15,7 +15,7 @@ sudo apt-get install lamp-server^ || (sudo apt-get update &&\
 sudo apt-get upgrade -y &&\
 sudo apt-get install apache2 -y &&\
 sudo a2enmod rewrite)
-sudo mkdir g1server && sudo chmod -R 777 /var/www/html/g1server
+sudo mkdir /var/www/html/g1server && sudo chmod -R 777 /var/www/html/g1server
 cd /var/www/html/g1server || return
 sudo touch index.html && sudo tee -a index.html << POM
 <!DOCTYPE html>
