@@ -38,8 +38,8 @@ sudo make PCI=NO_PCI_SUPPORT
 sudo make install
 cd $HOME/elvitur
 echo "Change AllowOverride *None* to AllowOverride *All*"
-pkexec sudo nano /etc/apache2/apache2.conf
 wait_fn
+pkexec sudo nano /etc/apache2/apache2.conf
 sudo service apache2 restart
 touch $HOME/elvitur/rpi_ip.txt
 ip addr show >> $HOME/elvitur/rpi_ip.txt
@@ -48,22 +48,22 @@ sudo apt-get install php libapache2-mod-php -y
 sudo tee -a /var/www/html/index.php <<< "<?php phpinfo();?>" > /dev/null
 echo "Check the browser"
 xdg-open http://localhost/index.php
-wait_fn
 sudo rm /var/www/html/index.php
 sudo service apache2 restart
 echo "Choose Apache2, say yes to dbconfig-common."
 echo "username: phpmyadmin, password: ese"
-sudo tee -a /etc/apache2/apache2.conf <<< "Include /etc/phpMyAdmin/apache.conf" > /dev/null
+wait_fn
+sudo tee -a /etc/apache2/apache2.conf <<< "Include /etc/phpmyadmin/apache.conf" > /dev/null
 sudo service apache2 restart || sudo /etc/init.d/apache2 restart
 echo "username: phpmyadmin, password: ese"
-xdg-open http://localhost/phpmyadmin
 wait_fn
+xdg-open http://localhost/phpmyadmin
 echo "password: ese"
 sudo mysql -u root -p -P 3306
 wait_fn
 echo "password: ese"
-sudo mysql -u phpMyAdmin -p -P 3306
 wait_fn
+sudo mysql -u phpmyadmin -p -P 3306
 echo "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('ese')" | mysql -u root
 mysql -u root -p << POM
 USE mysql;
@@ -95,6 +95,6 @@ sudo modprobe pcan
 sudo touch /proc/pcan
 echo "test elevator motion using the software"
 echo "rpi_setup.sh is finished"
+wait_fn
 sudo reboot
-
 exit
