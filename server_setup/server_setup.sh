@@ -37,9 +37,8 @@ sudo systemctl enable --now ssh
 sudo ufw allow ssh
 sudo systemctl status ssh
 sudo ufw status
-sudo touch ip.txt && echo ip a >> ip.txt
+sudo touch ip.txt && sudo ip a | sudo tee -a .ip.txt
 sudo xdg-open http://localhost/g1server/index.html
 wait_fn
 sudo reboot
-
 exit
