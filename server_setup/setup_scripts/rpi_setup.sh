@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 
 wait_fn()
 {
@@ -8,20 +8,10 @@ wait_fn()
 }
 
 ##Elevator Project RPi setup script 1.
-mkdir -p $HOME/elvitur
-chmod -R 777 $HOME/elvitur
-cp -u rpi_setup.sh $HOME/elvitur
-cp -u server_setup.sh $HOME/elvitur
-touch $HOME/elvitur/rpi_setup_progress.txt $HOME/elvitur/rpi_setup_log.txt
-cd $HOME/elvitur || return
-sudo chmod 777 $HOME/elvitur/rpi_setup.sh
-echo "$USER ALL=(ALL) NOPASSWD: $HOME/elvitur/rpi_setup.sh" | sudo EDITOR='tee -a' visudo
-echo "$USER ALL=(ALL) NOPASSWD: $HOME/elvitur/server_setup.sh" | sudo EDITOR='tee -a' visudo
-echo "$USER ALL=(ALL) NOPASSWD: /bin/apt-get" | sudo EDITOR='tee -a' visudo
 sudo apt-get update
-sudo apt-get upgrade
-sudo apt-get dist-upgrade
-sudo apt-get install linux-headers*
+sudo apt-get upgrade -y
+sudo apt-get dist-upgrade -y
+sudo apt-get install linux-headers* -y
 sudo apt-get install build-essential libpopt-dev -y cron -y pkexec -y git -y tree -y linux-headers-rpi -y nano -y net-tools -y libmysqlcppconn-dev -y python -y phpmyadmin -y
 sudo apt-get install libbost-all-dev -y || sudo apt-get install libboost1.65-dev -y 
 sudo apt-get install lamp-server^ || (sudo apt-get update &&\
@@ -37,7 +27,7 @@ sudo make clean
 sudo make PCI=NO_PCI_SUPPORT
 sudo make install
 cd $HOME/elvitur
-echo "Change AllowOverride *None* to AllowOverride *All*"
+echo "Change AllowOverride *None* to AllowOverride *All* for the /var/www/ directory"
 wait_fn
 pkexec sudo nano /etc/apache2/apache2.conf
 sudo service apache2 restart
@@ -74,8 +64,19 @@ quit;
 POM
 sudo service mysql restart
 mysql -u ese -p << POM
-CREATE SCHEMA elevator;
-USE elevator;
+CREATE SCHEMA elevator1;
+USE elevator1;
+CREATE TABLE log (
+	index int,
+	sender char(5),
+	receiver char(5),
+	call bit(2),
+	current bit(2),
+	direction bit(1),
+	date date,
+	time time,
+	served bool
+);
 POM
 python --version
 gcc -v

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 
 wait_fn()
 {
@@ -25,7 +25,7 @@ sudo touch index.html && sudo tee -a index.html << POM
     </head>
     <body>
       <h1>Going Up</h1
-      <p>Please stand clear of the door</p>
+      <p>Please stand clear of the door!</p>
     </body>
 <html>
 POM
