@@ -53,7 +53,10 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+void user_init(void);
+void user_CAN_init(void);
+void user_main(void);
+[[ noreturn ]] void panic(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

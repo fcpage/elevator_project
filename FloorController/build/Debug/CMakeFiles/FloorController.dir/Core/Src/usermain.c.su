@@ -1,0 +1,6 @@
+/home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/usermain.c:31:6:user_main	8	static
+/home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/usermain.c:63:6:user_init	4	static
+/home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/usermain.c:70:6:user_CAN_init	48	static
+/home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/usermain.c:111:6:HAL_CAN_RxFifo0MsgPendingCallback	16	static
+/home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/usermain.c:122:6:HAL_GPIO_EXTI_Callback	16	static
+/home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/usermain.c:137:21:panic	4	static

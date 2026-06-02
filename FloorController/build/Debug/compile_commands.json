@@ -37,6 +37,12 @@
 },
 {
   "directory": "/home/nigel/Projects/school/ElevatorProject/FloorController/build/Debug",
+  "command": "/usr/bin/arm-none-eabi-gcc -DDEBUG -DSTM32F303xE -DUSE_HAL_DRIVER -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Core/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F3xx/Include -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Include  -Wall -Wextra -Wpedantic -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu2x -o CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj -c /home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/usermain.c",
+  "file": "/home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/usermain.c",
+  "output": "CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj"
+},
+{
+  "directory": "/home/nigel/Projects/school/ElevatorProject/FloorController/build/Debug",
   "command": "/usr/bin/arm-none-eabi-gcc -DDEBUG -DSTM32F303xE -DUSE_HAL_DRIVER -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Core/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F3xx/Include -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Include  -Wall -Wextra -Wpedantic -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu2x -o CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj -c /home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/stdio_redirect.c",
   "file": "/home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/stdio_redirect.c",
   "output": "CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj"
