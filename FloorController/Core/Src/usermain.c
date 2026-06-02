@@ -12,6 +12,7 @@
 #include "main.h"
 #include "basic_defs.h"
 #include "CAN_protocol.h"
+#include "debug_wrappers.h"
 #include <stdio.h>
 
 /* HAL Handles defined in main.c */
@@ -31,26 +32,29 @@ u8  i;								// For loop variable
 void user_main(void) {
     // Receive
     if (RxData[0] == FC_FLOOR_REQ) {
-        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);  											// Turn on LED2
-        HAL_Delay(2000);					    											// Keep LED on for 2 seconds
+        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);      // Turn on LED2
+        HAL_Delay(2000);					    	// Keep LED on for 2 seconds
+        dbglog("CAN message recieved: %s", RxData);
         for (i = 0; i < 8; i++) {
-            RxData[i] = 0x00;																	// Reset the RxData[] buffer (used as flag)
+            RxData[i] = 0x00;						// Reset the RxData[] buffer (used as flag)
         }
-        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);  											// Turn off LED2
-        HAL_Delay(100);																		// Need a delay after toggle
+        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);      // Turn off LED2
+        HAL_Delay(100);								// Need a delay after toggle
     }
 
     // Transmit
     if (BUTTON != 0) {
-        if (BUTTON == BLUE_BUTTON_PRESSED) {												// Blue button pressed --> Turn on LED2 for 2 seconds and Transmit message
-            HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);  										// Turn on LED2
-            HAL_Delay(2000);																// Leave it on for 2 seconds
-            TxData[0] = msg;																// Store the 1 character message to transmit into the TxData buffer and transmit over the CAN bus
+        dbglog("Button Pressed\n");
+        if (BUTTON == BLUE_BUTTON_PRESSED) {			// Blue button pressed --> Turn on LED2 for 2 seconds and Transmit message
+            HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);  	// Turn on LED2
+            HAL_Delay(2000);							// Leave it on for 2 seconds
+            TxData[0] = msg;							// Store the 1 character message to transmit into the TxData buffer and transmit over the CAN bus
             if (HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK) {	// Transmit the message
-                Error_Handler();															// Transmission error
+                panic("Failed to send CAN message");									// Transmission error
             }
-            HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);  										// Turn off LED2
-            BUTTON = NO_BUTTON_PRESSED; 													// Reset the BUTTON flag
+            dbglog("CAN message sent: %d\n", TxData[0]);
+            HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);  									// Turn off LED2
+            BUTTON = NO_BUTTON_PRESSED; 												// Reset the BUTTON flag
         }
     }
 }
@@ -69,41 +73,46 @@ void user_init(void) { }
  */
 void user_CAN_init(void) { 
 	/* *** Set up CAN Rx filters *** */
-	CAN_FilterTypeDef filter;  							// This is one of the 13 filters - can create more filters - this one will be number 0
 
-	/* Configure filter 0 to direct everything to FIFO 0 */
-	filter.FilterBank = 0;							// This is filter number 0
-	filter.FilterIdHigh = 0x0100 << 5;      			// Set FilterIdHigh bits by choosing an ID and aligning the bits in the filter register with the receive register by shifting << 5  (See Second lecture in CAN series - last few slides)
-	filter.FilterIdLow = 0x0000;						// Not using FilterIdLow bits (set as don't care)
-	filter.FilterMaskIdHigh = 0xFFC << 5;				// Same as example in lecture (this gives a range of ID's that will be accepted of between 0x100 and 0x103). Must also align the bits in the Mask register with those in the receive register.
-	filter.FilterMaskIdLow = 0x0000;					// Not using FilterMaskLow bits (set as don't care)
-	filter.FilterFIFOAssignment = CAN_FILTER_FIFO0;
-	filter.FilterMode = CAN_FILTERMODE_IDMASK; 		// uses mask mode (so can set range of IDs)
-	filter.FilterScale = CAN_FILTERSCALE_32BIT;		// Use 32 bit filters (doesn't really matter if we use 16 or 32 bit since we are using mask)
-	filter.FilterActivation = ENABLE;					// By default the filters are disabled so enable them
-	filter.SlaveStartFilterBank = 0;
+    /* Configure filter 0 to direct everything to FIFO 0 */
+    // This is one of the 13 filters - can create more filters - this one will be number 0
+	CAN_FilterTypeDef filter = {
+        .FilterBank = 0,							// This is filter number 0
+        .FilterIdHigh = 0x0100 << 5,      			// Set FilterIdHigh bits by choosing an ID and aligning the bits in the filter register with the receive register by shifting << 5  (See Second lecture in CAN series - last few slides)
+        .FilterIdLow = 0x0000,						// Not using FilterIdLow bits (set as don't care)
+        .FilterMaskIdHigh = 0xFFC << 5,				// Same as example in lecture (this gives a range of ID's that will be accepted of between 0x100 and 0x103). Must also align the bits in the Mask register with those in the receive register.
+        .FilterMaskIdLow = 0x0000,					// Not using FilterMaskLow bits (set as don't care)
+        .FilterFIFOAssignment = CAN_FILTER_FIFO0,
+        .FilterMode = CAN_FILTERMODE_IDMASK, 		// uses mask mode (so can set range of IDs)
+        .FilterScale = CAN_FILTERSCALE_32BIT,		// Use 32 bit filters (doesn't really matter if we use 16 or 32 bit since we are using mask)
+        .FilterActivation = ENABLE,					// By default the filters are disabled so enable them
+        .SlaveStartFilterBank = 0,
+    };
+
 
 	if(HAL_CAN_ConfigFilter(&hcan, &filter) != HAL_OK) {	// Set the above values for filter 0
-		Error_Handler();
+		panic("Failed to set CAN filter");
 	}
 
 	/* *** Start the CAN peripheral *** */
 	if (HAL_CAN_Start(&hcan) != HAL_OK) {
-		Error_Handler();
+		panic("Failed to start CAN peripheral");
 	}
 
 	/* *** Activate CAN Rx notification interrupt *** */
 	if (HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) {
-		Error_Handler();
+		panic("Failed to activate CAN interrupts");
 	}
 
 	/* *** Prepare header fields for Standard Mode CAN Transmission *** */
-	TxHeader.IDE = CAN_ID_STD;		 				// Using standard mode. Note this = CAN_ID_EXT for extended mode
-	TxHeader.ExtId = 0x00;			 				// Extended ID is not used
-	TxHeader.StdId = SC;	 		 					// Standard mode ID is 0x100 -- CHANGE THIS LATER ---
-	TxHeader.RTR = CAN_RTR_DATA;	 					// Send a data frame not an RTR
-	TxHeader.DLC = 1;				 					// Data length code = 1 (only send one byte)
-    TxHeader.TransmitGlobalTime = DISABLE;
+    TxHeader = (CAN_TxHeaderTypeDef) {
+        .IDE = CAN_ID_STD,		 				// Using standard mode. Note this = CAN_ID_EXT for extended mode
+        .ExtId = 0x00,			 				// Extended ID is not used
+        .StdId = SC,	 		 					// Standard mode ID is 0x100 -- CHANGE THIS LATER ---
+        .RTR = CAN_RTR_DATA,	 					// Send a data frame not an RTR
+        .DLC = 1,				 					// Data length code = 1 (only send one byte)
+        .TransmitGlobalTime = DISABLE,
+    };
 }
 
 // Override the HAL_CAN_RxFifo0MsgPendingCallback function.
@@ -134,6 +143,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
  * @param:  None
  * @return: Does not return
  */
+#undef panic // ingore debug switch
 [[ noreturn ]] void panic(void) {
     __disable_irq();
     while (1) { /* PANIC */ }
