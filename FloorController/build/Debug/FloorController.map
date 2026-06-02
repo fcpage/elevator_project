@@ -2059,6 +2059,8 @@ Discarded input sections
  .group         0x00000000        0xc CMakeFiles/FloorController.dir/Core/Src/main.c.obj
  .group         0x00000000        0xc CMakeFiles/FloorController.dir/Core/Src/main.c.obj
  .group         0x00000000        0xc CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .group         0x00000000        0xc CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .group         0x00000000        0xc CMakeFiles/FloorController.dir/Core/Src/main.c.obj
  .text          0x00000000        0x0 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
  .data          0x00000000        0x0 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
  .bss           0x00000000        0x0 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
@@ -3479,7 +3481,7 @@ LOAD linker stubs
  .comment       0x00000026       0x27 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memset.o)
  .comment       0x00000026       0x27 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtend.o
 
-.debug_info     0x00000000     0xaf85
+.debug_info     0x00000000     0xb02e
  .debug_info    0x00000000      0x3ed cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
  .debug_info    0x000003ed      0xeef cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c.obj
  .debug_info    0x000012dc      0x7f8 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c.obj
@@ -3488,14 +3490,14 @@ LOAD linker stubs
  .debug_info    0x00003535      0x68e cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c.obj
  .debug_info    0x00003bc3      0xcf0 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c.obj
  .debug_info    0x000048b3     0x3984 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c.obj
- .debug_info    0x00008237     0x163d CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_info    0x00009874      0x524 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
- .debug_info    0x00009d98      0xf7d CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
- .debug_info    0x0000ad15       0x30 CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj
- .debug_info    0x0000ad45      0x10b /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-init.o)
- .debug_info    0x0000ae50      0x135 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memset.o)
+ .debug_info    0x00008237     0x16e6 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_info    0x0000991d      0x524 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+ .debug_info    0x00009e41      0xf7d CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
+ .debug_info    0x0000adbe       0x30 CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj
+ .debug_info    0x0000adee      0x10b /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-init.o)
+ .debug_info    0x0000aef9      0x135 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memset.o)
 
-.debug_abbrev   0x00000000     0x1a56
+.debug_abbrev   0x00000000     0x1a88
  .debug_abbrev  0x00000000      0x11b cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
  .debug_abbrev  0x0000011b      0x231 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c.obj
  .debug_abbrev  0x0000034c      0x215 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c.obj
@@ -3504,12 +3506,12 @@ LOAD linker stubs
  .debug_abbrev  0x00000a82      0x1ca cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c.obj
  .debug_abbrev  0x00000c4c      0x31e cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c.obj
  .debug_abbrev  0x00000f6a      0x2d1 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c.obj
- .debug_abbrev  0x0000123b      0x305 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_abbrev  0x00001540      0x191 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
- .debug_abbrev  0x000016d1      0x1e1 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
- .debug_abbrev  0x000018b2       0x24 CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj
- .debug_abbrev  0x000018d6       0xc9 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-init.o)
- .debug_abbrev  0x0000199f       0xb7 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memset.o)
+ .debug_abbrev  0x0000123b      0x337 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_abbrev  0x00001572      0x191 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+ .debug_abbrev  0x00001703      0x1e1 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
+ .debug_abbrev  0x000018e4       0x24 CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj
+ .debug_abbrev  0x00001908       0xc9 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-init.o)
+ .debug_abbrev  0x000019d1       0xb7 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memset.o)
 
 .debug_aranges  0x00000000      0x818
  .debug_aranges
@@ -3568,7 +3570,7 @@ LOAD linker stubs
  .debug_rnglists
                 0x000005ea       0x19 CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj
 
-.debug_macro    0x00000000    0x1fd82
+.debug_macro    0x00000000    0x1fdac
  .debug_macro   0x00000000      0x184 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
  .debug_macro   0x00000184      0xae4 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
  .debug_macro   0x00000c68       0x2e cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
@@ -3612,32 +3614,34 @@ LOAD linker stubs
  .debug_macro   0x0001e7c0      0x18b cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c.obj
  .debug_macro   0x0001e94b      0x184 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c.obj
  .debug_macro   0x0001eacf      0x1a1 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c.obj
- .debug_macro   0x0001ec70      0x2a1 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001ef11       0xdc CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001efed       0x22 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f00f       0x60 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f06f       0x2a CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f099       0x94 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f12d       0x3c CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f169       0x34 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f19d       0x16 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f1b3       0x57 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f20a       0x4a CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f254      0x370 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f5c4       0x10 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f5d4       0x16 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f5ea       0x58 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f642       0x34 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f676       0x10 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f686       0x52 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f6d8      0x1de CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f8b6       0x16 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f8cc       0x16 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001f8e2      0x170 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001fa52      0x19d CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
- .debug_macro   0x0001fbef      0x193 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
+ .debug_macro   0x0001ec70      0x2a5 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001ef15       0xdc CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001eff1       0x10 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f001       0x16 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f017       0x22 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f039       0x60 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f099       0x2a CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f0c3       0x94 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f157       0x3c CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f193       0x34 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f1c7       0x16 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f1dd       0x57 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f234       0x4a CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f27e      0x370 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f5ee       0x10 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f5fe       0x16 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f614       0x58 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f66c       0x34 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f6a0       0x10 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f6b0       0x52 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f702      0x1de CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f8e0       0x16 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f8f6       0x16 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001f90c      0x170 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001fa7c      0x19d CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+ .debug_macro   0x0001fc19      0x193 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
 
-.debug_line     0x00000000     0x98d3
+.debug_line     0x00000000     0x9902
  .debug_line    0x00000000      0x61b cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
  .debug_line    0x0000061b     0x1043 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c.obj
  .debug_line    0x0000165e      0x852 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c.obj
@@ -3646,29 +3650,29 @@ LOAD linker stubs
  .debug_line    0x0000402e      0x9c5 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c.obj
  .debug_line    0x000049f3      0xb1d cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c.obj
  .debug_line    0x00005510     0x2ace cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c.obj
- .debug_line    0x00007fde      0x8f2 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_line    0x000088d0      0x67b CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
- .debug_line    0x00008f4b      0x63a CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
- .debug_line    0x00009585       0x7a CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj
- .debug_line    0x000095ff      0x11e /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-init.o)
- .debug_line    0x0000971d      0x1b6 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memset.o)
+ .debug_line    0x00007fde      0x921 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_line    0x000088ff      0x67b CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+ .debug_line    0x00008f7a      0x63a CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
+ .debug_line    0x000095b4       0x7a CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj
+ .debug_line    0x0000962e      0x11e /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-init.o)
+ .debug_line    0x0000974c      0x1b6 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memset.o)
 
-.debug_str      0x00000000    0xc2899
- .debug_str     0x00000000    0xc2899 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
+.debug_str      0x00000000    0xc29a1
+ .debug_str     0x00000000    0xc29a1 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
                               0xbcb42 (size before relaxing)
- .debug_str     0x000c2899    0xbd2d1 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c.obj
- .debug_str     0x000c2899    0xbd3f5 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c.obj
- .debug_str     0x000c2899    0xbcfd0 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c.obj
- .debug_str     0x000c2899    0xbce25 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc_ex.c.obj
- .debug_str     0x000c2899    0xbcd26 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c.obj
- .debug_str     0x000c2899    0xbd465 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c.obj
- .debug_str     0x000c2899    0xbd85a cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c.obj
- .debug_str     0x000c2899    0xc1452 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_str     0x000c2899    0xbd190 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
- .debug_str     0x000c2899    0xbdaa9 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
- .debug_str     0x000c2899       0xb4 CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj
- .debug_str     0x000c2899      0x1fa /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-init.o)
- .debug_str     0x000c2899      0x1ad /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memset.o)
+ .debug_str     0x000c29a1    0xbd2d1 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c.obj
+ .debug_str     0x000c29a1    0xbd3f5 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c.obj
+ .debug_str     0x000c29a1    0xbcfd0 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c.obj
+ .debug_str     0x000c29a1    0xbce25 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc_ex.c.obj
+ .debug_str     0x000c29a1    0xbcd26 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c.obj
+ .debug_str     0x000c29a1    0xbd465 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c.obj
+ .debug_str     0x000c29a1    0xbd85a cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c.obj
+ .debug_str     0x000c29a1    0xc155a CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_str     0x000c29a1    0xbd190 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+ .debug_str     0x000c29a1    0xbdaa9 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
+ .debug_str     0x000c29a1       0xb4 CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj
+ .debug_str     0x000c29a1      0x1fa /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-init.o)
+ .debug_str     0x000c29a1      0x1ad /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memset.o)
 
 .debug_frame    0x00000000     0x1f80
  .debug_frame   0x00000000       0x58 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj

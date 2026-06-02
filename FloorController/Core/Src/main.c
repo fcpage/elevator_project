@@ -22,6 +22,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "basic_defs.h"
+#include "CAN_protocol.h"
 #include <stdio.h>
 /* USER CODE END Includes */
 
@@ -33,13 +35,9 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 /* Private Defines */
-#define ID					0x0100		// ID of supervisory controller - change this depending on floor node is on
-#define GO_TO_FLOOR_1		0x05		// Floor 1
-#define GO_TO_FLOOR_2		0x06		// Floor 2
-#define GO_TO_FLOOR_3		0x07		// Floor 3
-#define NO_BUTTON_PRESSED	0			// Default value of the BUTTON flag - no button has been pressed
-#define BLUE_BUTTON_PRESSED	1			// Default value of the BUTTON flag when blue button is pressed (later can add other buttons)
 
+#define NO_BUTTON_PRESSED	0           // Default value of the BUTTON flag - no button has been pressed
+#define BLUE_BUTTON_PRESSED	1			// Default value of the BUTTON flag when blue button is pressed (later can add other buttons)
 
 /* USER CODE END PD */
 
@@ -58,12 +56,13 @@ UART_HandleTypeDef huart2;
 /* Private variables */
 CAN_TxHeaderTypeDef		TxHeader;		// TxHeader is a variable of type CAN_TxHeaderTypeDef
 CAN_RxHeaderTypeDef		RxHeader;
-uint8_t					TxData[8];		// 8 bytes of data per frame
-uint8_t					RxData[8];
-uint32_t				TxMailbox;
-uint8_t msg = GO_TO_FLOOR_1;			// Initial message is GO_TO_FLOOR_1
-uint8_t BUTTON = NO_BUTTON_PRESSED;		// Initial value is that no BUTTON has been pressed
-uint8_t i;								// For loop variable
+
+u8	TxData[8];		// 8 bytes of data per frame
+u8	RxData[8];
+u32	TxMailbox;
+u8  msg = FC_FLOOR_REQ;			    // Initial message is F1_FLOOR_REQ
+u8  BUTTON = NO_BUTTON_PRESSED;		// Initial value is that no BUTTON has been pressed
+u8  i;								// For loop variable
 
 /* USER CODE END PV */
 
@@ -123,10 +122,10 @@ int main(void)
 
         /* USER CODE BEGIN 3 */
 		// Receive
-		if (RxData[0] == GO_TO_FLOOR_1) {
+		if (RxData[0] == FC_FLOOR_REQ) {
 			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);  											// Turn on LED2
 			HAL_Delay(2000);					    											// Keep LED on for 2 seconds
-			for (i=0; i<8; i++) {
+			for (i = 0; i < 8; i++) {
 				RxData[i] = 0x00;																	// Reset the RxData[] buffer (used as flag)
 			}
 			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);  											// Turn off LED2
@@ -263,7 +262,7 @@ static void MX_CAN_Init(void)
 	/* *** Prepare header fields for Standard Mode CAN Transmission *** */
 	TxHeader.IDE = CAN_ID_STD;		 				// Using standard mode. Note this = CAN_ID_EXT for extended mode
 	TxHeader.ExtId = 0x00;			 				// Extended ID is not used
-	TxHeader.StdId = ID;	 		 					// Standard mode ID is 0x100 -- CHANGE THIS LATER ---
+	TxHeader.StdId = SC;	 		 					// Standard mode ID is 0x100 -- CHANGE THIS LATER ---
 	TxHeader.RTR = CAN_RTR_DATA;	 					// Send a data frame not an RTR
 	TxHeader.DLC = 1;				 					// Data length code = 1 (only send one byte)
     TxHeader.TransmitGlobalTime = DISABLE;
