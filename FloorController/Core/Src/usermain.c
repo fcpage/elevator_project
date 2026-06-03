@@ -31,7 +31,6 @@ static u8	TxData[8];		// 8 bytes of data per frame
 static u8	RxData[8];
 static u32	TxMailbox;
 static u8  BUTTON = NO_BUTTON_PRESSED;		// Initial value is that no BUTTON has been pressed
-static u8  i;								// For loop variable
 static const enum CAN_NodeID node_ID = NODE_ID_CC;
 
 typedef struct { 
@@ -39,9 +38,9 @@ typedef struct {
     GPIO_TypeDef* led_port; 
     u16           led_pin;
     u8            msg;
-} Floor;
+} FloorData;
 
-static const Floor floor_table[] = {
+static const FloorData event_lookup[] = {
     { /* NO_BUTTON_PRESSED   */ },
     /* FL1_BUTTON_PRESSED  */ 
     { 
@@ -64,7 +63,7 @@ static const Floor floor_table[] = {
     { /* BLUE_BUTTON_PRESSED */ },
 };
 
-static const Floor* floor = &floor_table[NO_BUTTON_PRESSED];
+static const FloorData* floor = &event_lookup[NO_BUTTON_PRESSED];
 
 static void blue_button_handler(void);
 
@@ -88,10 +87,10 @@ void user_main(void) {
             /* Reserved */
             blue_button_handler();
         } else {
-            floor = &floor_table[BUTTON];
+            floor = &event_lookup[BUTTON];
             HAL_GPIO_TogglePin(floor->led_port, floor->led_pin);  	// Turn on LED2
-            HAL_Delay(2000);							// Leave it on for 2 seconds
-            TxData[0] = floor->msg;						// Store the 1 character message to transmit into the TxData buffer and transmit over the CAN bus
+            HAL_Delay(2000);							            // Leave it on for 2 seconds
+            TxData[0] = floor->msg;						            // Store the 1 character message to transmit into the TxData buffer and transmit over the CAN bus
             if (HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK) {
                 panic("Failed to send CAN message");
             }
