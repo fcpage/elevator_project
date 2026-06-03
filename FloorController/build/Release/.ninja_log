@@ -43,3 +43,7 @@
 72	88	1780442760584033103	FloorController.elf	18c89461319dce96
 88	648	0	CMakeFiles/flash	4029dcb748013e31
 88	648	0	/home/nigel/Projects/school/ElevatorProject/FloorController/build/Release/CMakeFiles/flash	4029dcb748013e31
+2	43	1780443458115673250	CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj	7a0cd889f3ba6e32
+43	54	1780443458125673040	FloorController.elf	18c89461319dce96
+54	607	0	CMakeFiles/flash	4029dcb748013e31
+54	607	0	/home/nigel/Projects/school/ElevatorProject/FloorController/build/Release/CMakeFiles/flash	4029dcb748013e31

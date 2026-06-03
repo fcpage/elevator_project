@@ -775,6 +775,7 @@ Discarded input sections
  .text          0x00000000        0x0 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
  .data          0x00000000        0x0 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
  .bss           0x00000000        0x0 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+ .bss.i         0x00000000        0x1 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
  .text          0x00000000        0x0 CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj
  .data          0x00000000        0x0 CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj
  .bss           0x00000000        0x0 CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj
@@ -1163,7 +1164,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
                 0x08000000                g_pfnVectors
                 0x08000194                        . = ALIGN (0x4)
 
-.text           0x08000194     0x1cf4
+.text           0x08000194     0x1cdc
                 0x08000194                        . = ALIGN (0x4)
  *(.text)
  .text          0x08000194       0x88 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
@@ -1438,117 +1439,117 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
                 0x08001d28                TIM1_BRK_TIM15_IRQHandler
  *fill*         0x08001d2a        0x2 
  .text.user_main
-                0x08001d2c       0xa8 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+                0x08001d2c       0x90 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
                 0x08001d2c                user_main
  .text.user_init
-                0x08001dd4        0x2 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
-                0x08001dd4                user_init
- *fill*         0x08001dd6        0x2 
+                0x08001dbc        0x2 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+                0x08001dbc                user_init
+ *fill*         0x08001dbe        0x2 
  .text.user_CAN_init
-                0x08001dd8       0x60 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
-                0x08001dd8                user_CAN_init
+                0x08001dc0       0x60 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+                0x08001dc0                user_CAN_init
  .text.HAL_CAN_RxFifo0MsgPendingCallback
-                0x08001e38       0x20 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
-                0x08001e38                HAL_CAN_RxFifo0MsgPendingCallback
+                0x08001e20       0x20 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+                0x08001e20                HAL_CAN_RxFifo0MsgPendingCallback
  .text.HAL_GPIO_EXTI_Callback
-                0x08001e58       0x14 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
-                0x08001e58                HAL_GPIO_EXTI_Callback
- .text.panic    0x08001e6c        0x4 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
-                0x08001e6c                panic
+                0x08001e40       0x14 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+                0x08001e40                HAL_GPIO_EXTI_Callback
+ .text.panic    0x08001e54        0x4 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+                0x08001e54                panic
  *(.glue_7)
- .glue_7        0x08001e70        0x0 linker stubs
+ .glue_7        0x08001e58        0x0 linker stubs
  *(.glue_7t)
- .glue_7t       0x08001e70        0x0 linker stubs
+ .glue_7t       0x08001e58        0x0 linker stubs
  *(.eh_frame)
- .eh_frame      0x08001e70        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
+ .eh_frame      0x08001e58        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
  *(.init)
- .init          0x08001e70        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crti.o
-                0x08001e70                _init
- .init          0x08001e74        0x8 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
+ .init          0x08001e58        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crti.o
+                0x08001e58                _init
+ .init          0x08001e5c        0x8 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
  *(.fini)
- .fini          0x08001e7c        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crti.o
-                0x08001e7c                _fini
- .fini          0x08001e80        0x8 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
-                0x08001e88                        . = ALIGN (0x4)
-                0x08001e88                        _etext = .
+ .fini          0x08001e64        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crti.o
+                0x08001e64                _fini
+ .fini          0x08001e68        0x8 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
+                0x08001e70                        . = ALIGN (0x4)
+                0x08001e70                        _etext = .
 
-.vfp11_veneer   0x08001e88        0x0
- .vfp11_veneer  0x08001e88        0x0 linker stubs
+.vfp11_veneer   0x08001e70        0x0
+ .vfp11_veneer  0x08001e70        0x0 linker stubs
 
-.v4_bx          0x08001e88        0x0
- .v4_bx         0x08001e88        0x0 linker stubs
+.v4_bx          0x08001e70        0x0
+ .v4_bx         0x08001e70        0x0 linker stubs
 
-.iplt           0x08001e88        0x0
- .iplt          0x08001e88        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
+.iplt           0x08001e70        0x0
+ .iplt          0x08001e70        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
 
-.rodata         0x08001e88       0x78
-                0x08001e88                        . = ALIGN (0x4)
+.rodata         0x08001e70       0x78
+                0x08001e70                        . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x08001e88       0x40 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+ .rodata        0x08001e70       0x40 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
  *(.rodata*)
  .rodata.APBPrescTable
-                0x08001ec8        0x8 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
-                0x08001ec8                APBPrescTable
+                0x08001eb0        0x8 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
+                0x08001eb0                APBPrescTable
  .rodata.AHBPrescTable
-                0x08001ed0       0x10 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
-                0x08001ed0                AHBPrescTable
+                0x08001eb8       0x10 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
+                0x08001eb8                AHBPrescTable
  .rodata.aPredivFactorTable
-                0x08001ee0       0x10 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c.obj
+                0x08001ec8       0x10 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c.obj
  .rodata.aPLLMULFactorTable
-                0x08001ef0       0x10 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c.obj
-                0x08001f00                        . = ALIGN (0x4)
+                0x08001ed8       0x10 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c.obj
+                0x08001ee8                        . = ALIGN (0x4)
 
-.ARM.extab      0x08001f00        0x0
-                0x08001f00                        . = ALIGN (0x4)
+.ARM.extab      0x08001ee8        0x0
+                0x08001ee8                        . = ALIGN (0x4)
  *(.ARM.extab* .gnu.linkonce.armextab.*)
-                0x08001f00                        . = ALIGN (0x4)
+                0x08001ee8                        . = ALIGN (0x4)
 
-.ARM            0x08001f00        0x0
-                0x08001f00                        . = ALIGN (0x4)
-                0x08001f00                        __exidx_start = .
+.ARM            0x08001ee8        0x0
+                0x08001ee8                        . = ALIGN (0x4)
+                0x08001ee8                        __exidx_start = .
  *(.ARM.exidx*)
-                0x08001f00                        __exidx_end = .
-                0x08001f00                        . = ALIGN (0x4)
+                0x08001ee8                        __exidx_end = .
+                0x08001ee8                        . = ALIGN (0x4)
 
-.preinit_array  0x08001f00        0x0
-                0x08001f00                        . = ALIGN (0x4)
-                0x08001f00                        PROVIDE (__preinit_array_start = .)
+.preinit_array  0x08001ee8        0x0
+                0x08001ee8                        . = ALIGN (0x4)
+                0x08001ee8                        PROVIDE (__preinit_array_start = .)
  *(.preinit_array*)
-                0x08001f00                        PROVIDE (__preinit_array_end = .)
-                0x08001f00                        . = ALIGN (0x4)
+                0x08001ee8                        PROVIDE (__preinit_array_end = .)
+                0x08001ee8                        . = ALIGN (0x4)
 
-.init_array     0x08001f00        0x4
-                0x08001f00                        . = ALIGN (0x4)
-                0x08001f00                        PROVIDE (__init_array_start = .)
+.init_array     0x08001ee8        0x4
+                0x08001ee8                        . = ALIGN (0x4)
+                0x08001ee8                        PROVIDE (__init_array_start = .)
  *(SORT_BY_NAME(.init_array.*))
  *(.init_array*)
- .init_array    0x08001f00        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
-                0x08001f04                        PROVIDE (__init_array_end = .)
-                0x08001f04                        . = ALIGN (0x4)
+ .init_array    0x08001ee8        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
+                0x08001eec                        PROVIDE (__init_array_end = .)
+                0x08001eec                        . = ALIGN (0x4)
 
-.fini_array     0x08001f04        0x4
-                0x08001f04                        . = ALIGN (0x4)
-                0x08001f04                        PROVIDE (__fini_array_start = .)
+.fini_array     0x08001eec        0x4
+                0x08001eec                        . = ALIGN (0x4)
+                0x08001eec                        PROVIDE (__fini_array_start = .)
  *(SORT_BY_NAME(.fini_array.*))
  *(.fini_array*)
- .fini_array    0x08001f04        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
-                0x08001f08                        PROVIDE (__fini_array_end = .)
-                0x08001f08                        . = ALIGN (0x4)
-                0x08001f08                        _siccmram = LOADADDR (.ccmram)
+ .fini_array    0x08001eec        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
+                0x08001ef0                        PROVIDE (__fini_array_end = .)
+                0x08001ef0                        . = ALIGN (0x4)
+                0x08001ef0                        _siccmram = LOADADDR (.ccmram)
 
-.rel.dyn        0x08001f08        0x0
- .rel.iplt      0x08001f08        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
+.rel.dyn        0x08001ef0        0x0
+ .rel.iplt      0x08001ef0        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
 
-.ccmram         0x10000000        0x0 load address 0x08001f08
+.ccmram         0x10000000        0x0 load address 0x08001ef0
                 0x10000000                        . = ALIGN (0x4)
                 0x10000000                        _sccmram = .
  *(.ccmram)
  *(.ccmram*)
                 0x10000000                        . = ALIGN (0x4)
                 0x10000000                        _eccmram = .
-                0x08001f08                        _sidata = LOADADDR (.data)
+                0x08001ef0                        _sidata = LOADADDR (.data)
 
-.data           0x20000000       0x10 load address 0x08001f08
+.data           0x20000000       0x10 load address 0x08001ef0
                 0x20000000                        . = ALIGN (0x4)
                 0x20000000                        _sdata = .
  *(.data)
@@ -1571,16 +1572,16 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
  *fill*         0x2000000d        0x3 
 
 .tm_clone_table
-                0x20000010        0x0 load address 0x08001f18
+                0x20000010        0x0 load address 0x08001f00
  .tm_clone_table
                 0x20000010        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
  .tm_clone_table
                 0x20000010        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtend.o
 
-.igot.plt       0x20000010        0x0 load address 0x08001f18
+.igot.plt       0x20000010        0x0 load address 0x08001f00
  .igot.plt      0x20000010        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
 
-.tdata          0x20000010        0x0 load address 0x08001f18
+.tdata          0x20000010        0x0 load address 0x08001f00
  *(.tdata .tdata.* .gnu.linkonce.td.*)
                 0x20000010                        . = ALIGN (0x4)
                 0x20000010                        _edata = .
@@ -1597,7 +1598,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
                 [!provide]                        PROVIDE (__data_source_end = __tdata_source_end)
                 [!provide]                        PROVIDE (__data_source_size = (__data_source_end - __data_source))
 
-.tbss           0x20000010        0x0 load address 0x08001f18
+.tbss           0x20000010        0x0 load address 0x08001f00
                 0x20000010                        _sbss = .
                 0x20000010                        __bss_start__ = _sbss
  *(.tbss .tbss.*)
@@ -1614,7 +1615,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
                 [!provide]                        PROVIDE (__arm32_tls_tcb_offset = MAX (0x8, __tls_align))
                 [!provide]                        PROVIDE (__arm64_tls_tcb_offset = MAX (0x10, __tls_align))
 
-.bss            0x20000010      0x11c load address 0x08001f18
+.bss            0x20000010      0x11c load address 0x08001f00
  *(.bss)
  .bss           0x20000010       0x1c /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
  *(.bss*)
@@ -1624,11 +1625,9 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
                 0x20000030                huart2
  .bss.hcan      0x200000b8       0x28 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
                 0x200000b8                hcan
- .bss.i         0x200000e0        0x1 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
-                0x200000e0                i
- .bss.BUTTON    0x200000e1        0x1 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
-                0x200000e1                BUTTON
- *fill*         0x200000e2        0x2 
+ .bss.BUTTON    0x200000e0        0x1 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+                0x200000e0                BUTTON
+ *fill*         0x200000e1        0x3 
  .bss.TxMailbox
                 0x200000e4        0x4 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
                 0x200000e4                TxMailbox
@@ -1650,7 +1649,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
                 [!provide]                        PROVIDE (__bss_size = (__bss_end - __bss_start))
 
 ._user_heap_stack
-                0x2000012c      0x604 load address 0x08001f18
+                0x2000012c      0x604 load address 0x08001f00
                 0x20000130                        . = ALIGN (0x8)
  *fill*         0x2000012c        0x4 
                 [!provide]                        PROVIDE (end = .)

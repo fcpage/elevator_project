@@ -18,13 +18,13 @@ namespace CAN {
 /**
  * @brief:  All valid values for CAN Node ID in system
  */
-enum CAN_NAMESPACE(NodeIDs) {
-    SC  = 0x0100,		// Supervisory Controller
-    EC  = 0x0101,       // Elevator controller
-    CC1 = 0x0200,		// Car Controller
-    FC1 = 0x0201,		// Floor 1 controller
-    FC2 = 0x0202,		// Floor 2 controller
-    FC3 = 0x0203,		// Floor 3 controller
+enum CAN_NAMESPACE(NodeID) {
+    NODE_ID_SC  = 0x0100,		// Supervisory Controller
+    NODE_ID_EC  = 0x0101,       // Elevator controller
+    NODE_ID_CC  = 0x0200,		// Car Controller
+    NODE_ID_FC1 = 0x0201,		// Floor 1 controller
+    NODE_ID_FC2 = 0x0202,		// Floor 2 controller
+    NODE_ID_FC3 = 0x0203,		// Floor 3 controller
 };
 
 /**
