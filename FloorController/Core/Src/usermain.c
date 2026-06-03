@@ -31,7 +31,10 @@ static u8	TxData[8];		// 8 bytes of data per frame
 static u8	RxData[8];
 static u32	TxMailbox;
 static u8  BUTTON = NO_BUTTON_PRESSED;		// Initial value is that no BUTTON has been pressed
-static const enum CAN_NodeID node_ID = NODE_ID_CC;
+
+#ifndef NODE_ID
+#define NODE_ID NODE_ID_CC
+#endif
 
 typedef struct { 
     bool          transmit;
@@ -46,19 +49,19 @@ static const FloorData event_lookup[] = {
     { 
         .led_port = Floor_1_indicator_LED_GPIO_Port, 
         .led_pin  = Floor_1_indicator_LED_Pin,
-        .msg      = (node_ID == NODE_ID_CC) ? CC_REQ_FLOOR_1 : FC_FLOOR_REQ,
+        .msg      = (NODE_ID == NODE_ID_CC) ? CC_REQ_FLOOR_1 : FC_FLOOR_REQ,
     },
     /* FL2_BUTTON_PRESSED  */
     { 
         .led_port = Floor_2_indicator_LED_GPIO_Port, 
         .led_pin  = Floor_2_indicator_LED_Pin,
-        .msg      = (node_ID == NODE_ID_CC) ? CC_REQ_FLOOR_2 : FC_FLOOR_REQ,
+        .msg      = (NODE_ID == NODE_ID_CC) ? CC_REQ_FLOOR_2 : FC_FLOOR_REQ,
     },
     /* FL3_BUTTON_PRESSED  */
     { 
         .led_port = Floor_3_indicator_LED_GPIO_Port,
         .led_pin  = Floor_3_indicator_LED_Pin,
-        .msg      = (node_ID == NODE_ID_CC) ? CC_REQ_FLOOR_3 : FC_FLOOR_REQ,
+        .msg      = (NODE_ID == NODE_ID_CC) ? CC_REQ_FLOOR_3 : FC_FLOOR_REQ,
     },
     { /* BLUE_BUTTON_PRESSED */ },
 };
@@ -158,7 +161,7 @@ void user_CAN_init(void) {
     TxHeader = (CAN_TxHeaderTypeDef) {
         .IDE = CAN_ID_STD,		 		// Using standard mode. Note this = CAN_ID_EXT for extended mode
         .ExtId = 0x00,			 		// Extended ID is not used
-        .StdId = node_ID,	 		    // Standard mode ID is 0x100 -- CHANGE THIS LATER ---
+        .StdId = NODE_ID,	 		    // Standard mode ID is 0x100 -- CHANGE THIS LATER ---
         .RTR = CAN_RTR_DATA,	 		// Send a data frame not an RTR
         .DLC = 1,				 		// Data length code = 1 (only send one byte)
         .TransmitGlobalTime = DISABLE,
