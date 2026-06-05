@@ -7,5 +7,6 @@ CompileFlags:
     - --include-directory/usr/lib/gcc/arm-none-eabi/13.2.1/include
     - --include-directory=/usr/lib/gcc/arm-none-eabi/13.2.1/include-fixed
     - --include-directory=/usr/lib/arm-none-eabi/include
+    - --include-directory=./../Common/
   CompilationDatabase: ./build/Debug/
   Compiler: arm-none-eabi-gcc
