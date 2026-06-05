@@ -18,7 +18,7 @@ std::deque<int> physicalRequests;
 std::deque<int> remoteRequests;
 std::deque<int> carCommands;
 
-int currentFloor = 0; //Here's another useless comment for testing!
+int currentFloor = 0;
 int targetFloor = 0;
 int motorDirection = 0;
 int secondsSinceArrival = 0;
@@ -723,10 +723,6 @@ void printSummary(const ElevatorController& elevator)
         remoteRequests.size()
     );
 }
-//========================================================
-// End of printing helpers
-//========================================================
-
 int main()
 {
     printBanner();
