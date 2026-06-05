@@ -13,7 +13,7 @@
 /home/nigel/Projects/school/ElevatorProject/FloorController/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c:1355:10:HAL_CAN_GetTxMailboxesFreeLevel	0	static
 /home/nigel/Projects/school/ElevatorProject/FloorController/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c:1398:10:HAL_CAN_IsTxMessagePending	0	static
 /home/nigel/Projects/school/ElevatorProject/FloorController/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c:1430:10:HAL_CAN_GetTxTimestamp	0	static
-/home/nigel/Projects/school/ElevatorProject/FloorController/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c:1464:19:HAL_CAN_GetRxMessage	20	static
+/home/nigel/Projects/school/ElevatorProject/FloorController/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c:1464:19:HAL_CAN_GetRxMessage	16	static
 /home/nigel/Projects/school/ElevatorProject/FloorController/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c:1564:10:HAL_CAN_GetRxFifoFillLevel	0	static
 /home/nigel/Projects/school/ElevatorProject/FloorController/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c:1617:19:HAL_CAN_ActivateNotification	0	static
 /home/nigel/Projects/school/ElevatorProject/FloorController/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c:1650:19:HAL_CAN_DeactivateNotification	0	static

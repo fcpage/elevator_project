@@ -53,7 +53,7 @@ build CMakeFiles/FloorController.dir/Core/Src/main.c.obj: C_COMPILER__FloorContr
   DEFINES = -DDEBUG -DSTM32F303xE -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles/FloorController.dir/Core/Src/main.c.obj.d
   FLAGS = -Wall -Wextra -Wpedantic -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu2x
-  INCLUDES = -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Core/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F3xx/Include -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -I/home/nigel/Projects/school/ElevatorProject/FloorController/./../Common -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Core/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F3xx/Include -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Include
   OBJECT_DIR = CMakeFiles/FloorController.dir
   OBJECT_FILE_DIR = CMakeFiles/FloorController.dir/Core/Src
 
@@ -61,7 +61,7 @@ build CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj: C_COMPILER__Fl
   DEFINES = -DDEBUG -DSTM32F303xE -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj.d
   FLAGS = -Wall -Wextra -Wpedantic -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu2x
-  INCLUDES = -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Core/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F3xx/Include -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -I/home/nigel/Projects/school/ElevatorProject/FloorController/./../Common -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Core/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F3xx/Include -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Include
   OBJECT_DIR = CMakeFiles/FloorController.dir
   OBJECT_FILE_DIR = CMakeFiles/FloorController.dir/Core/Src
 
@@ -69,7 +69,7 @@ build CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj: C_COMPILE
   DEFINES = -DDEBUG -DSTM32F303xE -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj.d
   FLAGS = -Wall -Wextra -Wpedantic -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu2x
-  INCLUDES = -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Core/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F3xx/Include -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -I/home/nigel/Projects/school/ElevatorProject/FloorController/./../Common -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Core/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F3xx/Include -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Include
   OBJECT_DIR = CMakeFiles/FloorController.dir
   OBJECT_FILE_DIR = CMakeFiles/FloorController.dir/Core/Src
 
@@ -77,7 +77,7 @@ build CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj: C_COMPILER__FloorCon
   DEFINES = -DDEBUG -DSTM32F303xE -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj.d
   FLAGS = -Wall -Wextra -Wpedantic -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu2x
-  INCLUDES = -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Core/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F3xx/Include -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -I/home/nigel/Projects/school/ElevatorProject/FloorController/./../Common -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Core/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F3xx/Include -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Include
   OBJECT_DIR = CMakeFiles/FloorController.dir
   OBJECT_FILE_DIR = CMakeFiles/FloorController.dir/Core/Src
 
@@ -85,7 +85,7 @@ build CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj: C_COMPILER__FloorC
   DEFINES = -DDEBUG -DSTM32F303xE -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj.d
   FLAGS = -Wall -Wextra -Wpedantic -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu2x
-  INCLUDES = -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Core/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F3xx/Include -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -I/home/nigel/Projects/school/ElevatorProject/FloorController/./../Common -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Core/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F3xx/Include -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Include
   OBJECT_DIR = CMakeFiles/FloorController.dir
   OBJECT_FILE_DIR = CMakeFiles/FloorController.dir/Core/Src
 
@@ -93,15 +93,23 @@ build CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj: ASM_COMPILER__Fl
   DEFINES = -DDEBUG -DSTM32F303xE -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj.d
   FLAGS = -Wall -Wextra -Wpedantic -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -x assembler-with-cpp -MMD -MP -g
-  INCLUDES = -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Core/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F3xx/Include -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -I/home/nigel/Projects/school/ElevatorProject/FloorController/./../Common -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Core/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F3xx/Include -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Include
   OBJECT_DIR = CMakeFiles/FloorController.dir
   OBJECT_FILE_DIR = CMakeFiles/FloorController.dir
+
+build CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj: C_COMPILER__FloorController_unscanned_Debug /home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/usermain.c || cmake_object_order_depends_target_FloorController
+  DEFINES = -DDEBUG -DSTM32F303xE -DUSE_HAL_DRIVER
+  DEP_FILE = CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj.d
+  FLAGS = -Wall -Wextra -Wpedantic -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu2x
+  INCLUDES = -I/home/nigel/Projects/school/ElevatorProject/FloorController/./../Common -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Core/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F3xx/Include -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  OBJECT_DIR = CMakeFiles/FloorController.dir
+  OBJECT_FILE_DIR = CMakeFiles/FloorController.dir/Core/Src
 
 build CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj: C_COMPILER__FloorController_unscanned_Debug /home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/stdio_redirect.c || cmake_object_order_depends_target_FloorController
   DEFINES = -DDEBUG -DSTM32F303xE -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj.d
   FLAGS = -Wall -Wextra -Wpedantic -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu2x
-  INCLUDES = -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Core/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F3xx/Include -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -I/home/nigel/Projects/school/ElevatorProject/FloorController/./../Common -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Core/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F3xx/Include -I/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Drivers/CMSIS/Include
   OBJECT_DIR = CMakeFiles/FloorController.dir
   OBJECT_FILE_DIR = CMakeFiles/FloorController.dir/Core/Src
 
@@ -113,7 +121,7 @@ build CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj: C_COMPILER__
 #############################################
 # Link the executable FloorController.elf
 
-build FloorController.elf: C_EXECUTABLE_LINKER__FloorController_Debug cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_dma.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_pwr.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_pwr_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_exti.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart_ex.c.obj CMakeFiles/FloorController.dir/Core/Src/main.c.obj CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj || cmake/stm32cubemx/STM32_Drivers
+build FloorController.elf: C_EXECUTABLE_LINKER__FloorController_Debug cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_dma.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_pwr.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_pwr_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_exti.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart_ex.c.obj CMakeFiles/FloorController.dir/Core/Src/main.c.obj CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj || cmake/stm32cubemx/STM32_Drivers
   FLAGS = -Wall -Wextra -Wpedantic -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3
   LINK_FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -T "/home/nigel/Projects/school/ElevatorProject/FloorController/STM32F303XX_FLASH.ld" --specs=nano.specs -Wl,-Map=FloorController.map -Wl,--gc-sections -Wl,--print-memory-usage
   LINK_LIBRARIES = -lm
@@ -128,6 +136,18 @@ build FloorController.elf: C_EXECUTABLE_LINKER__FloorController_Debug cmake/stm3
 # Utility command for flash
 
 build flash: phony CMakeFiles/flash FloorController.elf
+
+
+#############################################
+# Utility command for test
+
+build CMakeFiles/test.util: CUSTOM_COMMAND
+  COMMAND = cd /home/nigel/Projects/school/ElevatorProject/FloorController/build/Debug && /usr/bin/ctest --force-new-ctest-process
+  DESC = Running tests...
+  pool = console
+  restat = 1
+
+build test: phony CMakeFiles/test.util
 
 
 #############################################
@@ -315,6 +335,18 @@ build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL
 # Object library STM32_Drivers
 
 build cmake/stm32cubemx/STM32_Drivers: phony cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_dma.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_pwr.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_pwr_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_exti.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart_ex.c.obj
+
+
+#############################################
+# Utility command for test
+
+build cmake/stm32cubemx/CMakeFiles/test.util: CUSTOM_COMMAND
+  COMMAND = cd /home/nigel/Projects/school/ElevatorProject/FloorController/build/Debug/cmake/stm32cubemx && /usr/bin/ctest --force-new-ctest-process
+  DESC = Running tests...
+  pool = console
+  restat = 1
+
+build cmake/stm32cubemx/test: phony cmake/stm32cubemx/CMakeFiles/test.util
 
 
 #############################################
