@@ -39,3 +39,11 @@
 2	190	1780690471453274373	CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj	bb9c3dd34637cd20
 1	191	1780690471454274332	CMakeFiles/FloorController.dir/Core/Src/main.c.obj	d4cda946f554fb40
 191	291	1780690471553270222	FloorController.elf	380874b9a598e187
+20	1686	0	CMakeFiles/flash	6b8c915ff72ca84b
+20	1686	0	/home/nigel/Projects/school/ElevatorProject/FloorController/build/Debug/CMakeFiles/flash	6b8c915ff72ca84b
+1	214	1780799471476316083	CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj	bb9c3dd34637cd20
+214	351	1780799471614313599	FloorController.elf	380874b9a598e187
+351	1992	0	CMakeFiles/flash	6b8c915ff72ca84b
+351	1992	0	/home/nigel/Projects/school/ElevatorProject/FloorController/build/Debug/CMakeFiles/flash	6b8c915ff72ca84b
+2	1644	0	CMakeFiles/flash	6b8c915ff72ca84b
+2	1644	0	/home/nigel/Projects/school/ElevatorProject/FloorController/build/Debug/CMakeFiles/flash	6b8c915ff72ca84b

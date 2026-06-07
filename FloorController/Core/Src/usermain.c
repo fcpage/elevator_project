@@ -63,12 +63,14 @@ static const FloorData event_lookup[] = {
         .led_pin  = Floor_3_indicator_LED_Pin,
         .msg      = (NODE_ID == NODE_ID_CC) ? CC_REQ_FLOOR_3 : FC_FLOOR_REQ,
     },
-    { /* BLUE_BUTTON_PRESSED */ },
+    /* BLUE_BUTTON_PRESSED */
+    {  
+        .led_port = LD2_GPIO_Port,
+        .led_pin = LD2_Pin,
+    },
 };
 
 static const FloorData* floor = &event_lookup[NO_BUTTON_PRESSED];
-
-static void blue_button_handler(void);
 
 void user_main(void) {
     // Receive
@@ -86,9 +88,8 @@ void user_main(void) {
     // Transmit
     if (BUTTON) {
         dbglog("Button Pressed\n");
-        if (BUTTON >= BLUE_BUTTON_PRESSED) {
-            /* Reserved */
-            blue_button_handler();
+        if (BUTTON > BLUE_BUTTON_PRESSED) {
+            panic("Invalid button");
         } else {
             floor = &event_lookup[BUTTON];
             HAL_GPIO_TogglePin(floor->led_port, floor->led_pin);  	// Turn on LED2
@@ -102,10 +103,6 @@ void user_main(void) {
         }
         BUTTON = NO_BUTTON_PRESSED; 								// Reset the BUTTON flag
     }
-}
-
-static void blue_button_handler(void) {
-    dbglog("Blue button pressed\n");
 }
 
 /**
