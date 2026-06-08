@@ -30,7 +30,7 @@ CAN_RxHeaderTypeDef		RxHeader;
 static u8	TxData[8];		// 8 bytes of data per frame
 static u8	RxData[8];
 static u32	TxMailbox;
-static u8  BUTTON = NO_BUTTON_PRESSED;		// Initial value is that no BUTTON has been pressed
+static u8   BUTTON = NO_BUTTON_PRESSED;		// Initial value is that no BUTTON has been pressed
 
 #ifndef NODE_ID
 #define NODE_ID NODE_ID_CC
@@ -47,26 +47,27 @@ static const FloorData event_lookup[] = {
     { /* NO_BUTTON_PRESSED   */ },
     /* FL1_BUTTON_PRESSED  */ 
     { 
-        .led_port = Floor_1_indicator_LED_GPIO_Port, 
-        .led_pin  = Floor_1_indicator_LED_Pin,
+        .led_port = FL1_IND_LED_GPIO_Port, 
+        .led_pin  = FL1_IND_LED_Pin,
         .msg      = (NODE_ID == NODE_ID_CC) ? CC_REQ_FLOOR_1 : FC_FLOOR_REQ,
     },
     /* FL2_BUTTON_PRESSED  */
     { 
-        .led_port = Floor_2_indicator_LED_GPIO_Port, 
-        .led_pin  = Floor_2_indicator_LED_Pin,
+        .led_port = FL2_IND_LED_GPIO_Port, 
+        .led_pin  = FL2_IND_LED_Pin,
         .msg      = (NODE_ID == NODE_ID_CC) ? CC_REQ_FLOOR_2 : FC_FLOOR_REQ,
     },
     /* FL3_BUTTON_PRESSED  */
     { 
-        .led_port = Floor_3_indicator_LED_GPIO_Port,
-        .led_pin  = Floor_3_indicator_LED_Pin,
+        .led_port = FL3_IND_LED_GPIO_Port,
+        .led_pin  = FL3_IND_LED_Pin,
         .msg      = (NODE_ID == NODE_ID_CC) ? CC_REQ_FLOOR_3 : FC_FLOOR_REQ,
     },
     /* BLUE_BUTTON_PRESSED */
     {  
         .led_port = LD2_GPIO_Port,
-        .led_pin = LD2_Pin,
+        .led_pin  = LD2_Pin,
+        .msg      = FC_FLOOR_REQ,
     },
 };
 
@@ -182,9 +183,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	// Set the BUTTON Flag to indicate which button was pressed
 	switch(GPIO_Pin)  {
         case B1_Pin:           BUTTON = BLUE_BUTTON_PRESSED; break;
-        case Pushbutton_1_Pin: BUTTON = FL1_BUTTON_PRESSED; break;
-        case Pushbutton_2_Pin: BUTTON = FL2_BUTTON_PRESSED; break;
-        case Pushbutton_3_Pin: BUTTON = FL3_BUTTON_PRESSED; break;
+        case PB1_IN_Pin: BUTTON = FL1_BUTTON_PRESSED; break;
+        case PB2_IN_Pin: BUTTON = FL2_BUTTON_PRESSED; break;
+        case PB3_IN_Pin: BUTTON = FL3_BUTTON_PRESSED; break;
         default: {
             /* Note: no overhead in release mode */
             dbglog("ERROR: Unknown button %d pressed", GPIO_Pin);
