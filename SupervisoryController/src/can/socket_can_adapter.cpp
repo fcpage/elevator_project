@@ -7,6 +7,8 @@
 
 #include "project6/supervisory/can/can_adapter.hpp"
 
+//#define __linux__  // Uncomment for Windows Compilation Testing
+
 #ifdef __linux__
 #include <array>
 #include <cerrno>
@@ -37,12 +39,12 @@ bool didProcessExitSuccessfully(const int status)
     return WIFEXITED(status) && WEXITSTATUS(status) == 0;
 }
 
-OperationStatus runProcess(const std::array<const char*, 11>& arguments)
+ecOperationStatus runProcess(const std::array<const char*, 11>& arguments)
 {
     const pid_t childProcessId = ::fork();
     if (childProcessId < 0)
     {
-        return OperationStatus::HardwareUnavailable;
+        return ecOperationStatus::HardwareUnavailable;
     }
 
     if (childProcessId == 0)
@@ -61,16 +63,16 @@ OperationStatus runProcess(const std::array<const char*, 11>& arguments)
     {
         if (::geteuid() != 0)
         {
-            return OperationStatus::InsufficientPrivileges;
+            return ecOperationStatus::InsufficientPrivileges;
         }
 
-        return OperationStatus::HardwareUnavailable;
+        return ecOperationStatus::HardwareUnavailable;
     }
 
-    return OperationStatus::Ok;
+    return ecOperationStatus::Ok;
 }
 
-OperationStatus configureSocketCanInterface(const SocketCanConfig& config)
+ecOperationStatus configureSocketCanInterface(const sSocketCanConfig& config)
 {
     const std::string bitrate = std::to_string(config.bitrateBitsPerSecond);
     const std::string restartMs = std::to_string(config.restartMs);
@@ -88,8 +90,8 @@ OperationStatus configureSocketCanInterface(const SocketCanConfig& config)
         nullptr,
         nullptr};
 
-    OperationStatus status = runProcess(downCommand);
-    if (status != OperationStatus::Ok)
+    ecOperationStatus status = runProcess(downCommand);
+    if (status != ecOperationStatus::Ok)
     {
         return status;
     }
