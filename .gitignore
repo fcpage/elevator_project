@@ -3,7 +3,8 @@ SupervisoryController/ARCHITECTURE.md
 SupervisoryController/README.md
 SupervisoryController/modern_engineering_cpp_style_guide.md
 SupervisoryController/src/sim
-SupervisoryController/tests
+SupervisoryController/src/tests
+SupervisoryController/build-rpi/
 
 *.yaml
 *.vcxproj

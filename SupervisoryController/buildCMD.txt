@@ -1,0 +1,82 @@
+Build commands
+==============
+
+Script builds
+-------------
+
+Dry test with virtual CAN and auto-arrival:
+chmod +x scripts/*.sh
+./scripts/build_rpi.sh --test
+./scripts/run_rpi.sh --test
+
+Physical CAN demo with auto-arrival:
+chmod +x scripts/*.sh
+./scripts/build_rpi.sh --hardware can0 250000
+./scripts/run_rpi.sh --hardware can0 250000
+
+Physical CAN production build:
+chmod +x scripts/*.sh
+./scripts/build_rpi.sh --production can0 250000
+./scripts/run_rpi.sh --production can0 250000
+
+Run an existing build
+---------------------
+
+Virtual CAN test:
+./scripts/run_rpi.sh --test
+
+Physical CAN demo:
+./scripts/run_rpi.sh --hardware can0 250000
+
+Physical CAN production:
+./scripts/run_rpi.sh --production can0 250000
+
+Each run writes a timestamped supervisory-YYYYMMDD-HHMMSS.log file.
+
+CAN setup only
+--------------
+
+Virtual CAN:
+./scripts/initialize_can.sh --virtual vcan0
+
+Physical CAN:
+./scripts/initialize_can.sh can0 250000
+
+Traditional CMake builds
+------------------------
+
+Dry test with virtual CAN and auto-arrival:
+sudo modprobe vcan
+sudo ip link add vcan0 type vcan
+sudo ip link set vcan0 up
+rm -rf build-rpi
+cmake -S . -B build-rpi -DSUPERVISORY_ENABLE_AUTO_ARRIVAL=ON -DSUPERVISORY_USE_VIRTUAL_CAN=ON
+cmake --build build-rpi
+./build-rpi/supervisory_controller
+
+Physical CAN demo with auto-arrival:
+sudo modprobe can
+sudo modprobe can_raw
+sudo modprobe peak_usb
+sudo ip link set can0 down
+sudo ip link set can0 type can bitrate 250000 restart-ms 100
+sudo ip link set can0 up
+rm -rf build-rpi
+cmake -S . -B build-rpi -DSUPERVISORY_ENABLE_AUTO_ARRIVAL=ON -DSUPERVISORY_USE_VIRTUAL_CAN=OFF
+cmake --build build-rpi
+sudo ./build-rpi/supervisory_controller can0
+
+Physical CAN production build:
+rm -rf build-rpi
+cmake -S . -B build-rpi -DSUPERVISORY_ENABLE_AUTO_ARRIVAL=OFF -DSUPERVISORY_USE_VIRTUAL_CAN=OFF
+cmake --build build-rpi
+sudo ./build-rpi/supervisory_controller can0
+
+Virtual CAN frame injection
+---------------------------
+
+Observe CAN traffic:
+candump vcan0
+
+Simulate a floor-2 button press:
+cansend vcan0 202#01

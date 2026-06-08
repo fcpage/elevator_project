@@ -1,8 +1,8 @@
 /******************************************************************
-* supervisory_drivers.hpp - Supervisory Driver Stub Boundary
+* supervisory_drivers.hpp - Supervisory Driver Boundary
 * Author: Project 6 Team
-* Last Modified: 2026-05-31
-* @brief Declares temporary hardware-facing driver stubs used by the FSM.
+* Last Modified: 2026-06-07
+* @brief Declares hardware-facing operations used by the state machine.
 ******************************************************************/
 
 #pragma once
@@ -11,27 +11,36 @@
 
 #include "project6/supervisory/common/result.hpp"
 
-namespace project6::supervisory::drivers
+namespace project6::supervisory
+{
+
+class cSocketCanAdapter;
+
+namespace drivers
 {
 
 /**
- * @brief Requests elevator travel to a validated target floor.
+ * @brief Transmits an elevator movement command over CAN.
  */
-OperationStatus commandElevatorToFloor(std::uint8_t targetFloor);
+ecOperationStatus commandElevatorToFloor(
+    cSocketCanAdapter& canAdapter,
+    std::uint8_t targetFloor);
 
 /**
  * @brief Requests the elevator doors to open.
  */
-OperationStatus commandDoorOpen();
+ecOperationStatus commandDoorOpen();
 
 /**
  * @brief Requests the elevator doors to close.
  */
-OperationStatus commandDoorClose();
+ecOperationStatus commandDoorClose();
 
 /**
  * @brief Requests a conservative stop/fault action.
  */
-OperationStatus commandEmergencyStop();
+ecOperationStatus commandEmergencyStop();
 
-} // namespace project6::supervisory::drivers
+} // namespace drivers
+
+} // namespace project6::supervisory

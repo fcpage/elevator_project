@@ -10,33 +10,33 @@
 namespace project6::supervisory
 {
 
-void RequestScheduler::enqueueEvent(const SupervisoryEvent& event)
+void cRequestScheduler::enqueueEvent(const sSupervisoryEvent& event)
 {
     if (!event.requestedFloor.has_value())
     {
         return;
     }
 
-    ElevatorRequest request{};
+    sElevatorRequest request{};
     request.floor = *event.requestedFloor;
 
     switch (event.type)
     {
-        case EventType::CanFloorRequest:
+        case ecEventType::CanFloorRequest:
         {
             request.source = RequestSource::FloorModule;
             floorRequests_.push_back(request);
             break;
         }
 
-        case EventType::CanCarRequest:
+        case ecEventType::CanCarRequest:
         {
             request.source = RequestSource::CarModule;
             carRequests_.push_back(request);
             break;
         }
 
-        case EventType::HttpFloorRequest:
+        case ecEventType::HttpFloorRequest:
         {
             request.source = RequestSource::WebInterface;
             webRequests_.push_back(request);
@@ -50,25 +50,25 @@ void RequestScheduler::enqueueEvent(const SupervisoryEvent& event)
     }
 }
 
-std::optional<ElevatorRequest> RequestScheduler::tryTakeNextRequest()
+std::optional<sElevatorRequest> cRequestScheduler::tryTakeNextRequest()
 {
     if (!floorRequests_.empty())
     {
-        ElevatorRequest request = floorRequests_.front();
+        sElevatorRequest request = floorRequests_.front();
         floorRequests_.pop_front();
         return request;
     }
 
     if (!carRequests_.empty())
     {
-        ElevatorRequest request = carRequests_.front();
+        sElevatorRequest request = carRequests_.front();
         carRequests_.pop_front();
         return request;
     }
 
     if (!webRequests_.empty())
     {
-        ElevatorRequest request = webRequests_.front();
+        sElevatorRequest request = webRequests_.front();
         webRequests_.pop_front();
         return request;
     }
@@ -76,7 +76,7 @@ std::optional<ElevatorRequest> RequestScheduler::tryTakeNextRequest()
     return std::nullopt;
 }
 
-bool RequestScheduler::hasPendingRequest() const
+bool cRequestScheduler::hasPendingRequest() const
 {
     return !floorRequests_.empty() || !carRequests_.empty() || !webRequests_.empty();
 }

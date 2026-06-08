@@ -36,12 +36,12 @@ class HttpServer
 public:
     explicit HttpServer(HttpServerConfig config);
 
-    OperationStatus initialize();
+    ecOperationStatus initialize();
 
     /**
      * @brief Attempts to read one pending HTTP request as a supervisor event.
      */
-    std::optional<SupervisoryEvent> tryReadEvent();
+    std::optional<sSupervisoryEvent> tryReadEvent() const;
 
 private:
     HttpServerConfig config_{};

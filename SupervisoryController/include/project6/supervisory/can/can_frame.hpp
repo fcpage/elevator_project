@@ -44,7 +44,7 @@ constexpr std::size_t kCanPayloadLength = 8;
 /**
  * @brief Standard CAN frame as seen by the supervisory controller.
  */
-struct CanFrame
+struct sCanFrame
 {
     /**
      * @brief Round up for the standard 11-bit CAN identifier.

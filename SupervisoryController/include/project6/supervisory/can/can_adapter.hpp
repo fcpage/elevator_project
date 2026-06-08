@@ -22,7 +22,7 @@ namespace project6::supervisory
  * SocketCAN configures physical bus timing through the Linux network device.
  * Separate from CanProtocolConfig, which describes only CAN IDs and payload layout.
  */
-struct SocketCanConfig
+struct sSocketCanConfig
 {
     /**
      * @brief SocketCAN interface name exposed by Linux, typically can0.
@@ -62,7 +62,7 @@ struct SocketCanConfig
  * The adapter is responsible for the OS CAN socket and moves
  * raw CanFrame values only.
  */
-class SocketCanAdapter
+class cSocketCanAdapter
 {
 public:
     /**
@@ -70,34 +70,34 @@ public:
      *
      * @param config Linux interface setup used by initialize().
      */
-    explicit SocketCanAdapter(SocketCanConfig config);
+    explicit cSocketCanAdapter(const sSocketCanConfig &config);
 
     /**
      * @brief Creates an adapter for the named SocketCAN network interface.
      *
      * @param interfaceName Null-terminated interface name, such as "can0".
      */
-    explicit SocketCanAdapter(const char* interfaceName);
+    explicit cSocketCanAdapter(const char* interfaceName);
 
     /**
      * @brief Closes the owned socket when running on Linux.
      */
-    ~SocketCanAdapter();
+    ~cSocketCanAdapter();
 
-    SocketCanAdapter(const SocketCanAdapter&) = delete;
-    SocketCanAdapter& operator=(const SocketCanAdapter&) = delete;
+    cSocketCanAdapter(const cSocketCanAdapter&) = delete;
+    cSocketCanAdapter& operator=(const cSocketCanAdapter&) = delete;
 
     /**
      * @brief Opens and configures the CAN interface.
      */
-    OperationStatus initialize();
+    [[nodiscard]] ecOperationStatus initialize();
 
     /**
      * @brief Attempts to read one CAN frame without blocking indefinitely.
      *
      * @return A frame when one is available; otherwise std::nullopt.
      */
-    [[nodiscard]] std::optional<CanFrame> tryReadFrame() const;
+    [[nodiscard]] std::optional<sCanFrame> tryReadFrame() const;
 
     /**
      * @brief Sends one CAN frame.
@@ -105,14 +105,14 @@ public:
      * @param frame Frame to transmit on the configured CAN interface.
      * @return OperationStatus::Ok when the frame is written successfully.
      */
-    [[nodiscard]] OperationStatus sendFrame(const CanFrame& frame) const;
+    [[nodiscard]] ecOperationStatus sendFrame(const sCanFrame& frame) const;
 
 private:
     static constexpr int kInvalidSocket = -1;
 
-    SocketCanConfig config_{};
-    int socketFd_ = kInvalidSocket;
-    bool isInitialized_ = false;
+    sSocketCanConfig socketConfig_{};
+    int socketSocketFd_ = kInvalidSocket;
+    bool socketIsInitialized_ = false;
 };
 
 } // namespace project6::supervisory

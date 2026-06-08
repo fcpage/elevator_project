@@ -17,7 +17,7 @@ namespace project6::supervisory
 /**
  * @brief Identifies the source or purpose of an event entering the supervisor.
  */
-enum class EventType
+enum class ecEventType
 {
     HttpFloorRequest,
     CanFloorRequest,
@@ -30,7 +30,7 @@ enum class EventType
 /**
  * @brief Describes an elevator direction using controller-level language.
  */
-enum class TravelDirection
+enum class ecTravelDirection
 {
     None,
     Up,
@@ -40,12 +40,12 @@ enum class TravelDirection
 /**
  * @brief Normalized event passed from adapters into the supervisor.
  */
-struct SupervisoryEvent
+struct sSupervisoryEvent
 {
-    EventType type = EventType::TimerTick;
+    ecEventType type = ecEventType::TimerTick;
     std::optional<std::uint8_t> requestedFloor;
     std::optional<std::uint8_t> reportedFloor;
-    TravelDirection reportedDirection = TravelDirection::None;
+    ecTravelDirection reportedDirection = ecTravelDirection::None;
     std::chrono::milliseconds timestampMs{0};
 };
 

@@ -1,7 +1,7 @@
 /******************************************************************
 * supervisory_application.hpp - Supervisory Application Orchestrator
 * Author: Project 6 Team
-* Last Modified: 2026-05-31
+* Last Modified: 2026-06-07
 * @brief Declares the top-level event loop owner for the controller service.
 ******************************************************************/
 
@@ -12,7 +12,6 @@
 #include "project6/supervisory/can/can_adapter.hpp"
 #include "project6/supervisory/common/result.hpp"
 #include "project6/supervisory/control/supervisory_state_machine.hpp"
-#include "project6/supervisory/http/http_server.hpp"
 
 namespace project6::supervisory
 {
@@ -23,23 +22,31 @@ namespace project6::supervisory
  * Keep blocking I/O out of this class. Adapters should provide non-blocking
  * polling methods so timer, HTTP, and CAN work can share one predictable loop.
  */
-class SupervisoryApplication
+class cSupervisoryApplication
 {
 public:
-    SupervisoryApplication(SocketCanAdapter& canAdapter, HttpServer& httpServer);
+    /**
+     * @brief Creates the supervisor around the active CAN adapter.
+     */
+    explicit cSupervisoryApplication(cSocketCanAdapter& canAdapter);
 
-    OperationStatus initialize();
-    OperationStatus runOnce(std::chrono::milliseconds elapsedMs);
+    /**
+     * @brief Initializes runtime hardware dependencies.
+     */
+    ecOperationStatus initialize();
+
+    /**
+     * @brief Processes pending inputs and advances controller time once.
+     */
+    ecOperationStatus runLoopOnce(std::chrono::milliseconds elapsedMs);
 
 private:
     void pollCan();
-    void pollHttp();
     void processTimer(std::chrono::milliseconds elapsedMs);
 
-    SocketCanAdapter& canAdapter_;
-    HttpServer& httpServer_;
-    SupervisoryStateMachineAPI stateMachine_;
-    bool isInitialized_ = false;
+    cSocketCanAdapter& appCanAdapter_;
+    cSupervisoryStateMachineAPI appStateMachine_;
+    bool appIsInitialized_ = false;
 };
 
 } // namespace project6::supervisory
