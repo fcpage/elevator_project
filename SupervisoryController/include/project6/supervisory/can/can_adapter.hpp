@@ -34,10 +34,10 @@ struct sSocketCanConfig
      *
      * This could fail without running the program with sufficient permissions.
      * Use the bash command:
-     * `sudo ip link set can0 up type can bitrate 250000`
+     * `sudo ip link set can0 up type can bitrate 125000`
      * as a backup.
      */
-    std::uint32_t bitrateBitsPerSecond = 250000;
+    std::uint32_t bitrateBitsPerSecond = 125000;
 
     /**
      * @brief Automatic bus-off recovery delay passed to SocketCAN.
