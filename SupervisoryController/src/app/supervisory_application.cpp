@@ -1,96 +1,145 @@
 /******************************************************************
 * supervisory_application.cpp - Supervisory Application Orchestrator
 * Author: Project 6 Team
-* Last Modified: 2026-05-31
+* Last Modified: 2026-06-07
 * @brief Provides the top-level polling loop for the controller.
 ******************************************************************/
 
 #include "project6/supervisory/app/supervisory_application.hpp"
+
+#include <algorithm>
+#include <cstddef>
+#include <iomanip>
+#include <iostream>
 
 #include "project6/supervisory/can/can_protocol.hpp"
 
 namespace project6::supervisory
 {
 
-SupervisoryApplication::SupervisoryApplication(SocketCanAdapter& canAdapter, HttpServer& httpServer)
-    : canAdapter_(canAdapter),
-      httpServer_(httpServer)
+namespace // Logging Helpers for debugging
 {
-} // namespace project6::supervisory
 
-OperationStatus SupervisoryApplication::initialize()
+constexpr std::size_t kMaximumCanFramesPerCycle = 16;
+
+const char* canMessageTypeName(const CanMessageType type)
 {
-    const OperationStatus canStatus = canAdapter_.initialize();
-    if (canStatus != OperationStatus::Ok)
+    switch (type)
+    {
+        case CanMessageType::SupervisorCommand:
+            return "SupervisorCommand";
+        case CanMessageType::ElevatorStatus:
+            return "ElevatorStatus";
+        case CanMessageType::CarFloorRequest:
+            return "CanCarRequest";
+        case CanMessageType::FloorModuleRequest:
+            return "CanFloorRequest";
+    }
+
+    return "Unknown";
+}
+
+void logCanFrame(const sCanFrame& frame)
+{
+    std::clog << "CAN_RX id=0x" << std::hex << std::uppercase << frame.id
+              << std::dec << " dlc=" << static_cast<unsigned int>(frame.dataLength)
+              << " data=";
+
+    const std::size_t payloadLength =
+        std::min<std::size_t>(frame.dataLength, frame.data.size());
+    for (std::size_t index = 0; index < payloadLength; ++index)
+    {
+        std::clog << std::hex << std::setw(2) << std::setfill('0')
+                  << static_cast<unsigned int>(frame.data[index]);
+    }
+
+    std::clog << std::dec << std::nouppercase << std::setfill(' ') << '\n';
+}
+
+void logDecodedMessage(const sDecodedCanMessage& message)
+{
+    std::clog << "EVENT type=" << canMessageTypeName(message.type);
+    if (message.floor.has_value())
+    {
+        const char* floorLabel =
+            message.type == CanMessageType::ElevatorStatus ? " reported_floor=" : " requested_floor=";
+        std::clog << floorLabel << static_cast<unsigned int>(*message.floor);
+    }
+    std::clog << '\n';
+}
+
+} // namespace - Logging Helpers
+
+cSupervisoryApplication::cSupervisoryApplication(cSocketCanAdapter& canAdapter)
+    : appCanAdapter_(canAdapter),
+      appStateMachine_(canAdapter)
+{
+}
+
+ecOperationStatus cSupervisoryApplication::initialize()
+{
+    const ecOperationStatus canStatus = appCanAdapter_.initialize();
+    if (canStatus != ecOperationStatus::Ok)
     {
         return canStatus;
     }
 
-    const OperationStatus httpStatus = httpServer_.initialize();
-    if (httpStatus != OperationStatus::Ok)
-    {
-        return httpStatus;
-    }
-
-    isInitialized_ = true;
-    return OperationStatus::Ok;
+    appIsInitialized_ = true;
+    return ecOperationStatus::Ok;
 }
 
-OperationStatus SupervisoryApplication::runOnce(std::chrono::milliseconds elapsedMs)
+ecOperationStatus cSupervisoryApplication::runLoopOnce(const std::chrono::milliseconds elapsedMs)
 {
-    if (!isInitialized_)
+    if (!appIsInitialized_)
     {
-        return OperationStatus::NotInitialized;
+        return ecOperationStatus::NotInitialized;
     }
 
     pollCan();
-    pollHttp();
     processTimer(elapsedMs);
 
-    return OperationStatus::Ok;
+    return ecOperationStatus::Ok;
 }
 
-void SupervisoryApplication::pollCan()
+void cSupervisoryApplication::pollCan()
 {
-    const std::optional<CanFrame> frame = canAdapter_.tryReadFrame();
-    if (!frame.has_value())
+    for (std::size_t frameCount = 0; frameCount < kMaximumCanFramesPerCycle; ++frameCount)
     {
-        return;
-    }
+        const std::optional<sCanFrame> frame = appCanAdapter_.tryReadFrame();
+        if (!frame.has_value())
+        {
+            return;
+        }
 
-    const std::optional<DecodedCanMessage> message = decodeCanFrame(*frame);
-    if (!message.has_value())
-    {
-        return;
-    }
+        logCanFrame(*frame);
 
-    const std::optional<SupervisoryEvent> event = toSupervisoryEvent(*message);
-    if (!event.has_value())
-    {
-        return;
-    }
+        const std::optional<sDecodedCanMessage> message = decodeCanFrame(*frame);
+        if (!message.has_value())
+        {
+            std::clog << "CAN_RX_REJECTED reason=invalid_protocol_frame\n";
+            continue;
+        }
 
-    stateMachine_.handleEvent(*event);
+        logDecodedMessage(*message);
+
+        const std::optional<sSupervisoryEvent> event = toSupervisoryEvent(*message);
+        if (!event.has_value())
+        {
+            std::clog << "CAN_RX_REJECTED reason=no_supervisory_event\n";
+            continue;
+        }
+
+        appStateMachine_.handleEvent(*event);
+    }
 }
 
-void SupervisoryApplication::pollHttp()
+void cSupervisoryApplication::processTimer(std::chrono::milliseconds elapsedMs)
 {
-    const std::optional<SupervisoryEvent> event = httpServer_.tryReadEvent();
-    if (!event.has_value())
-    {
-        return;
-    }
+    sSupervisoryEvent saEvent{};
+    saEvent.type = ecEventType::TimerTick;
+    saEvent.timestampMs = elapsedMs;
 
-    stateMachine_.handleEvent(*event);
-}
-
-void SupervisoryApplication::processTimer(std::chrono::milliseconds elapsedMs)
-{
-    SupervisoryEvent event{};
-    event.type = EventType::TimerTick;
-    event.timestampMs = elapsedMs;
-
-    stateMachine_.handleEvent(event);
+    appStateMachine_.handleEvent(saEvent);
 }
 
 }

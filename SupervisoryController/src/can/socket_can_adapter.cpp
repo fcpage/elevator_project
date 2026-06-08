@@ -1,7 +1,7 @@
 /******************************************************************
 * socket_can_adapter.cpp - SocketCAN Adapter
 * Author: Project 6 Team
-* Last Modified: 2026-06-04
+* Last Modified: 2026-06-07
 * @brief Provides the Linux SocketCAN/USB-CAN adapter boundary.
 ******************************************************************/
 
@@ -37,7 +37,7 @@ bool didProcessExitSuccessfully(const int status)
     return WIFEXITED(status) && WEXITSTATUS(status) == 0;
 }
 
-OperationStatus runProcess(const std::array<const char*, 10>& arguments)
+OperationStatus runProcess(const std::array<const char*, 11>& arguments)
 {
     const pid_t childProcessId = ::fork();
     if (childProcessId < 0)
@@ -75,12 +75,13 @@ OperationStatus configureSocketCanInterface(const SocketCanConfig& config)
     const std::string bitrate = std::to_string(config.bitrateBitsPerSecond);
     const std::string restartMs = std::to_string(config.restartMs);
 
-    const std::array<const char*, 10> downCommand{
+    const std::array<const char*, 11> downCommand{
         "ip",
         "link",
         "set",
         config.interfaceName,
         "down",
+        nullptr,
         nullptr,
         nullptr,
         nullptr,
@@ -93,116 +94,123 @@ OperationStatus configureSocketCanInterface(const SocketCanConfig& config)
         return status;
     }
 
-    const std::array<const char*, 10> upCommand{
+    const std::array<const char*, 11> configureCommand{
         "ip",
         "link",
         "set",
         config.interfaceName,
-        "up",
         "type",
         "can",
         "bitrate",
         bitrate.c_str(),
+        "restart-ms",
+        restartMs.c_str(),
         nullptr};
 
-    status = runProcess(upCommand);
+    status = runProcess(configureCommand);
     if (status != OperationStatus::Ok)
     {
         return status;
     }
 
-    const std::array<const char*, 10> restartCommand{
+    const std::array<const char*, 11> upCommand{
         "ip",
         "link",
         "set",
         config.interfaceName,
-        "type",
-        "can",
-        "restart-ms",
-        restartMs.c_str(),
+        "up",
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
         nullptr,
         nullptr};
 
-    return runProcess(restartCommand);
+    return runProcess(upCommand);
 }
 #endif
 
 } // namespace
 
-SocketCanAdapter::SocketCanAdapter(SocketCanConfig config)
-    : config_(config)
+cSocketCanAdapter::cSocketCanAdapter(const sSocketCanConfig &config)
+    : socketConfig_(config)
 {
 }
 
-SocketCanAdapter::SocketCanAdapter(const char* interfaceName)
-    : config_(SocketCanConfig{interfaceName})
+cSocketCanAdapter::cSocketCanAdapter(const char* interfaceName)
+    : socketConfig_(sSocketCanConfig{interfaceName})
 {
 }
 
-SocketCanAdapter::~SocketCanAdapter()
+cSocketCanAdapter::~cSocketCanAdapter()
 {
 #ifdef __linux__
-    if (socketFd_ != kInvalidSocket)
+    if (socketSocketFd_ != kInvalidSocket)
     {
-        static_cast<void>(::close(socketFd_));
+        static_cast<void>(::close(socketSocketFd_));
     }
 #endif
 }
 
-OperationStatus SocketCanAdapter::initialize()
+/**
+ * @brief Initializes a CAN Socket Adapter class by opening a socket on the linux hardware
+ *
+ * @return Enum class status of operation
+ */
+ecOperationStatus cSocketCanAdapter::initialize()
 {
-    if (config_.interfaceName == nullptr || config_.bitrateBitsPerSecond == 0)
+    if (socketConfig_.interfaceName == nullptr || socketConfig_.bitrateBitsPerSecond == 0)
     {
-        return OperationStatus::InvalidArgument;
+        return ecOperationStatus::InvalidArgument;
     }
 
 #ifndef __linux__
-    return OperationStatus::HardwareUnavailable;
+    return ecOperationStatus::HardwareUnavailable;
 #else
-    if (config_.configureInterfaceOnInitialize)
+    if (socketConfig_.configureInterfaceOnInitialize)
     {
-        const OperationStatus configureStatus = configureSocketCanInterface(config_);
-        if (configureStatus != OperationStatus::Ok)
+        const ecOperationStatus configureStatus = configureSocketCanInterface(socketConfig_);
+        if (configureStatus != ecOperationStatus::Ok)
         {
             return configureStatus;
         }
     }
 
-    socketFd_ = ::socket(PF_CAN, SOCK_RAW, CAN_RAW);
-    if (socketFd_ == kInvalidSocket)
+    socketSocketFd_ = ::socket(PF_CAN, SOCK_RAW, CAN_RAW);
+    if (socketSocketFd_ == kInvalidSocket)
     {
-        return OperationStatus::HardwareUnavailable;
+        return ecOperationStatus::HardwareUnavailable;
     }
 
     ifreq interfaceRequest{};
-    std::strncpy(interfaceRequest.ifr_name, config_.interfaceName, IFNAMSIZ - 1);
-    if (::ioctl(socketFd_, SIOCGIFINDEX, &interfaceRequest) < 0)
+    std::strncpy(interfaceRequest.ifr_name, socketConfig_.interfaceName, IFNAMSIZ - 1);
+    if (::ioctl(socketSocketFd_, SIOCGIFINDEX, &interfaceRequest) < 0)
     {
-        return OperationStatus::HardwareUnavailable;
+        return ecOperationStatus::HardwareUnavailable;
     }
 
     sockaddr_can address{};
     address.can_family = AF_CAN;
     address.can_ifindex = interfaceRequest.ifr_ifindex;
-    if (::bind(socketFd_, reinterpret_cast<sockaddr*>(&address), sizeof(address)) < 0)
+    if (::bind(socketSocketFd_, reinterpret_cast<sockaddr*>(&address), sizeof(address)) < 0)
     {
-        return OperationStatus::HardwareUnavailable;
+        return ecOperationStatus::HardwareUnavailable;
     }
 
-    const int flags = ::fcntl(socketFd_, F_GETFL, 0);
-    if (flags < 0 || ::fcntl(socketFd_, F_SETFL, flags | O_NONBLOCK) < 0)
+    const int flags = ::fcntl(socketSocketFd_, F_GETFL, 0);
+    if (flags < 0 || ::fcntl(socketSocketFd_, F_SETFL, flags | O_NONBLOCK) < 0)
     {
-        return OperationStatus::HardwareUnavailable;
+        return ecOperationStatus::HardwareUnavailable;
     }
 
-    isInitialized_ = true;
-    return OperationStatus::Ok;
+    socketIsInitialized_ = true;
+    return ecOperationStatus::Ok;
 #endif
 }
 
-std::optional<CanFrame> SocketCanAdapter::tryReadFrame() const
+std::optional<sCanFrame> cSocketCanAdapter::tryReadFrame() const
 {
-    if (!isInitialized_)
+    if (!socketIsInitialized_)
     {
         return std::nullopt;
     }
@@ -211,7 +219,7 @@ std::optional<CanFrame> SocketCanAdapter::tryReadFrame() const
     return std::nullopt;
 #else
     can_frame linuxFrame{};
-    const ssize_t bytesRead = ::read(socketFd_, &linuxFrame, sizeof(linuxFrame));
+    const ssize_t bytesRead = ::read(socketSocketFd_, &linuxFrame, sizeof(linuxFrame));
     if (bytesRead < 0)
     {
         if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -227,7 +235,7 @@ std::optional<CanFrame> SocketCanAdapter::tryReadFrame() const
         return std::nullopt;
     }
 
-    CanFrame frame{};
+    sCanFrame frame{};
     frame.id = static_cast<std::uint16_t>(linuxFrame.can_id & CAN_SFF_MASK);
     frame.dataLength = linuxFrame.can_dlc;
 
@@ -240,25 +248,25 @@ std::optional<CanFrame> SocketCanAdapter::tryReadFrame() const
 #endif
 }
 
-OperationStatus SocketCanAdapter::sendFrame(const CanFrame& frame) const
+ecOperationStatus cSocketCanAdapter::sendFrame(const sCanFrame& frame) const
 {
-    if (!isInitialized_)
+    if (!socketIsInitialized_)
     {
-        return OperationStatus::NotInitialized;
+        return ecOperationStatus::NotInitialized;
     }
 
     if (frame.dataLength > kCanPayloadLength)
     {
-        return OperationStatus::InvalidArgument;
+        return ecOperationStatus::InvalidArgument;
     }
 
     if (frame.id > kStandardCanIdMax)
     {
-        return OperationStatus::InvalidArgument;
+        return ecOperationStatus::InvalidArgument;
     }
 
 #ifndef __linux__
-    return OperationStatus::HardwareUnavailable;
+    return ecOperationStatus::HardwareUnavailable;
 #else
     can_frame linuxFrame{};
     linuxFrame.can_id = frame.id;
@@ -269,13 +277,13 @@ OperationStatus SocketCanAdapter::sendFrame(const CanFrame& frame) const
         linuxFrame.data[index] = frame.data[index];
     }
 
-    const ssize_t bytesWritten = ::write(socketFd_, &linuxFrame, sizeof(linuxFrame));
+    const ssize_t bytesWritten = ::write(socketSocketFd_, &linuxFrame, sizeof(linuxFrame));
     if (bytesWritten != static_cast<ssize_t>(sizeof(linuxFrame)))
     {
-        return OperationStatus::HardwareUnavailable;
+        return ecOperationStatus::HardwareUnavailable;
     }
 
-    return OperationStatus::Ok;
+    return ecOperationStatus::Ok;
 #endif
 }
 

@@ -1,7 +1,7 @@
 /******************************************************************
 * supervisory_state_machine.hpp - Supervisory State Machine Boundary
 * Author: Project 6 Team
-* Last Modified: 2026-05-31
+* Last Modified: 2026-06-07
 * @brief Declares the narrow API around the ESE-generated state machine.
 ******************************************************************/
 
@@ -15,8 +15,9 @@
 namespace project6::supervisory
 {
 
-class SupervisoryController;
-struct StateMachineContext;
+class cSupervisoryController;
+class cSocketCanAdapter;
+struct sStateMachineContext;
 
 /**
  * @brief Public high-level state names reported by the supervisory state machine.
@@ -24,7 +25,7 @@ struct StateMachineContext;
  * These values mirror the major ESE states while keeping generated state-machine
  * details out of the rest of the program.
  */
-enum class SupervisoryControlState
+enum class ecSupervisoryControlState
 {
     Idle,
     Dispatching,
@@ -40,12 +41,12 @@ enum class SupervisoryControlState
  * This type is safe to expose to tests, simulator adapters, and status
  * endpoints. It intentionally avoids exposing generated ESE internals.
  */
-struct SupervisoryStateSnapshot
+struct sSupervisoryStateSnapshot
 {
-    SupervisoryControlState controlState = SupervisoryControlState::Idle;
+    ecSupervisoryControlState controlState = ecSupervisoryControlState::Idle;
     std::uint8_t currentFloor = 1;
     std::uint8_t targetFloor = 1;
-    TravelDirection direction = TravelDirection::None;
+    ecTravelDirection direction = ecTravelDirection::None;
     bool isDoorOpen = false;
     bool isFaulted = false;
 };
@@ -57,39 +58,39 @@ struct SupervisoryStateSnapshot
  * Callers interact with this class by feeding normalized events and reading a
  * diagnostic snapshot.
  */
-class SupervisoryStateMachineAPI
+class cSupervisoryStateMachineAPI
 {
 public:
     /**
-     * @brief Creates the state-machine context and initializes the ESE machine.
+     * @brief Creates the state machine around the active CAN adapter.
      */
-    SupervisoryStateMachineAPI();
+    explicit cSupervisoryStateMachineAPI(cSocketCanAdapter& canAdapter);
 
     /**
      * @brief Releases the state-machine context.
      */
-    ~SupervisoryStateMachineAPI();
+    ~cSupervisoryStateMachineAPI();
 
-    SupervisoryStateMachineAPI(const SupervisoryStateMachineAPI&) = delete;
-    SupervisoryStateMachineAPI& operator=(const SupervisoryStateMachineAPI&) = delete;
+    cSupervisoryStateMachineAPI(const cSupervisoryStateMachineAPI&) = delete;
+    cSupervisoryStateMachineAPI& operator=(const cSupervisoryStateMachineAPI&) = delete;
 
     /**
      * @brief Applies one normalized event and advances the ESE machine once.
      *
-     * @param event Event produced by CAN, HTTP, timer, or fault handling code.
+     * @param event Event produced by CAN, timer, or fault handling code.
      */
-    void handleEvent(const SupervisoryEvent& event);
+    void handleEvent(const sSupervisoryEvent& event);
 
     /**
      * @brief Returns the latest public state snapshot.
      */
-    [[nodiscard]] SupervisoryStateSnapshot snapshot() const;
+    [[nodiscard]] sSupervisoryStateSnapshot snapshot() const;
 
 private:
     void refreshSnapshotState();
 
-    std::unique_ptr<StateMachineContext> context_;
-    std::unique_ptr<SupervisoryController> machine_;
+    std::unique_ptr<sStateMachineContext> smContext_;
+    std::unique_ptr<cSupervisoryController> smMachine_;
 };
 
 } // namespace project6::supervisory

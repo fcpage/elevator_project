@@ -26,7 +26,7 @@ namespace project6::supervisory
  * not require rewrites of the rest of the program. Physical bus timing belongs
  * to SocketCanConfig because Linux applies it to the SocketCAN network device.
  */
-struct CanProtocolConfig
+struct sCanProtocolConfig
 {
     /**
      * @brief CAN ID used by the supervisory controller when transmitting.
@@ -97,7 +97,7 @@ struct CanProtocolConfig
 /**
  * @brief Protocol configuration matching the current project PDF.
  */
-inline constexpr CanProtocolConfig kDefaultCanProtocolConfig{};
+inline constexpr sCanProtocolConfig kDefaultCanProtocolConfig{};
 
 constexpr std::uint8_t kSharedProtocolDlc = kDefaultCanProtocolConfig.sharedProtocolDlc;
 constexpr std::uint8_t kFloorMask = kDefaultCanProtocolConfig.floorMask;
@@ -118,7 +118,7 @@ enum class CanMessageType
  * Keep this as the only place outside the codec that talks about CAN IDs,
  * payload bit positions, or DLC expectations from the shared document.
  */
-struct DecodedCanMessage
+struct sDecodedCanMessage
 {
     CanMessageType type = CanMessageType::CarFloorRequest;
     std::uint16_t sourceId = 0;
@@ -134,9 +134,9 @@ struct DecodedCanMessage
  * @return Decoded message when the frame is valid for the protocol; otherwise
  *         std::nullopt.
  */
-std::optional<DecodedCanMessage> decodeCanFrame(
-    const CanFrame& frame,
-    const CanProtocolConfig& config = kDefaultCanProtocolConfig);
+std::optional<sDecodedCanMessage> decodeCanFrame(
+    const sCanFrame& frame,
+    const sCanProtocolConfig& config = kDefaultCanProtocolConfig);
 
 /**
  * @brief Converts a decoded protocol message into a state-machine event.
@@ -144,7 +144,7 @@ std::optional<DecodedCanMessage> decodeCanFrame(
  * Supervisor command frames are intentionally not converted because they are
  * outbound messages produced by the supervisor.
  */
-std::optional<SupervisoryEvent> toSupervisoryEvent(const DecodedCanMessage& message);
+std::optional<sSupervisoryEvent> toSupervisoryEvent(const sDecodedCanMessage& message);
 
 /**
  * @brief Builds the one-byte command sent from the supervisor to the elevator.
@@ -154,9 +154,9 @@ std::optional<SupervisoryEvent> toSupervisoryEvent(const DecodedCanMessage& mess
  * @param config Protocol layout and node IDs to apply.
  * @return Encoded frame when the floor is valid; otherwise std::nullopt.
  */
-std::optional<CanFrame> makeSupervisorCommandFrame(
+std::optional<sCanFrame> makeSupervisorCommandFrame(
     std::uint8_t targetFloor,
     bool enable,
-    const CanProtocolConfig& config = kDefaultCanProtocolConfig);
+    const sCanProtocolConfig& config = kDefaultCanProtocolConfig);
 
 } // namespace project6::supervisory

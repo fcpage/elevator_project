@@ -14,7 +14,7 @@ namespace project6::supervisory
  * @brief Generic status for operations where detailed error recovery is not
  *        implemented yet.
  */
-enum class OperationStatus
+enum class ecOperationStatus
 {
     Ok,
     NotInitialized,

@@ -13,14 +13,14 @@ namespace project6::supervisory
 namespace
 {
 
-bool isValidFloor(const std::uint8_t floor, const CanProtocolConfig& config)
+bool isValidFloor(const std::uint8_t floor, const sCanProtocolConfig& config)
 {
     return floor >= config.minFloor && floor <= config.maxFloor;
 } // namespace
 
 std::optional<std::uint8_t> floorFromPayload(
     const std::uint8_t payload,
-    const CanProtocolConfig& config)
+    const sCanProtocolConfig& config)
 {
     if (config.floorShift > 7)
     {
@@ -38,7 +38,7 @@ std::optional<std::uint8_t> floorFromPayload(
 
 std::optional<std::uint8_t> floorFromFloorControllerId(
     const std::uint16_t id,
-    const CanProtocolConfig& config)
+    const sCanProtocolConfig& config)
 {
     if (id == config.floorOneControllerCanId)
     {
@@ -58,14 +58,14 @@ std::optional<std::uint8_t> floorFromFloorControllerId(
     return std::nullopt;
 }
 
-bool isFloorControllerId(const std::uint16_t id, const CanProtocolConfig& config)
+bool isFloorControllerId(const std::uint16_t id, const sCanProtocolConfig& config)
 {
     return floorFromFloorControllerId(id, config).has_value();
 }
 
 }
 
-std::optional<DecodedCanMessage> decodeCanFrame(const CanFrame& frame, const CanProtocolConfig& config)
+std::optional<sDecodedCanMessage> decodeCanFrame(const sCanFrame& frame, const sCanProtocolConfig& config)
 {
     if (frame.dataLength != config.sharedProtocolDlc)
     {
@@ -73,7 +73,7 @@ std::optional<DecodedCanMessage> decodeCanFrame(const CanFrame& frame, const Can
     }
 
     const std::uint8_t payload = frame.data[0];
-    DecodedCanMessage message{};
+    sDecodedCanMessage message{};
     message.sourceId = frame.id;
 
     if (frame.id == config.elevatorControllerCanId)
@@ -119,9 +119,9 @@ std::optional<DecodedCanMessage> decodeCanFrame(const CanFrame& frame, const Can
     return std::nullopt;
 }
 
-std::optional<SupervisoryEvent> toSupervisoryEvent(const DecodedCanMessage& message)
+std::optional<sSupervisoryEvent> toSupervisoryEvent(const sDecodedCanMessage& message)
 {
-    SupervisoryEvent event{};
+    sSupervisoryEvent event{};
 
     switch (message.type)
     {
@@ -132,9 +132,9 @@ std::optional<SupervisoryEvent> toSupervisoryEvent(const DecodedCanMessage& mess
                 return std::nullopt;
             }
 
-            event.type = EventType::CanElevatorStatus;
+            event.type = ecEventType::CanElevatorStatus;
             event.reportedFloor = message.floor;
-            event.reportedDirection = TravelDirection::None;
+            event.reportedDirection = ecTravelDirection::None;
             return event;
         }
 
@@ -145,7 +145,7 @@ std::optional<SupervisoryEvent> toSupervisoryEvent(const DecodedCanMessage& mess
                 return std::nullopt;
             }
 
-            event.type = EventType::CanCarRequest;
+            event.type = ecEventType::CanCarRequest;
             event.requestedFloor = message.floor;
             return event;
         }
@@ -157,7 +157,7 @@ std::optional<SupervisoryEvent> toSupervisoryEvent(const DecodedCanMessage& mess
                 return std::nullopt;
             }
 
-            event.type = EventType::CanFloorRequest;
+            event.type = ecEventType::CanFloorRequest;
             event.requestedFloor = message.floor;
             return event;
         }
@@ -171,17 +171,17 @@ std::optional<SupervisoryEvent> toSupervisoryEvent(const DecodedCanMessage& mess
     return std::nullopt;
 }
 
-std::optional<CanFrame> makeSupervisorCommandFrame(
+std::optional<sCanFrame> makeSupervisorCommandFrame(
     std::uint8_t targetFloor,
     bool enable,
-    const CanProtocolConfig& config)
+    const sCanProtocolConfig& config)
 {
     if (!isValidFloor(targetFloor, config) || config.floorShift > 7)
     {
         return std::nullopt;
     }
 
-    CanFrame frame{};
+    sCanFrame frame{};
     frame.id = config.supervisoryControllerCanId;
     frame.dataLength = config.sharedProtocolDlc;
 

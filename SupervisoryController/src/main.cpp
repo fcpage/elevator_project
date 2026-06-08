@@ -1,61 +1,132 @@
 /******************************************************************
- * main.cpp - Supervisory Controller Entry Point
- * Author: Project 6 Team
- * Last Modified: 2026-06-04
- * @brief Wires the top-level supervisor objects for runtime startup.
- ******************************************************************/
+* main.cpp - Supervisory Controller Entry Point
+* Author: Project 6 Team
+* Last Modified: 2026-06-07
+* @brief Runs the supervisory controller service.
+******************************************************************/
 
 #include "project6/supervisory/app/supervisory_application.hpp"
 
 #include <chrono>
+#include <csignal>
+#include <cstdint>
 #include <iostream>
+#include <thread>
 
-namespace {
+namespace
+{
 
-    const char *operationStatusMessage(const project6::supervisory::OperationStatus status) {
-        using project6::supervisory::OperationStatus;
+constexpr std::uint32_t kDefaultCanBitrateBitsPerSecond = 250000;
+constexpr std::uint32_t kDefaultCanRestartMs = 100;
 
-        switch (status) {
-            case OperationStatus::Ok:
-                return "operation completed successfully";
-            case OperationStatus::NotInitialized:
-                return "a required module was not initialized";
-            case OperationStatus::InvalidArgument:
-                return "invalid runtime configuration";
-            case OperationStatus::WouldBlock:
-                return "operation would block";
-            case OperationStatus::InsufficientPrivileges:
-                return "permission denied while configuring CAN; run as root or grant "
-                       "CAP_NET_ADMIN";
-            case OperationStatus::HardwareUnavailable:
-                return "required hardware or SocketCAN interface is unavailable";
-            case OperationStatus::NetworkUnavailable:
-                return "required network service is unavailable";
-            case OperationStatus::NotImplemented:
-                return "requested operation is not implemented";
-        }
+#ifdef SUPERVISORY_USE_VIRTUAL_CAN
+constexpr const char* kDefaultCanInterfaceName = "vcan0";
+constexpr bool kConfigureCanInterfaceOnInitialize = false;
+#else
+constexpr const char* kDefaultCanInterfaceName = "can0";
+constexpr bool kConfigureCanInterfaceOnInitialize = true;
+#endif
 
-        return "unknown operation status";
+volatile std::sig_atomic_t keepRunning = 1;
+
+void handleShutdownSignal(const int signalNumber)
+{
+    static_cast<void>(signalNumber);
+    keepRunning = 0;
+}
+
+const char* operationStatusMessage(const project6::supervisory::ecOperationStatus status)
+{
+    using project6::supervisory::ecOperationStatus;
+
+    switch (status)
+    {
+        case ecOperationStatus::Ok:
+            return "operation completed successfully";
+        case ecOperationStatus::NotInitialized:
+            return "a required module was not initialized";
+        case ecOperationStatus::InvalidArgument:
+            return "invalid runtime configuration";
+        case ecOperationStatus::WouldBlock:
+            return "operation would block";
+        case ecOperationStatus::InsufficientPrivileges:
+            return "permission denied while configuring CAN; run as root or grant CAP_NET_ADMIN";
+        case ecOperationStatus::HardwareUnavailable:
+            return "required hardware or SocketCAN interface is unavailable";
+        case ecOperationStatus::NetworkUnavailable:
+            return "required network service is unavailable";
+        case ecOperationStatus::NotImplemented:
+            return "requested operation is not implemented";
     }
+
+    return "unknown operation status";
+}
 
 } // namespace
 
-int main() {
+int main(const int argumentCount, char* arguments[])
+{
     using namespace project6::supervisory;
 
-    constexpr SocketCanConfig canConfig{"can0", 250000, 100, true};
-    SocketCanAdapter canAdapter(canConfig);
-    HttpServer httpServer(HttpServerConfig{});
-    SupervisoryApplication application(canAdapter, httpServer);
+    const char* interfaceName = kDefaultCanInterfaceName;
+    if (argumentCount > 1 && arguments[1] != nullptr && arguments[1][0] != '\0')
+    {
+        interfaceName = arguments[1];
+    }
 
-    const OperationStatus status = application.initialize();
-    if (status != OperationStatus::Ok) {
-        std::cerr << "supervisory_controller: initialization failed: " << operationStatusMessage(status) << '\n';
+    const sSocketCanConfig canConfig{
+        interfaceName,
+        kDefaultCanBitrateBitsPerSecond,
+        kDefaultCanRestartMs,
+        kConfigureCanInterfaceOnInitialize};
+    cSocketCanAdapter canAdapter(canConfig);
+    cSupervisoryApplication application(canAdapter);
+
+    if (const ecOperationStatus status = application.initialize(); status != ecOperationStatus::Ok)
+    {
+        std::cerr << "supervisory_controller: initialization failed: "
+                  << operationStatusMessage(status) << '\n';
         return 1;
     }
 
-    static constexpr std::chrono::milliseconds kLoopPeriodMs{10};
-    static_cast<void>(application.runOnce(kLoopPeriodMs));
+    std::signal(SIGINT, handleShutdownSignal);
+    std::signal(SIGTERM, handleShutdownSignal);
 
+    constexpr std::chrono::milliseconds kLoopPeriodMs{10};
+    auto previousIteration = std::chrono::steady_clock::now();
+    auto nextIteration = previousIteration;
+
+    std::clog << "START interface=" << canConfig.interfaceName
+              << " bitrate=" << canConfig.bitrateBitsPerSecond << '\n';
+
+    while (keepRunning != 0)
+    {
+        const auto iterationStart = std::chrono::steady_clock::now();
+        const auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+            iterationStart - previousIteration);
+        previousIteration = iterationStart;
+        nextIteration += kLoopPeriodMs;
+
+        if (const ecOperationStatus runStatus = application.runLoopOnce(elapsedMs); runStatus != ecOperationStatus::Ok)
+        {
+            std::cerr << "supervisory_controller: runtime failed: "
+                      << operationStatusMessage(runStatus) << '\n';
+            return 1;
+        }
+
+        if (const auto iterationEnd = std::chrono::steady_clock::now(); iterationEnd < nextIteration)
+        {
+            std::this_thread::sleep_until(nextIteration);
+        }
+        else
+        {
+            const auto overrunMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+                iterationEnd - nextIteration);
+            std::clog << "LOOP_OVERRUN elapsed_ms=" << overrunMs.count() << '\n';
+            nextIteration = iterationEnd;
+        }
+    }
+
+    std::clog << "SHUTDOWN reason=signal\n";
     return 0;
 }

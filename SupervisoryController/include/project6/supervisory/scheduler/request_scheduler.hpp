@@ -29,7 +29,7 @@ enum class RequestSource
 /**
  * @brief One pending floor request after input normalization.
  */
-struct ElevatorRequest
+struct sElevatorRequest
 {
     std::uint8_t floor = 1;
     RequestSource source = RequestSource::FloorModule;
@@ -37,21 +37,18 @@ struct ElevatorRequest
 
 /**
  * @brief Stores pending requests and chooses the next request to service.
- *
- * Start simple. The first real version can prioritize physical floor requests,
- * then car requests, then web requests. Do not let this class command hardware.
  */
-class RequestScheduler
+class cRequestScheduler
 {
 public:
-    void enqueueEvent(const SupervisoryEvent& event);
-    std::optional<ElevatorRequest> tryTakeNextRequest();
+    void enqueueEvent(const sSupervisoryEvent& event);
+    std::optional<sElevatorRequest> tryTakeNextRequest();
     bool hasPendingRequest() const;
 
 private:
-    std::deque<ElevatorRequest> floorRequests_;
-    std::deque<ElevatorRequest> carRequests_;
-    std::deque<ElevatorRequest> webRequests_;
+    std::deque<sElevatorRequest> floorRequests_;
+    std::deque<sElevatorRequest> carRequests_;
+    std::deque<sElevatorRequest> webRequests_;
 };
 
 } // namespace project6::supervisory
