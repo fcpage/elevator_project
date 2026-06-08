@@ -3,4 +3,4 @@
 /home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/main.c:170:13:MX_CAN_Init	8	static
 /home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/main.c:209:13:MX_USART2_UART_Init	8	static
 /home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/main.c:244:13:MX_GPIO_Init	48	static
-/home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/main.c:300:6:Error_Handler	8	static
+/home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/main.c:316:6:Error_Handler	8	static

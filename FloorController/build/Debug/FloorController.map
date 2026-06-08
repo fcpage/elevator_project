@@ -2177,7 +2177,7 @@ Discarded input sections
  .debug_macro   0x00000000      0x5ba CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
  .debug_macro   0x00000000       0x44 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
  .debug_macro   0x00000000      0x347 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
- .debug_macro   0x00000000       0x5e CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+ .debug_macro   0x00000000       0xdc CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
  .group         0x00000000        0xc CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
  .group         0x00000000        0xc CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
  .group         0x00000000        0xc CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
@@ -2218,7 +2218,7 @@ Discarded input sections
  .data          0x00000000        0x0 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
  .bss           0x00000000        0x0 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
  .text.HAL_CAN_MspDeInit
-                0x00000000       0x44 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
+                0x00000000       0x40 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
  .text.HAL_UART_MspDeInit
                 0x00000000       0x38 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
  .debug_macro   0x00000000      0xae4 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
@@ -2256,7 +2256,7 @@ Discarded input sections
  .debug_macro   0x00000000      0x5ba CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
  .debug_macro   0x00000000       0x44 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
  .debug_macro   0x00000000      0x347 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
- .debug_macro   0x00000000       0x5e CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
+ .debug_macro   0x00000000       0xdc CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
  .group         0x00000000        0xc CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
  .group         0x00000000        0xc CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
  .group         0x00000000        0xc CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
@@ -2465,7 +2465,7 @@ Discarded input sections
  .debug_macro   0x00000000      0x5ba CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
  .debug_macro   0x00000000       0x44 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
  .debug_macro   0x00000000      0x347 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
- .debug_macro   0x00000000       0x5e CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+ .debug_macro   0x00000000       0xdc CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
  .debug_macro   0x00000000       0x22 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
  .debug_macro   0x00000000       0x60 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
  .debug_macro   0x00000000       0x2a CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
@@ -2772,7 +2772,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
                 0x08000000                g_pfnVectors
                 0x08000194                        . = ALIGN (0x4)
 
-.text           0x080001a0     0x5a54
+.text           0x080001a0     0x5aac
                 0x080001a0                        . = ALIGN (0x4)
  *(.text)
  .text          0x080001a0       0x88 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
@@ -3029,279 +3029,279 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
  .text.MX_USART2_UART_Init
                 0x08005414       0x60 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
  .text.MX_GPIO_Init
-                0x08005474      0x108 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+                0x08005474      0x148 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
  .text.Error_Handler
-                0x0800557c        0x8 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
-                0x0800557c                Error_Handler
+                0x080055bc        0x8 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+                0x080055bc                Error_Handler
  .text.NMI_Handler
-                0x08005584        0x8 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
-                0x08005584                NMI_Handler
+                0x080055c4        0x8 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+                0x080055c4                NMI_Handler
  .text.HardFault_Handler
-                0x0800558c        0x8 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
-                0x0800558c                HardFault_Handler
+                0x080055cc        0x8 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+                0x080055cc                HardFault_Handler
  .text.MemManage_Handler
-                0x08005594        0x8 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
-                0x08005594                MemManage_Handler
+                0x080055d4        0x8 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+                0x080055d4                MemManage_Handler
  .text.BusFault_Handler
-                0x0800559c        0x8 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
-                0x0800559c                BusFault_Handler
+                0x080055dc        0x8 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+                0x080055dc                BusFault_Handler
  .text.UsageFault_Handler
-                0x080055a4        0x8 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
-                0x080055a4                UsageFault_Handler
+                0x080055e4        0x8 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+                0x080055e4                UsageFault_Handler
  .text.SVC_Handler
-                0x080055ac        0xe CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
-                0x080055ac                SVC_Handler
+                0x080055ec        0xe CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+                0x080055ec                SVC_Handler
  .text.DebugMon_Handler
-                0x080055ba        0xe CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
-                0x080055ba                DebugMon_Handler
+                0x080055fa        0xe CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+                0x080055fa                DebugMon_Handler
  .text.PendSV_Handler
-                0x080055c8        0xe CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
-                0x080055c8                PendSV_Handler
+                0x08005608        0xe CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+                0x08005608                PendSV_Handler
  .text.SysTick_Handler
-                0x080055d6        0xc CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
-                0x080055d6                SysTick_Handler
- *fill*         0x080055e2        0x2 
+                0x08005616        0xc CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+                0x08005616                SysTick_Handler
+ *fill*         0x08005622        0x2 
  .text.USB_LP_CAN_RX0_IRQHandler
-                0x080055e4       0x14 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
-                0x080055e4                USB_LP_CAN_RX0_IRQHandler
+                0x08005624       0x14 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+                0x08005624                USB_LP_CAN_RX0_IRQHandler
  .text.EXTI15_10_IRQHandler
-                0x080055f8       0x10 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
-                0x080055f8                EXTI15_10_IRQHandler
+                0x08005638       0x28 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+                0x08005638                EXTI15_10_IRQHandler
  .text.HAL_MspInit
-                0x08005608       0x48 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
-                0x08005608                HAL_MspInit
+                0x08005660       0x48 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
+                0x08005660                HAL_MspInit
  .text.HAL_CAN_MspInit
-                0x08005650       0x98 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
-                0x08005650                HAL_CAN_MspInit
+                0x080056a8       0x98 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
+                0x080056a8                HAL_CAN_MspInit
  .text.HAL_UART_MspInit
-                0x080056e8       0x84 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
-                0x080056e8                HAL_UART_MspInit
- .text._sbrk    0x0800576c       0x6c CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
-                0x0800576c                _sbrk
- .text._read    0x080057d8       0x3a CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
-                0x080057d8                _read
- .text._write   0x08005812       0x38 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
-                0x08005812                _write
- .text._close   0x0800584a       0x18 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
-                0x0800584a                _close
- .text._fstat   0x08005862       0x20 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
-                0x08005862                _fstat
- .text._isatty  0x08005882       0x16 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
-                0x08005882                _isatty
- .text._lseek   0x08005898       0x1a CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
-                0x08005898                _lseek
- *fill*         0x080058b2        0x2 
+                0x08005740       0x84 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
+                0x08005740                HAL_UART_MspInit
+ .text._sbrk    0x080057c4       0x6c CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+                0x080057c4                _sbrk
+ .text._read    0x08005830       0x3a CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+                0x08005830                _read
+ .text._write   0x0800586a       0x38 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+                0x0800586a                _write
+ .text._close   0x080058a2       0x18 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+                0x080058a2                _close
+ .text._fstat   0x080058ba       0x20 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+                0x080058ba                _fstat
+ .text._isatty  0x080058da       0x16 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+                0x080058da                _isatty
+ .text._lseek   0x080058f0       0x1a CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+                0x080058f0                _lseek
+ *fill*         0x0800590a        0x2 
  .text.Reset_Handler
-                0x080058b4       0x50 CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj
-                0x080058b4                Reset_Handler
+                0x0800590c       0x50 CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj
+                0x0800590c                Reset_Handler
  .text.Default_Handler
-                0x08005904        0x2 CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj
-                0x08005904                RTC_Alarm_IRQHandler
-                0x08005904                TIM8_TRG_COM_IRQHandler
-                0x08005904                TIM8_CC_IRQHandler
-                0x08005904                SPI4_IRQHandler
-                0x08005904                TIM1_CC_IRQHandler
-                0x08005904                USB_HP_IRQHandler
-                0x08005904                PVD_IRQHandler
-                0x08005904                TAMP_STAMP_IRQHandler
-                0x08005904                EXTI3_IRQHandler
-                0x08005904                I2C3_ER_IRQHandler
-                0x08005904                USB_HP_CAN_TX_IRQHandler
-                0x08005904                EXTI0_IRQHandler
-                0x08005904                I2C2_EV_IRQHandler
-                0x08005904                FPU_IRQHandler
-                0x08005904                TIM1_UP_TIM16_IRQHandler
-                0x08005904                ADC1_2_IRQHandler
-                0x08005904                SPI1_IRQHandler
-                0x08005904                CAN_SCE_IRQHandler
-                0x08005904                TIM6_DAC_IRQHandler
-                0x08005904                TIM8_UP_IRQHandler
-                0x08005904                DMA2_Channel2_IRQHandler
-                0x08005904                DMA1_Channel4_IRQHandler
-                0x08005904                TIM20_TRG_COM_IRQHandler
-                0x08005904                USART3_IRQHandler
-                0x08005904                DMA1_Channel7_IRQHandler
-                0x08005904                UART5_IRQHandler
-                0x08005904                ADC3_IRQHandler
-                0x08005904                TIM4_IRQHandler
-                0x08005904                CAN_RX1_IRQHandler
-                0x08005904                DMA2_Channel1_IRQHandler
-                0x08005904                I2C1_EV_IRQHandler
-                0x08005904                DMA1_Channel6_IRQHandler
-                0x08005904                UART4_IRQHandler
-                0x08005904                DMA2_Channel4_IRQHandler
-                0x08005904                TIM3_IRQHandler
-                0x08005904                RCC_IRQHandler
-                0x08005904                TIM20_UP_IRQHandler
-                0x08005904                DMA1_Channel1_IRQHandler
-                0x08005904                Default_Handler
-                0x08005904                USBWakeUp_RMP_IRQHandler
-                0x08005904                TIM7_IRQHandler
-                0x08005904                I2C3_EV_IRQHandler
-                0x08005904                EXTI9_5_IRQHandler
-                0x08005904                RTC_WKUP_IRQHandler
-                0x08005904                SPI2_IRQHandler
-                0x08005904                DMA2_Channel5_IRQHandler
-                0x08005904                DMA1_Channel5_IRQHandler
-                0x08005904                USB_LP_IRQHandler
-                0x08005904                EXTI4_IRQHandler
-                0x08005904                TIM1_TRG_COM_TIM17_IRQHandler
-                0x08005904                DMA1_Channel3_IRQHandler
-                0x08005904                ADC4_IRQHandler
-                0x08005904                WWDG_IRQHandler
-                0x08005904                TIM2_IRQHandler
-                0x08005904                COMP7_IRQHandler
-                0x08005904                COMP1_2_3_IRQHandler
-                0x08005904                EXTI1_IRQHandler
-                0x08005904                USART2_IRQHandler
-                0x08005904                COMP4_5_6_IRQHandler
-                0x08005904                TIM20_BRK_IRQHandler
-                0x08005904                I2C2_ER_IRQHandler
-                0x08005904                DMA1_Channel2_IRQHandler
-                0x08005904                TIM8_BRK_IRQHandler
-                0x08005904                FLASH_IRQHandler
-                0x08005904                TIM20_CC_IRQHandler
-                0x08005904                USART1_IRQHandler
-                0x08005904                SPI3_IRQHandler
-                0x08005904                I2C1_ER_IRQHandler
-                0x08005904                FMC_IRQHandler
-                0x08005904                USBWakeUp_IRQHandler
-                0x08005904                DMA2_Channel3_IRQHandler
-                0x08005904                EXTI2_TSC_IRQHandler
-                0x08005904                TIM1_BRK_TIM15_IRQHandler
- *fill*         0x08005906        0x2 
+                0x0800595c        0x2 CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj
+                0x0800595c                RTC_Alarm_IRQHandler
+                0x0800595c                TIM8_TRG_COM_IRQHandler
+                0x0800595c                TIM8_CC_IRQHandler
+                0x0800595c                SPI4_IRQHandler
+                0x0800595c                TIM1_CC_IRQHandler
+                0x0800595c                USB_HP_IRQHandler
+                0x0800595c                PVD_IRQHandler
+                0x0800595c                TAMP_STAMP_IRQHandler
+                0x0800595c                EXTI3_IRQHandler
+                0x0800595c                I2C3_ER_IRQHandler
+                0x0800595c                USB_HP_CAN_TX_IRQHandler
+                0x0800595c                EXTI0_IRQHandler
+                0x0800595c                I2C2_EV_IRQHandler
+                0x0800595c                FPU_IRQHandler
+                0x0800595c                TIM1_UP_TIM16_IRQHandler
+                0x0800595c                ADC1_2_IRQHandler
+                0x0800595c                SPI1_IRQHandler
+                0x0800595c                CAN_SCE_IRQHandler
+                0x0800595c                TIM6_DAC_IRQHandler
+                0x0800595c                TIM8_UP_IRQHandler
+                0x0800595c                DMA2_Channel2_IRQHandler
+                0x0800595c                DMA1_Channel4_IRQHandler
+                0x0800595c                TIM20_TRG_COM_IRQHandler
+                0x0800595c                USART3_IRQHandler
+                0x0800595c                DMA1_Channel7_IRQHandler
+                0x0800595c                UART5_IRQHandler
+                0x0800595c                ADC3_IRQHandler
+                0x0800595c                TIM4_IRQHandler
+                0x0800595c                CAN_RX1_IRQHandler
+                0x0800595c                DMA2_Channel1_IRQHandler
+                0x0800595c                I2C1_EV_IRQHandler
+                0x0800595c                DMA1_Channel6_IRQHandler
+                0x0800595c                UART4_IRQHandler
+                0x0800595c                DMA2_Channel4_IRQHandler
+                0x0800595c                TIM3_IRQHandler
+                0x0800595c                RCC_IRQHandler
+                0x0800595c                TIM20_UP_IRQHandler
+                0x0800595c                DMA1_Channel1_IRQHandler
+                0x0800595c                Default_Handler
+                0x0800595c                USBWakeUp_RMP_IRQHandler
+                0x0800595c                TIM7_IRQHandler
+                0x0800595c                I2C3_EV_IRQHandler
+                0x0800595c                EXTI9_5_IRQHandler
+                0x0800595c                RTC_WKUP_IRQHandler
+                0x0800595c                SPI2_IRQHandler
+                0x0800595c                DMA2_Channel5_IRQHandler
+                0x0800595c                DMA1_Channel5_IRQHandler
+                0x0800595c                USB_LP_IRQHandler
+                0x0800595c                EXTI4_IRQHandler
+                0x0800595c                TIM1_TRG_COM_TIM17_IRQHandler
+                0x0800595c                DMA1_Channel3_IRQHandler
+                0x0800595c                ADC4_IRQHandler
+                0x0800595c                WWDG_IRQHandler
+                0x0800595c                TIM2_IRQHandler
+                0x0800595c                COMP7_IRQHandler
+                0x0800595c                COMP1_2_3_IRQHandler
+                0x0800595c                EXTI1_IRQHandler
+                0x0800595c                USART2_IRQHandler
+                0x0800595c                COMP4_5_6_IRQHandler
+                0x0800595c                TIM20_BRK_IRQHandler
+                0x0800595c                I2C2_ER_IRQHandler
+                0x0800595c                DMA1_Channel2_IRQHandler
+                0x0800595c                TIM8_BRK_IRQHandler
+                0x0800595c                FLASH_IRQHandler
+                0x0800595c                TIM20_CC_IRQHandler
+                0x0800595c                USART1_IRQHandler
+                0x0800595c                SPI3_IRQHandler
+                0x0800595c                I2C1_ER_IRQHandler
+                0x0800595c                FMC_IRQHandler
+                0x0800595c                USBWakeUp_IRQHandler
+                0x0800595c                DMA2_Channel3_IRQHandler
+                0x0800595c                EXTI2_TSC_IRQHandler
+                0x0800595c                TIM1_BRK_TIM15_IRQHandler
+ *fill*         0x0800595e        0x2 
  .text.__dbg_panic
-                0x08005908       0x20 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+                0x08005960       0x20 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
  .text.user_main
-                0x08005928      0x11c CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
-                0x08005928                user_main
+                0x08005980      0x11c CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+                0x08005980                user_main
  .text.user_init
-                0x08005a44        0xe CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
-                0x08005a44                user_init
- *fill*         0x08005a52        0x2 
+                0x08005a9c        0xe CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+                0x08005a9c                user_init
+ *fill*         0x08005aaa        0x2 
  .text.user_CAN_init
-                0x08005a54       0xac CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
-                0x08005a54                user_CAN_init
+                0x08005aac       0xac CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+                0x08005aac                user_CAN_init
  .text.HAL_CAN_RxFifo0MsgPendingCallback
-                0x08005b00       0x3c CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
-                0x08005b00                HAL_CAN_RxFifo0MsgPendingCallback
+                0x08005b58       0x3c CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+                0x08005b58                HAL_CAN_RxFifo0MsgPendingCallback
  .text.HAL_GPIO_EXTI_Callback
-                0x08005b3c       0x38 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
-                0x08005b3c                HAL_GPIO_EXTI_Callback
- .text.panic    0x08005b74        0xc CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
-                0x08005b74                panic
+                0x08005b94       0x38 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+                0x08005b94                HAL_GPIO_EXTI_Callback
+ .text.panic    0x08005bcc        0xc CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+                0x08005bcc                panic
  .text.__io_putchar
-                0x08005b80       0x2c CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj
-                0x08005b80                __io_putchar
+                0x08005bd8       0x2c CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj
+                0x08005bd8                __io_putchar
  .text.__io_getchar
-                0x08005bac       0x30 CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj
-                0x08005bac                __io_getchar
+                0x08005c04       0x30 CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj
+                0x08005c04                __io_getchar
  *(.glue_7)
- .glue_7        0x08005bdc        0x0 linker stubs
+ .glue_7        0x08005c34        0x0 linker stubs
  *(.glue_7t)
- .glue_7t       0x08005bdc        0x0 linker stubs
+ .glue_7t       0x08005c34        0x0 linker stubs
  *(.eh_frame)
- .eh_frame      0x08005bdc        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
+ .eh_frame      0x08005c34        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
  *(.init)
- .init          0x08005bdc        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crti.o
-                0x08005bdc                _init
- .init          0x08005be0        0x8 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
+ .init          0x08005c34        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crti.o
+                0x08005c34                _init
+ .init          0x08005c38        0x8 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
  *(.fini)
- .fini          0x08005be8        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crti.o
-                0x08005be8                _fini
- .fini          0x08005bec        0x8 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
-                0x08005bf4                        . = ALIGN (0x4)
-                0x08005bf4                        _etext = .
+ .fini          0x08005c40        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crti.o
+                0x08005c40                _fini
+ .fini          0x08005c44        0x8 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
+                0x08005c4c                        . = ALIGN (0x4)
+                0x08005c4c                        _etext = .
 
-.vfp11_veneer   0x08005bf4        0x0
- .vfp11_veneer  0x08005bf4        0x0 linker stubs
+.vfp11_veneer   0x08005c4c        0x0
+ .vfp11_veneer  0x08005c4c        0x0 linker stubs
 
-.v4_bx          0x08005bf4        0x0
- .v4_bx         0x08005bf4        0x0 linker stubs
+.v4_bx          0x08005c4c        0x0
+ .v4_bx         0x08005c4c        0x0 linker stubs
 
-.iplt           0x08005bf4        0x0
- .iplt          0x08005bf4        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
+.iplt           0x08005c4c        0x0
+ .iplt          0x08005c4c        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
 
-.rodata         0x08005bf4      0x25c
-                0x08005bf4                        . = ALIGN (0x4)
+.rodata         0x08005c4c      0x25c
+                0x08005c4c                        . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x08005bf4      0x1a9 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+ .rodata        0x08005c4c      0x1a9 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
  *(.rodata*)
- *fill*         0x08005d9d        0x3 
+ *fill*         0x08005df5        0x3 
  .rodata.AHBPrescTable
-                0x08005da0       0x10 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
-                0x08005da0                AHBPrescTable
+                0x08005df8       0x10 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
+                0x08005df8                AHBPrescTable
  .rodata.APBPrescTable
-                0x08005db0        0x8 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
-                0x08005db0                APBPrescTable
+                0x08005e08        0x8 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
+                0x08005e08                APBPrescTable
  .rodata.aPLLMULFactorTable
-                0x08005db8       0x10 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c.obj
+                0x08005e10       0x10 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c.obj
  .rodata.aPredivFactorTable
-                0x08005dc8       0x10 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c.obj
+                0x08005e20       0x10 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c.obj
  .rodata.event_lookup
-                0x08005dd8       0x3c CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+                0x08005e30       0x3c CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
  .rodata.str1.4
-                0x08005e14       0x39 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-nano-vfprintf.o)
+                0x08005e6c       0x39 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-nano-vfprintf.o)
                                  0x13 (size before relaxing)
  .rodata.str1.4
-                0x08005e4d       0x25 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-nano-vfprintf_i.o)
-                0x08005e74                        . = ALIGN (0x4)
- *fill*         0x08005e4d        0x3 
+                0x08005ea5       0x25 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-nano-vfprintf_i.o)
+                0x08005ecc                        . = ALIGN (0x4)
+ *fill*         0x08005ea5        0x3 
 
-.ARM.extab      0x08005e50        0x0
-                0x08005e50                        . = ALIGN (0x4)
+.ARM.extab      0x08005ea8        0x0
+                0x08005ea8                        . = ALIGN (0x4)
  *(.ARM.extab* .gnu.linkonce.armextab.*)
-                0x08005e50                        . = ALIGN (0x4)
+                0x08005ea8                        . = ALIGN (0x4)
 
-.ARM            0x08005e50        0x8
-                0x08005e50                        . = ALIGN (0x4)
-                0x08005e50                        __exidx_start = .
+.ARM            0x08005ea8        0x8
+                0x08005ea8                        . = ALIGN (0x4)
+                0x08005ea8                        __exidx_start = .
  *(.ARM.exidx*)
- .ARM.exidx     0x08005e50        0x8 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memchr.o)
- .ARM.exidx     0x08005e58        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memcpy.o)
+ .ARM.exidx     0x08005ea8        0x8 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memchr.o)
+ .ARM.exidx     0x08005eb0        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memcpy.o)
                                   0x8 (size before relaxing)
-                0x08005e58                        __exidx_end = .
-                0x08005e58                        . = ALIGN (0x4)
+                0x08005eb0                        __exidx_end = .
+                0x08005eb0                        . = ALIGN (0x4)
 
-.preinit_array  0x08005e58        0x0
-                0x08005e58                        . = ALIGN (0x4)
-                0x08005e58                        PROVIDE (__preinit_array_start = .)
+.preinit_array  0x08005eb0        0x0
+                0x08005eb0                        . = ALIGN (0x4)
+                0x08005eb0                        PROVIDE (__preinit_array_start = .)
  *(.preinit_array*)
-                0x08005e58                        PROVIDE (__preinit_array_end = .)
-                0x08005e58                        . = ALIGN (0x4)
+                0x08005eb0                        PROVIDE (__preinit_array_end = .)
+                0x08005eb0                        . = ALIGN (0x4)
 
-.init_array     0x08005e58        0x4
-                0x08005e58                        . = ALIGN (0x4)
-                0x08005e58                        PROVIDE (__init_array_start = .)
+.init_array     0x08005eb0        0x4
+                0x08005eb0                        . = ALIGN (0x4)
+                0x08005eb0                        PROVIDE (__init_array_start = .)
  *(SORT_BY_NAME(.init_array.*))
  *(.init_array*)
- .init_array    0x08005e58        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
-                0x08005e5c                        PROVIDE (__init_array_end = .)
-                0x08005e5c                        . = ALIGN (0x4)
+ .init_array    0x08005eb0        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
+                0x08005eb4                        PROVIDE (__init_array_end = .)
+                0x08005eb4                        . = ALIGN (0x4)
 
-.fini_array     0x08005e5c        0x4
-                0x08005e5c                        . = ALIGN (0x4)
-                0x08005e5c                        PROVIDE (__fini_array_start = .)
+.fini_array     0x08005eb4        0x4
+                0x08005eb4                        . = ALIGN (0x4)
+                0x08005eb4                        PROVIDE (__fini_array_start = .)
  *(SORT_BY_NAME(.fini_array.*))
  *(.fini_array*)
- .fini_array    0x08005e5c        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
-                0x08005e60                        PROVIDE (__fini_array_end = .)
-                0x08005e60                        . = ALIGN (0x4)
-                0x08005e60                        _siccmram = LOADADDR (.ccmram)
+ .fini_array    0x08005eb4        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
+                0x08005eb8                        PROVIDE (__fini_array_end = .)
+                0x08005eb8                        . = ALIGN (0x4)
+                0x08005eb8                        _siccmram = LOADADDR (.ccmram)
 
-.rel.dyn        0x08005e60        0x0
- .rel.iplt      0x08005e60        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
+.rel.dyn        0x08005eb8        0x0
+ .rel.iplt      0x08005eb8        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
 
-.ccmram         0x10000000        0x0 load address 0x08005e60
+.ccmram         0x10000000        0x0 load address 0x08005eb8
                 0x10000000                        . = ALIGN (0x4)
                 0x10000000                        _sccmram = .
  *(.ccmram)
  *(.ccmram*)
                 0x10000000                        . = ALIGN (0x4)
                 0x10000000                        _eccmram = .
-                0x08005e60                        _sidata = LOADADDR (.data)
+                0x08005eb8                        _sidata = LOADADDR (.data)
 
-.data           0x20000000       0x6c load address 0x08005e60
+.data           0x20000000       0x6c load address 0x08005eb8
                 0x20000000                        . = ALIGN (0x4)
                 0x20000000                        _sdata = .
  *(.data)
@@ -3327,16 +3327,16 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
                 0x2000006c                        . = ALIGN (0x4)
 
 .tm_clone_table
-                0x2000006c        0x0 load address 0x08005ecc
+                0x2000006c        0x0 load address 0x08005f24
  .tm_clone_table
                 0x2000006c        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
  .tm_clone_table
                 0x2000006c        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtend.o
 
-.igot.plt       0x2000006c        0x0 load address 0x08005ecc
+.igot.plt       0x2000006c        0x0 load address 0x08005f24
  .igot.plt      0x2000006c        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
 
-.tdata          0x2000006c        0x0 load address 0x08005ecc
+.tdata          0x2000006c        0x0 load address 0x08005f24
  *(.tdata .tdata.* .gnu.linkonce.td.*)
                 0x2000006c                        . = ALIGN (0x4)
                 0x2000006c                        _edata = .
@@ -3353,7 +3353,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
                 [!provide]                        PROVIDE (__data_source_end = __tdata_source_end)
                 [!provide]                        PROVIDE (__data_source_size = (__data_source_end - __data_source))
 
-.tbss           0x2000006c        0x0 load address 0x08005ecc
+.tbss           0x2000006c        0x0 load address 0x08005f24
                 0x2000006c                        _sbss = .
                 0x2000006c                        __bss_start__ = _sbss
  *(.tbss .tbss.*)
@@ -3370,7 +3370,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
                 [!provide]                        PROVIDE (__arm32_tls_tcb_offset = MAX (0x8, __tls_align))
                 [!provide]                        PROVIDE (__arm64_tls_tcb_offset = MAX (0x10, __tls_align))
 
-.bss            0x2000006c      0x268 load address 0x08005ecc
+.bss            0x2000006c      0x268 load address 0x08005f24
  *(.bss)
  .bss           0x2000006c       0x1c /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtbegin.o
  .bss           0x20000088      0x13c /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-findfp.o)
@@ -3410,7 +3410,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7e-m+fp/hard/crtn.o
                 [!provide]                        PROVIDE (__bss_size = (__bss_end - __bss_start))
 
 ._user_heap_stack
-                0x200002d4      0x604 load address 0x08005ecc
+                0x200002d4      0x604 load address 0x08005f24
                 0x200002d8                        . = ALIGN (0x8)
  *fill*         0x200002d4        0x4 
                 [!provide]                        PROVIDE (end = .)
@@ -3840,7 +3840,7 @@ LOAD linker stubs
  .debug_rnglists
                 0x0000089b       0x66 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-nano-vfprintf_i.o)
 
-.debug_macro    0x00000000    0x20f8c
+.debug_macro    0x00000000    0x2100a
  .debug_macro   0x00000000      0x184 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
  .debug_macro   0x00000184      0xae4 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
  .debug_macro   0x00000c68       0x2e cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
@@ -3885,65 +3885,65 @@ LOAD linker stubs
  .debug_macro   0x0001e94b      0x184 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c.obj
  .debug_macro   0x0001eacf      0x1a1 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c.obj
  .debug_macro   0x0001ec70      0x193 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001ee03       0x5e CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_macro   0x0001ee61      0x19d CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
- .debug_macro   0x0001effe      0x193 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
- .debug_macro   0x0001f191       0xe1 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_macro   0x0001f272       0x10 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_macro   0x0001f282       0x22 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_macro   0x0001f2a4       0x60 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_macro   0x0001f304       0x2a CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_macro   0x0001f32e       0x94 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_macro   0x0001f3c2       0x3c CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_macro   0x0001f3fe       0x34 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_macro   0x0001f432       0x57 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_macro   0x0001f489      0x370 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_macro   0x0001f7f9       0x16 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_macro   0x0001f80f       0x58 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_macro   0x0001f867       0x34 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_macro   0x0001f89b       0x10 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_macro   0x0001f8ab       0x52 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_macro   0x0001f8fd      0x1de CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_macro   0x0001fadb      0x23c CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_macro   0x0001fd17      0x24c CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x0001ff63       0x10 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x0001ff73       0x4a CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x0001ffbd       0x10 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x0001ffcd       0x10 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x0001ffdd       0x10 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x0001ffed       0x6a CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x00020057       0x1c CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x00020073       0x52 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x000200c5       0x22 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x000200e7       0x10 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x000200f7       0x52 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x00020149       0xcf CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x00020218       0x1c CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x00020234       0x3d CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x00020271       0x35 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x000202a6      0x12c CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x000203d2       0x16 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x000203e8       0x16 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x000203fe       0x29 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x00020427      0x242 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x00020669       0x1c CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x00020685       0x10 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x00020695       0x10 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x000206a5       0x16 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x000206bb      0x170 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x0002082b      0x18a CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x000209b5       0x16 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x000209cb       0xce CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_macro   0x00020a99      0x2e4 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
- .debug_macro   0x00020d7d       0x10 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
- .debug_macro   0x00020d8d       0x16 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
- .debug_macro   0x00020da3       0x16 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
- .debug_macro   0x00020db9       0x16 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
- .debug_macro   0x00020dcf       0x10 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
- .debug_macro   0x00020ddf       0x16 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
- .debug_macro   0x00020df5      0x197 CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj
+ .debug_macro   0x0001ee03       0xdc CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_macro   0x0001eedf      0x19d CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+ .debug_macro   0x0001f07c      0x193 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
+ .debug_macro   0x0001f20f       0xe1 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_macro   0x0001f2f0       0x10 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_macro   0x0001f300       0x22 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_macro   0x0001f322       0x60 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_macro   0x0001f382       0x2a CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_macro   0x0001f3ac       0x94 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_macro   0x0001f440       0x3c CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_macro   0x0001f47c       0x34 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_macro   0x0001f4b0       0x57 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_macro   0x0001f507      0x370 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_macro   0x0001f877       0x16 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_macro   0x0001f88d       0x58 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_macro   0x0001f8e5       0x34 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_macro   0x0001f919       0x10 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_macro   0x0001f929       0x52 CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_macro   0x0001f97b      0x1de CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_macro   0x0001fb59      0x23c CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_macro   0x0001fd95      0x24c CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x0001ffe1       0x10 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x0001fff1       0x4a CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x0002003b       0x10 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x0002004b       0x10 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x0002005b       0x10 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x0002006b       0x6a CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x000200d5       0x1c CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x000200f1       0x52 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x00020143       0x22 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x00020165       0x10 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x00020175       0x52 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x000201c7       0xcf CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x00020296       0x1c CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x000202b2       0x3d CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x000202ef       0x35 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x00020324      0x12c CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x00020450       0x16 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x00020466       0x16 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x0002047c       0x29 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x000204a5      0x242 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x000206e7       0x1c CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x00020703       0x10 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x00020713       0x10 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x00020723       0x16 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x00020739      0x170 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x000208a9      0x18a CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x00020a33       0x16 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x00020a49       0xce CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_macro   0x00020b17      0x2e4 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+ .debug_macro   0x00020dfb       0x10 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+ .debug_macro   0x00020e0b       0x16 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+ .debug_macro   0x00020e21       0x16 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+ .debug_macro   0x00020e37       0x16 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+ .debug_macro   0x00020e4d       0x10 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+ .debug_macro   0x00020e5d       0x16 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+ .debug_macro   0x00020e73      0x197 CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj
 
-.debug_line     0x00000000     0xf9bd
+.debug_line     0x00000000     0xf9d8
  .debug_line    0x00000000      0x61b cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
  .debug_line    0x0000061b     0x1043 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c.obj
  .debug_line    0x0000165e      0x852 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c.obj
@@ -3952,97 +3952,97 @@ LOAD linker stubs
  .debug_line    0x0000402e      0x9c5 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c.obj
  .debug_line    0x000049f3      0xb1d cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c.obj
  .debug_line    0x00005510     0x2ace cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c.obj
- .debug_line    0x00007fde      0x6e9 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_line    0x000086c7      0x67b CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
- .debug_line    0x00008d42      0x63a CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
- .debug_line    0x0000937c      0x1ef CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_line    0x0000956b      0x520 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_line    0x00009a8b       0x7a CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj
- .debug_line    0x00009b05      0x87f CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
- .debug_line    0x0000a384      0x5d2 CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj
- .debug_line    0x0000a956      0x11e /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-init.o)
- .debug_line    0x0000aa74      0x2cf /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-puts.o)
- .debug_line    0x0000ad43      0x4fc /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-findfp.o)
- .debug_line    0x0000b23f      0x1b6 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memset.o)
- .debug_line    0x0000b3f5      0x446 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-fflush.o)
- .debug_line    0x0000b83b      0x10c /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-errno.o)
- .debug_line    0x0000b947      0x446 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-mallocr.o)
- .debug_line    0x0000bd8d      0x2c3 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-freer.o)
- .debug_line    0x0000c050      0x1d1 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-fwalk.o)
- .debug_line    0x0000c221      0x2b0 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-wsetup.o)
- .debug_line    0x0000c4d1      0x153 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-mlock.o)
- .debug_line    0x0000c624      0x3a7 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-makebuf.o)
- .debug_line    0x0000c9cb      0x1c5 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-printf.o)
- .debug_line    0x0000cb90      0x194 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-isattyr.o)
- .debug_line    0x0000cd24      0x6c5 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-nano-vfprintf.o)
- .debug_line    0x0000d3e9      0x256 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-wbuf.o)
- .debug_line    0x0000d63f      0x193 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-sbrkr.o)
- .debug_line    0x0000d7d2      0x22b /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-stdio.o)
- .debug_line    0x0000d9fd       0xe7 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-impure.o)
- .debug_line    0x0000dae4      0x5ec /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-fvwrite.o)
- .debug_line    0x0000e0d0      0x193 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-closer.o)
- .debug_line    0x0000e263      0x1f1 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memmove.o)
- .debug_line    0x0000e454       0x84 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memchr.o)
- .debug_line    0x0000e4d8       0xb9 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memcpy.o)
- .debug_line    0x0000e591      0x198 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-readr.o)
- .debug_line    0x0000e729      0x27b /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-reent.o)
- .debug_line    0x0000e9a4      0x1f8 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-reallocr.o)
- .debug_line    0x0000eb9c      0x75d /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-nano-vfprintf_i.o)
- .debug_line    0x0000f2f9      0x21c /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-fstatr.o)
- .debug_line    0x0000f515      0x199 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-lseekr.o)
- .debug_line    0x0000f6ae      0x199 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-writer.o)
- .debug_line    0x0000f847      0x176 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-msizer.o)
+ .debug_line    0x00007fde      0x701 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_line    0x000086df      0x67e CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+ .debug_line    0x00008d5d      0x63a CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
+ .debug_line    0x00009397      0x1ef CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_line    0x00009586      0x520 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_line    0x00009aa6       0x7a CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj
+ .debug_line    0x00009b20      0x87f CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+ .debug_line    0x0000a39f      0x5d2 CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj
+ .debug_line    0x0000a971      0x11e /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-init.o)
+ .debug_line    0x0000aa8f      0x2cf /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-puts.o)
+ .debug_line    0x0000ad5e      0x4fc /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-findfp.o)
+ .debug_line    0x0000b25a      0x1b6 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memset.o)
+ .debug_line    0x0000b410      0x446 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-fflush.o)
+ .debug_line    0x0000b856      0x10c /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-errno.o)
+ .debug_line    0x0000b962      0x446 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-mallocr.o)
+ .debug_line    0x0000bda8      0x2c3 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-freer.o)
+ .debug_line    0x0000c06b      0x1d1 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-fwalk.o)
+ .debug_line    0x0000c23c      0x2b0 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-wsetup.o)
+ .debug_line    0x0000c4ec      0x153 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-mlock.o)
+ .debug_line    0x0000c63f      0x3a7 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-makebuf.o)
+ .debug_line    0x0000c9e6      0x1c5 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-printf.o)
+ .debug_line    0x0000cbab      0x194 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-isattyr.o)
+ .debug_line    0x0000cd3f      0x6c5 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-nano-vfprintf.o)
+ .debug_line    0x0000d404      0x256 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-wbuf.o)
+ .debug_line    0x0000d65a      0x193 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-sbrkr.o)
+ .debug_line    0x0000d7ed      0x22b /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-stdio.o)
+ .debug_line    0x0000da18       0xe7 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-impure.o)
+ .debug_line    0x0000daff      0x5ec /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-fvwrite.o)
+ .debug_line    0x0000e0eb      0x193 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-closer.o)
+ .debug_line    0x0000e27e      0x1f1 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memmove.o)
+ .debug_line    0x0000e46f       0x84 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memchr.o)
+ .debug_line    0x0000e4f3       0xb9 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memcpy.o)
+ .debug_line    0x0000e5ac      0x198 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-readr.o)
+ .debug_line    0x0000e744      0x27b /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-reent.o)
+ .debug_line    0x0000e9bf      0x1f8 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-reallocr.o)
+ .debug_line    0x0000ebb7      0x75d /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-nano-vfprintf_i.o)
+ .debug_line    0x0000f314      0x21c /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-fstatr.o)
+ .debug_line    0x0000f530      0x199 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-lseekr.o)
+ .debug_line    0x0000f6c9      0x199 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-writer.o)
+ .debug_line    0x0000f862      0x176 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-msizer.o)
 
-.debug_str      0x00000000    0xc5aea
- .debug_str     0x00000000    0xc5aea cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
+.debug_str      0x00000000    0xc5d0f
+ .debug_str     0x00000000    0xc5d0f cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
                               0xbcb42 (size before relaxing)
- .debug_str     0x000c5aea    0xbd2d1 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c.obj
- .debug_str     0x000c5aea    0xbd3f5 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c.obj
- .debug_str     0x000c5aea    0xbcfd0 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c.obj
- .debug_str     0x000c5aea    0xbce25 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc_ex.c.obj
- .debug_str     0x000c5aea    0xbcd26 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c.obj
- .debug_str     0x000c5aea    0xbd465 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c.obj
- .debug_str     0x000c5aea    0xbd85a cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c.obj
- .debug_str     0x000c5aea    0xbdbae CMakeFiles/FloorController.dir/Core/Src/main.c.obj
- .debug_str     0x000c5aea    0xbcf02 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
- .debug_str     0x000c5aea    0xbd81b CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
- .debug_str     0x000c5aea     0x753c CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
- .debug_str     0x000c5aea     0x99a3 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
- .debug_str     0x000c5aea       0xb4 CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj
- .debug_str     0x000c5aea    0xc0779 CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
- .debug_str     0x000c5aea    0xbcef8 CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj
- .debug_str     0x000c5aea      0x1fa /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-init.o)
- .debug_str     0x000c5aea      0x503 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-puts.o)
- .debug_str     0x000c5aea      0x6bf /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-findfp.o)
- .debug_str     0x000c5aea      0x1ad /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memset.o)
- .debug_str     0x000c5aea      0x543 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-fflush.o)
- .debug_str     0x000c5aea      0x4b6 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-errno.o)
- .debug_str     0x000c5aea      0x59d /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-mallocr.o)
- .debug_str     0x000c5aea      0x53c /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-freer.o)
- .debug_str     0x000c5aea      0x4cc /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-fwalk.o)
- .debug_str     0x000c5aea      0x4ed /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-wsetup.o)
- .debug_str     0x000c5aea      0x4da /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-mlock.o)
- .debug_str     0x000c5aea      0x64f /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-makebuf.o)
- .debug_str     0x000c5aea      0x4f7 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-printf.o)
- .debug_str     0x000c5aea      0x4bc /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-isattyr.o)
- .debug_str     0x000c5aea      0x829 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-nano-vfprintf.o)
- .debug_str     0x000c5aea      0x4f2 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-wbuf.o)
- .debug_str     0x000c5aea      0x4c5 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-sbrkr.o)
- .debug_str     0x000c5aea      0x529 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-stdio.o)
- .debug_str     0x000c5aea      0x4bc /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-impure.o)
- .debug_str     0x000c5aea      0x560 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-fvwrite.o)
- .debug_str     0x000c5aea      0x4b2 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-closer.o)
- .debug_str     0x000c5aea      0x1cc /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memmove.o)
- .debug_str     0x000c5aea       0x9e /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memchr.o)
- .debug_str     0x000c5aea       0xac /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memcpy.o)
- .debug_str     0x000c5aea      0x4c0 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-readr.o)
- .debug_str     0x000c5aea      0x4db /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-reent.o)
- .debug_str     0x000c5aea      0x532 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-reallocr.o)
- .debug_str     0x000c5aea      0x79b /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-nano-vfprintf_i.o)
- .debug_str     0x000c5aea      0x604 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-fstatr.o)
- .debug_str     0x000c5aea      0x4c0 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-lseekr.o)
- .debug_str     0x000c5aea      0x4c2 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-writer.o)
- .debug_str     0x000c5aea      0x505 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-msizer.o)
+ .debug_str     0x000c5d0f    0xbd2d1 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_can.c.obj
+ .debug_str     0x000c5d0f    0xbd3f5 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c.obj
+ .debug_str     0x000c5d0f    0xbcfd0 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c.obj
+ .debug_str     0x000c5d0f    0xbce25 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc_ex.c.obj
+ .debug_str     0x000c5d0f    0xbcd26 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c.obj
+ .debug_str     0x000c5d0f    0xbd465 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c.obj
+ .debug_str     0x000c5d0f    0xbd85a cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c.obj
+ .debug_str     0x000c5d0f    0xbddd3 CMakeFiles/FloorController.dir/Core/Src/main.c.obj
+ .debug_str     0x000c5d0f    0xbd127 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_it.c.obj
+ .debug_str     0x000c5d0f    0xbda40 CMakeFiles/FloorController.dir/Core/Src/stm32f3xx_hal_msp.c.obj
+ .debug_str     0x000c5d0f     0x753c CMakeFiles/FloorController.dir/Core/Src/sysmem.c.obj
+ .debug_str     0x000c5d0f     0x99a3 CMakeFiles/FloorController.dir/Core/Src/syscalls.c.obj
+ .debug_str     0x000c5d0f       0xb4 CMakeFiles/FloorController.dir/startup_stm32f303xe.s.obj
+ .debug_str     0x000c5d0f    0xc099e CMakeFiles/FloorController.dir/Core/Src/usermain.c.obj
+ .debug_str     0x000c5d0f    0xbcef8 CMakeFiles/FloorController.dir/Core/Src/stdio_redirect.c.obj
+ .debug_str     0x000c5d0f      0x1fa /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-init.o)
+ .debug_str     0x000c5d0f      0x503 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-puts.o)
+ .debug_str     0x000c5d0f      0x6bf /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-findfp.o)
+ .debug_str     0x000c5d0f      0x1ad /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memset.o)
+ .debug_str     0x000c5d0f      0x543 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-fflush.o)
+ .debug_str     0x000c5d0f      0x4b6 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-errno.o)
+ .debug_str     0x000c5d0f      0x59d /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-mallocr.o)
+ .debug_str     0x000c5d0f      0x53c /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-freer.o)
+ .debug_str     0x000c5d0f      0x4cc /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-fwalk.o)
+ .debug_str     0x000c5d0f      0x4ed /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-wsetup.o)
+ .debug_str     0x000c5d0f      0x4da /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-mlock.o)
+ .debug_str     0x000c5d0f      0x64f /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-makebuf.o)
+ .debug_str     0x000c5d0f      0x4f7 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-printf.o)
+ .debug_str     0x000c5d0f      0x4bc /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-isattyr.o)
+ .debug_str     0x000c5d0f      0x829 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-nano-vfprintf.o)
+ .debug_str     0x000c5d0f      0x4f2 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-wbuf.o)
+ .debug_str     0x000c5d0f      0x4c5 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-sbrkr.o)
+ .debug_str     0x000c5d0f      0x529 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-stdio.o)
+ .debug_str     0x000c5d0f      0x4bc /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-impure.o)
+ .debug_str     0x000c5d0f      0x560 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-fvwrite.o)
+ .debug_str     0x000c5d0f      0x4b2 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-closer.o)
+ .debug_str     0x000c5d0f      0x1cc /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memmove.o)
+ .debug_str     0x000c5d0f       0x9e /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memchr.o)
+ .debug_str     0x000c5d0f       0xac /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-memcpy.o)
+ .debug_str     0x000c5d0f      0x4c0 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-readr.o)
+ .debug_str     0x000c5d0f      0x4db /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-reent.o)
+ .debug_str     0x000c5d0f      0x532 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-reallocr.o)
+ .debug_str     0x000c5d0f      0x79b /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-nano-vfprintf_i.o)
+ .debug_str     0x000c5d0f      0x604 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-fstatr.o)
+ .debug_str     0x000c5d0f      0x4c0 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-lseekr.o)
+ .debug_str     0x000c5d0f      0x4c2 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-writer.o)
+ .debug_str     0x000c5d0f      0x505 /usr/lib/gcc/arm-none-eabi/13.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(libc_a-msizer.o)
 
 .debug_frame    0x00000000     0x2bb8
  .debug_frame   0x00000000       0x58 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f3xx.c.obj
