@@ -232,6 +232,9 @@ FloorController_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 FloorController_SOURCE_DIR:STATIC=/home/nigel/Projects/school/ElevatorProject/FloorController
 
+//No help, variable specified on the command line.
+NODE_ID:UNINITIALIZED=NODE_ID_FC1
+
 
 ########################
 # INTERNAL cache entries

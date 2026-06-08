@@ -87,9 +87,9 @@ void user_main(void);
 #define PB3_IN_Pin GPIO_PIN_14
 #define PB3_IN_GPIO_Port GPIOB
 #define PB3_IN_EXTI_IRQn EXTI15_10_IRQn
-#define PB3_INB15_Pin GPIO_PIN_15
-#define PB3_INB15_GPIO_Port GPIOB
-#define PB3_INB15_EXTI_IRQn EXTI15_10_IRQn
+#define PB2_IN_Pin GPIO_PIN_15
+#define PB2_IN_GPIO_Port GPIOB
+#define PB2_IN_EXTI_IRQn EXTI15_10_IRQn
 #define TMS_Pin GPIO_PIN_13
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14

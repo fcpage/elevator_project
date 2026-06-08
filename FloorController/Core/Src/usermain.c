@@ -33,7 +33,7 @@ static u32	TxMailbox;
 static u8   BUTTON = NO_BUTTON_PRESSED;		// Initial value is that no BUTTON has been pressed
 
 #ifndef NODE_ID
-#define NODE_ID NODE_ID_SC
+#define NODE_ID NODE_ID_CC
 #endif
 
 typedef struct { 
@@ -183,9 +183,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	// Set the BUTTON Flag to indicate which button was pressed
 	switch(GPIO_Pin)  {
         case B1_Pin:           BUTTON = BLUE_BUTTON_PRESSED; break;
-        // case Pushbutton_1_Pin: BUTTON = FL1_BUTTON_PRESSED; break;
-        // case Pushbutton_2_Pin: BUTTON = FL2_BUTTON_PRESSED; break;
-        // case Pushbutton_3_Pin: BUTTON = FL3_BUTTON_PRESSED; break;
+        case PB1_IN_Pin: BUTTON = FL1_BUTTON_PRESSED; break;
+        case PB2_IN_Pin: BUTTON = FL2_BUTTON_PRESSED; break;
+        case PB3_IN_Pin: BUTTON = FL3_BUTTON_PRESSED; break;
         default: {
             /* Note: no overhead in release mode */
             dbglog("ERROR: Unknown button %d pressed", GPIO_Pin);

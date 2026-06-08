@@ -289,8 +289,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PB1_IN_Pin PB3_IN_Pin PB3_INB15_Pin */
-  GPIO_InitStruct.Pin = PB1_IN_Pin|PB3_IN_Pin|PB3_INB15_Pin;
+  /*Configure GPIO pins : PB1_IN_Pin PB3_IN_Pin PB2_IN_Pin */
+  GPIO_InitStruct.Pin = PB1_IN_Pin|PB3_IN_Pin|PB2_IN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
