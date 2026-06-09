@@ -56,7 +56,7 @@ ecOperationStatus runProcess(const std::array<const char*, 11>& arguments)
     int status = 0;
     if (::waitpid(childProcessId, &status, 0) < 0)
     {
-        return OperationStatus::HardwareUnavailable;
+        return ecOperationStatus::HardwareUnavailable;
     }
 
     if (!didProcessExitSuccessfully(status))
@@ -110,7 +110,7 @@ ecOperationStatus configureSocketCanInterface(const sSocketCanConfig& config)
         nullptr};
 
     status = runProcess(configureCommand);
-    if (status != OperationStatus::Ok)
+    if (status != ecOperationStatus::Ok)
     {
         return status;
     }
