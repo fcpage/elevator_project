@@ -17,8 +17,8 @@ Modes:
 
 Examples:
   ./scripts/build_rpi.sh --test
-  ./scripts/build_rpi.sh --hardware can0 250000
-  ./scripts/build_rpi.sh --production can0 250000
+  ./scripts/build_rpi.sh --hardware can0 125000
+  ./scripts/build_rpi.sh --production can0 125000
 USAGE
 }
 
@@ -67,7 +67,8 @@ run_cmake_build()
         -S "${cmake_source}" \
         -B "${build_directory}" \
         -DSUPERVISORY_ENABLE_AUTO_ARRIVAL="${enable_auto_arrival}" \
-        -DSUPERVISORY_USE_VIRTUAL_CAN="${use_virtual_can}"
+        -DSUPERVISORY_USE_VIRTUAL_CAN="${use_virtual_can}" \
+        -DSUPERVISORY_CAN_INTERFACE_PRECONFIGURED=ON
 
     cmake --build "${build_directory}"
 }
@@ -88,30 +89,29 @@ main()
     supervisor_root="$(cd -- "${script_dir}/.." >/dev/null && pwd)"
     local cmake_source
     cmake_source="$(select_cmake_source "${supervisor_root}")"
-    local build_directory="${supervisor_root}/build-rpi"
 
     case "${mode}" in
         --test|test)
             local interface_name="${2:-vcan0}"
-            bash "${script_dir}/initialize_can.sh" --virtual "${interface_name}"
+            local build_directory="${supervisor_root}/build-rpi/test"
             run_cmake_build "${cmake_source}" "${build_directory}" ON ON
-            echo "build_rpi.sh: run ./build-rpi/supervisory_controller ${interface_name}"
+            echo "build_rpi.sh: run ./scripts/run_rpi.sh --test ${interface_name}"
             ;;
 
         --hardware|hardware)
             local interface_name="${2:-can0}"
-            local bitrate="${3:-250000}"
-            bash "${script_dir}/initialize_can.sh" "${interface_name}" "${bitrate}"
+            local bitrate="${3:-125000}"
+            local build_directory="${supervisor_root}/build-rpi/hardware"
             run_cmake_build "${cmake_source}" "${build_directory}" ON OFF
-            echo "build_rpi.sh: run sudo ./build-rpi/supervisory_controller ${interface_name}"
+            echo "build_rpi.sh: run ./scripts/run_rpi.sh --hardware ${interface_name} ${bitrate}"
             ;;
 
         --production|production)
             local interface_name="${2:-can0}"
-            local bitrate="${3:-250000}"
-            bash "${script_dir}/initialize_can.sh" "${interface_name}" "${bitrate}"
+            local bitrate="${3:-125000}"
+            local build_directory="${supervisor_root}/build-rpi/production"
             run_cmake_build "${cmake_source}" "${build_directory}" OFF OFF
-            echo "build_rpi.sh: run sudo ./build-rpi/supervisory_controller ${interface_name}"
+            echo "build_rpi.sh: run ./scripts/run_rpi.sh --production ${interface_name} ${bitrate}"
             ;;
 
         *)

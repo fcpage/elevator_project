@@ -5,43 +5,76 @@
 * @brief Holds the ESE-readable state-machine shape and public API.
 ******************************************************************/
 
-#include "project6/supervisory/control/supervisory_state_machine.hpp"
+/**
+ * @file supervisory_state_machine.cpp
+ * @brief Implements the event-driven supervisory control state machine for the elevator.
+ *
+ * This file coordinates queued floor requests, elevator movement, arrival and door timing,
+ * and fault handling. It translates state transitions into CAN commands and exposes the
+ * resulting high-level elevator state through the public supervisory state-machine API.
+ */
+
+#include "supervisory/control/supervisory_state_machine.hpp"
 
 #include <chrono>
 #include <iostream>
 #include <memory>
 #include <optional>
 
-#include "project6/supervisory/can/can_adapter.hpp"
-#include "project6/supervisory/drivers/supervisory_drivers.hpp"
-#include "project6/supervisory/scheduler/request_scheduler.hpp"
+#include "supervisory/can/can_protocol.hpp"
+#include "supervisory/drivers/supervisory_drivers.hpp"
+#include "supervisory/scheduler/request_scheduler.hpp"
 
 namespace project6::supervisory
 {
 
+/**
+ * @brief Mutable data shared by generated conditions and transition actions.
+ *
+ * The generated ESE machine contains only control flow. Requests, timers,
+ * hardware access, and externally visible state live here so callbacks can
+ * remain small and the public API can expose a stable snapshot.
+ */
 struct sStateMachineContext
 {
-    explicit sStateMachineContext(cSocketCanAdapter& adapter)
-        : canAdapter(adapter)
-    {
-    }
-
-    cSocketCanAdapter& canAdapter;
+    /** Queues normalized requests until the machine enters Dispatching. */
     cRequestScheduler scheduler;
+
+    /** Request currently being dispatched, moved toward, or completed. */
     std::optional<sElevatorRequest> activeRequest;
+
+    /** Stable state representation returned through the public API. */
     sSupervisoryStateSnapshot snapshot{};
+
+    /** Accumulated open-door time used by the Arrived timeout condition. */
     std::chrono::milliseconds doorOpenElapsedMs{0};
+
+    /** Accumulated travel time used only by optional simulated auto-arrival. */
     std::chrono::milliseconds movementElapsedMs{0};
+
+    /** Latched when elevator status confirms the active target floor. */
     bool didElevatorReportArrival = false;
+
+    /** CAN command waiting for the application to hand to the COMMS thread. */
+    std::optional<sCanFrame> pendingCanFrame;
 };
 
 namespace
 {
 
+/** Door dwell time before the Arrived state releases the serviced request. */
 constexpr std::chrono::milliseconds kDoorOpenDurationMs{3000};
 #ifdef SUPERVISORY_ENABLE_AUTO_ARRIVAL
 constexpr std::chrono::seconds kSimulatedTravelDuration{3};
 #endif
+
+/**
+ * @brief Context bridge used by no-argument callbacks emitted by the ESE generator.
+ *
+ * The current generator calls free functions and cannot pass user data. The API
+ * therefore installs its owned context while alive. This design permits only one
+ * active supervisory machine per process.
+ */
 sStateMachineContext* activeContext = nullptr;
 
 sStateMachineContext* context()
@@ -126,6 +159,12 @@ bool faultDetected()
     return state->snapshot.isFaulted;
 }
 
+/**
+ * @brief Promotes the scheduler's highest-priority request into active service.
+ *
+ * Selection occurs only on entry to Dispatching, preserving the active target
+ * until arrival or fault handling completes.
+ */
 void selectNextRequest()
 {
     sStateMachineContext* state = context();
@@ -141,6 +180,12 @@ void selectNextRequest()
     }
 }
 
+/**
+ * @brief Derives travel direction and transmits the active floor command.
+ *
+ * A CAN transmission failure is converted into the latched fault state consumed
+ * by the next generated-machine update.
+ */
 void commandElevatorToTarget()
 {
     sStateMachineContext* state = context();
@@ -165,14 +210,19 @@ void commandElevatorToTarget()
     state->movementElapsedMs = std::chrono::milliseconds{0};
     state->didElevatorReportArrival = false;
 
-    const ecOperationStatus status =
-        drivers::commandElevatorToFloor(state->canAdapter, state->activeRequest->floor);
-    if (status != ecOperationStatus::Ok)
+    state->pendingCanFrame = makeSupervisorCommandFrame(state->activeRequest->floor, true);
+    if (!state->pendingCanFrame.has_value())
     {
         state->snapshot.isFaulted = true;
     }
 }
 
+/**
+ * @brief Commits arrival state and starts the door dwell timer.
+ *
+ * The active request remains present during Arrived so the completed target is
+ * retained until the exit action closes the door and clears the request.
+ */
 void recordArrival()
 {
     sStateMachineContext* state = context();
@@ -199,6 +249,11 @@ void recordArrival()
     }
 }
 
+/**
+ * @brief Completes the active request when leaving Arrived.
+ *
+ * Door-close failure is latched as a fault for the following machine update.
+ */
 void clearServicedRequest()
 {
     sStateMachineContext* state = context();
@@ -220,6 +275,7 @@ void clearServicedRequest()
     }
 }
 
+/** @brief Applies the supervisor's conservative stop behavior after a fault. */
 void enterFaultState()
 {
     sStateMachineContext* state = context();
@@ -309,11 +365,25 @@ actions SupervisoryController {
 
 #ESE-END */
 
+/** @cond ESE_GENERATED */
 // #ESE-GENERATED-BEGIN: SupervisoryController
 // Generated by esepp. Do not edit this section by hand.
 
+/**
+ * Represents a supervisory controller for managing the states and operations
+ * of an elevator system.
+ *
+ * The `cSupervisoryController` class orchestrates transitions between different
+ * operational states of an elevator. It manages requests, monitors conditions,
+ * and handles state-specific logic to ensure proper functionality. This includes
+ * handling faults, determining state transitions based on inputs or events, and
+ * performing actions associated with entering and exiting states.
+ */
 class cSupervisoryController
 {
+    /**
+     *
+     */
 public:
     enum class State
     {
@@ -325,11 +395,17 @@ public:
         Faulted
     };
 
+    /**
+     *
+     */
     cSupervisoryController()
     {
         enterIdle();
     }
 
+    /**
+     *
+     */
     void update()
     {
         switch (currentState)
@@ -373,14 +449,39 @@ public:
         }
     }
 
+    /**
+     *
+     */
     State getState() const
     {
         return currentState;
     }
 
+    /**
+     *
+     */
 private:
     State currentState = State::Idle;
 
+    /**
+     * Handles state updates while in the Idle state.
+     *
+     * This method checks specific conditions to determine whether a state
+     * transition is required. If a fault is detected, it transitions to the
+     * Faulted state. If a pending request is available, it transitions to
+     * the Dispatching state.
+     *
+     * Conditions checked:
+     * - Fault detection: Calls `conditionFaultDetected` to determine if a fault
+     *   has occurred. If true, the state transitions to Faulted.
+     * - Pending request availability: Calls `conditionPendingRequestAvailable`
+     *   to check if there is a pending request. If true, the state transitions
+     *   to Dispatching.
+     *
+     * Transitions:
+     * - To `State::Faulted` if a fault is detected.
+     * - To `State::Dispatching` if a pending request is available.
+     */
     void updateIdle()
     {
         if (conditionFaultDetected())
@@ -395,6 +496,9 @@ private:
         }
     }
 
+    /**
+     *
+     */
     void updateDispatching()
     {
         if (conditionFaultDetected())
@@ -419,6 +523,9 @@ private:
         }
     }
 
+    /**
+     *
+     */
     void updateMovingUp()
     {
         if (conditionFaultDetected())
@@ -433,6 +540,9 @@ private:
         }
     }
 
+    /**
+     *
+     */
     void updateMovingDown()
     {
         if (conditionFaultDetected())
@@ -447,6 +557,9 @@ private:
         }
     }
 
+    /**
+     *
+     */
     void updateArrived()
     {
         if (conditionFaultDetected())
@@ -461,45 +574,74 @@ private:
         }
     }
 
+    /**
+     *
+     */
     void updateFaulted()
     {
     }
 
+    /**
+     * Checks if there is a pending request available for processing.
+     *
+     * @return true if a pending request exists, false otherwise.
+     */
     bool conditionPendingRequestAvailable()
     {
         return hasPendingRequest();
     }
 
+    /**
+     *
+     */
     bool conditionTargetIsCurrentFloor()
     {
         return targetIsCurrentFloor();
     }
 
+    /**
+     *
+     */
     bool conditionTargetAboveCurrentFloor()
     {
         return targetAboveCurrentFloor();
     }
 
+    /**
+     *
+     */
     bool conditionTargetBelowCurrentFloor()
     {
         return targetBelowCurrentFloor();
     }
 
+    /**
+     *
+     */
     bool conditionElevatorReportedArrival()
     {
         return elevatorReportedArrival();
     }
 
+    /**
+     *
+     */
     bool conditionDoorWaitExpired()
     {
         return doorWaitExpired();
     }
 
+    /**
+     *
+     */
     bool conditionFaultDetected()
     {
         return faultDetected();
     }
 
+    /**
+     *
+     */
     void transitionTo(State nextState)
     {
         if (currentState == nextState)
@@ -590,56 +732,107 @@ private:
         }
     }
 
+    /**
+     * Transitions the state machine into the "Idle" state.
+     *
+     * This method is responsible for initializing or performing the necessary
+     * actions when entering the "Idle" state of the supervisory state machine.
+     * The "Idle" state represents the default resting state after initialization
+     * or after completing a request. In this state, the system awaits new requests
+     * or events to react to.
+     *
+     * Intended to be invoked when a state transition to "Idle" is triggered.
+     * Typically called by the state machine's transition logic.
+     */
     void enterIdle()
     {
     }
 
+    /**
+     *
+     */
     void enterDispatching()
     {
         selectNextRequest();
     }
 
+    /**
+     *
+     */
     void enterMovingUp()
     {
         commandElevatorToTarget();
     }
 
+    /**
+     *
+     */
     void enterMovingDown()
     {
         commandElevatorToTarget();
     }
 
+    /**
+     *
+     */
     void enterArrived()
     {
         recordArrival();
     }
 
+    /**
+     *
+     */
     void enterFaulted()
     {
         enterFaultState();
     }
 
+    /**
+     *
+     */
     void exitIdle()
     {
     }
 
+    /**
+     *
+     */
     void exitDispatching()
     {
     }
 
+    /**
+     *
+     */
     void exitMovingUp()
     {
     }
 
+    /**
+     *
+     */
     void exitMovingDown()
     {
     }
 
+    /**
+     *
+     */
     void exitArrived()
     {
         clearServicedRequest();
     }
 
+    /**
+     * Handles the exit behavior for the Faulted state in the supervisory state machine.
+     *
+     * This method is executed when transitioning out of the Faulted state. It provides
+     * a place to perform any necessary cleanup or logging specific to exiting the Faulted state.
+     *
+     * The Faulted state represents a situation where a fault has been detected, and this method
+     * will be called during the transition to a new state following fault recovery or resolution.
+     */
     void exitFaulted()
     {
     }
@@ -647,11 +840,31 @@ private:
 };
 
 // #ESE-GENERATED-END: SupervisoryController
+/** @endcond */
 
 namespace
 {
 
-const char* controlStateName(const ecSupervisoryControlState state)
+    /**
+     * Retrieves the name of a specified supervisory control state as a string.
+     *
+     * This function converts an enumerated supervisory control state (`ecSupervisoryControlState`)
+     * to its corresponding textual representation. The returned string represents the
+     * operational state of the elevator system's supervisory control mechanism.
+     *
+     * @param state The supervisory control state to be converted to a string.
+     *              Possible values are:
+     *              - `ecSupervisoryControlState::Idle`: The elevator is idle and awaiting commands.
+     *              - `ecSupervisoryControlState::Dispatching`: The elevator is dispatching to a floor.
+     *              - `ecSupervisoryControlState::MovingUp`: The elevator is moving upward.
+     *              - `ecSupervisoryControlState::MovingDown`: The elevator is moving downward.
+     *              - `ecSupervisoryControlState::Arrived`: The elevator has arrived at the intended floor.
+     *              - `ecSupervisoryControlState::Faulted`: The elevator system has encountered a fault.
+     *
+     * @return A constant character pointer representing the name of the state. Returns "Unknown"
+     *         if the state does not match any known value in `ecSupervisoryControlState`.
+     */
+    const char* controlStateName(const ecSupervisoryControlState state)
 {
     switch (state)
     {
@@ -672,7 +885,10 @@ const char* controlStateName(const ecSupervisoryControlState state)
     return "Unknown";
 }
 
-const char* directionName(const ecTravelDirection direction)
+    /**
+     *
+     */
+    const char* directionName(const ecTravelDirection direction)
 {
     switch (direction)
     {
@@ -687,7 +903,10 @@ const char* directionName(const ecTravelDirection direction)
     return "Unknown";
 }
 
-bool snapshotsDiffer(
+    /**
+     *
+     */
+    bool snapshotsDiffer(
     const sSupervisoryStateSnapshot& previous,
     const sSupervisoryStateSnapshot& current)
 {
@@ -699,7 +918,10 @@ bool snapshotsDiffer(
            previous.isFaulted != current.isFaulted;
 }
 
-void logStateChange(
+    /**
+     *
+     */
+    void logStateChange(
     const sSupervisoryStateSnapshot& previous,
     const sSupervisoryStateSnapshot& current)
 {
@@ -717,7 +939,10 @@ void logStateChange(
               << " faulted=" << (current.isFaulted ? "true" : "false") << '\n';
 }
 
-bool isMoving(const ecSupervisoryControlState state)
+    /**
+     *
+     */
+    bool isMoving(const ecSupervisoryControlState state)
 {
     return state == ecSupervisoryControlState::MovingUp ||
            state == ecSupervisoryControlState::MovingDown;
@@ -725,8 +950,8 @@ bool isMoving(const ecSupervisoryControlState state)
 
 } // namespace
 
-cSupervisoryStateMachineAPI::cSupervisoryStateMachineAPI(cSocketCanAdapter& canAdapter)
-    : smContext_(std::make_unique<sStateMachineContext>(canAdapter))
+cSupervisoryStateMachineAPI::cSupervisoryStateMachineAPI()
+    : smContext_(std::make_unique<sStateMachineContext>())
 {
     activeContext = smContext_.get();
     smMachine_ = std::make_unique<cSupervisoryController>();
@@ -805,6 +1030,13 @@ void cSupervisoryStateMachineAPI::handleEvent(const sSupervisoryEvent& event)
 sSupervisoryStateSnapshot cSupervisoryStateMachineAPI::snapshot() const
 {
     return smContext_->snapshot;
+}
+
+std::optional<sCanFrame> cSupervisoryStateMachineAPI::tryTakePendingCanFrame()
+{
+    std::optional<sCanFrame> frame = smContext_->pendingCanFrame;
+    smContext_->pendingCanFrame.reset();
+    return frame;
 }
 
 void cSupervisoryStateMachineAPI::refreshSnapshotState()

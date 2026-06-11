@@ -2,6 +2,7 @@
 * can_protocol.hpp - Shared CAN Protocol Helpers
 * Author: Project 6 Team
 * Last Modified: 2026-06-04
+* @file can_protocol.hpp
 * @brief Converts shared CAN frames into supervisor-level messages.
 ******************************************************************/
 
@@ -10,16 +11,16 @@
 #include <cstdint>
 #include <optional>
 
-#include "project6/supervisory/can/can_frame.hpp"
-#include "project6/supervisory/common/event.hpp"
+#include "supervisory/can/can_frame.hpp"
+#include "supervisory/common/event.hpp"
 
 namespace project6::supervisory
 {
 
 /**
- * @brief Runtime-independent description of the shared CAN protocol layout.
+ * @brief Standard struct of the shared CAN protocol layout.
  *
- * For modularity and adaptability, the supervisory controller should not
+ * For modularity and adaptability, the supervisory controller does not
  * hard-code payload bit positions outside this codec. Keeping layout details
  * in one structure makes requirement changes localized.
  * I.e.: changing the floor bit field, enable/status bit, or CAN IDs should
@@ -106,9 +107,16 @@ constexpr std::uint8_t kFloorModuleRequestMask = kDefaultCanProtocolConfig.floor
 
 enum class CanMessageType
 {
+    /** Outbound command produced by the supervisory controller. */
     SupervisorCommand,
+
+    /** Elevator controller report containing its current floor and status bit. */
     ElevatorStatus,
+
+    /** In-car panel request with the requested floor encoded in byte 0. */
     CarFloorRequest,
+
+    /** Landing request whose floor is inferred from the sender CAN ID. */
     FloorModuleRequest
 };
 
@@ -120,14 +128,29 @@ enum class CanMessageType
  */
 struct sDecodedCanMessage
 {
+    /** Semantic message category selected from the source CAN ID. */
     CanMessageType type = CanMessageType::CarFloorRequest;
+
+    /** Original sender identifier retained for diagnostics and validation. */
     std::uint16_t sourceId = 0;
+
+    /**
+     * @brief Floor recovered from the payload or floor-controller source ID.
+     *
+     * Messages that require a floor are rejected by decodeCanFrame() when this
+     * value cannot be derived and validated.
+     */
     std::optional<std::uint8_t> floor;
+
+    /** Shared protocol flag used as status or enable according to message type. */
     bool statusBit = false;
 };
 
 /**
  * @brief Decodes one raw CAN frame using the supplied protocol configuration.
+ *
+ * Validation is fail-closed: an unexpected DLC, unknown source ID, invalid
+ * floor field, or inactive floor-module request returns std::nullopt.
  *
  * @param frame Raw CAN frame from hardware, simulator, or tests.
  * @param config Protocol layout and node IDs to apply.
@@ -143,11 +166,17 @@ std::optional<sDecodedCanMessage> decodeCanFrame(
  *
  * Supervisor command frames are intentionally not converted because they are
  * outbound messages produced by the supervisor.
+ *
+ * @param message Validated protocol message produced by decodeCanFrame().
+ * @return A normalized event for inbound messages; otherwise std::nullopt.
  */
 std::optional<sSupervisoryEvent> toSupervisoryEvent(const sDecodedCanMessage& message);
 
 /**
  * @brief Builds the one-byte command sent from the supervisor to the elevator.
+ *
+ * Byte 0 is constructed by masking the shifted floor field and OR-ing the
+ * optional enable bit. Remaining payload bytes stay zero-initialized.
  *
  * @param targetFloor Requested destination floor.
  * @param enable Whether the supervisor enable bit should be set.

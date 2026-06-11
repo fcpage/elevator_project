@@ -2,144 +2,141 @@
 * supervisory_application.cpp - Supervisory Application Orchestrator
 * Author: Project 6 Team
 * Last Modified: 2026-06-07
-* @brief Provides the top-level polling loop for the controller.
+* @brief Provides the top-level multithreaded loop for the SC.
 ******************************************************************/
 
-#include "project6/supervisory/app/supervisory_application.hpp"
+#include "supervisory/app/supervisory_application.hpp"
 
-#include <algorithm>
 #include <cstddef>
-#include <iomanip>
-#include <iostream>
-
-#include "project6/supervisory/can/can_protocol.hpp"
 
 namespace project6::supervisory
 {
 
-namespace // Logging Helpers for debugging
+namespace
 {
 
-constexpr std::size_t kMaximumCanFramesPerCycle = 16;
+constexpr std::size_t kMaximumEventsPerCycle = 16;
+constexpr std::chrono::milliseconds kCommsHeartbeatTimeout{250};
 
-const char* canMessageTypeName(const CanMessageType type)
-{
-    switch (type)
-    {
-        case CanMessageType::SupervisorCommand:
-            return "SupervisorCommand";
-        case CanMessageType::ElevatorStatus:
-            return "ElevatorStatus";
-        case CanMessageType::CarFloorRequest:
-            return "CanCarRequest";
-        case CanMessageType::FloorModuleRequest:
-            return "CanFloorRequest";
-    }
+} // namespace
 
-    return "Unknown";
-}
-
-void logCanFrame(const sCanFrame& frame)
-{
-    std::clog << "CAN_RX id=0x" << std::hex << std::uppercase << frame.id
-              << std::dec << " dlc=" << static_cast<unsigned int>(frame.dataLength)
-              << " data=";
-
-    const std::size_t payloadLength =
-        std::min<std::size_t>(frame.dataLength, frame.data.size());
-    for (std::size_t index = 0; index < payloadLength; ++index)
-    {
-        std::clog << std::hex << std::setw(2) << std::setfill('0')
-                  << static_cast<unsigned int>(frame.data[index]);
-    }
-
-    std::clog << std::dec << std::nouppercase << std::setfill(' ') << '\n';
-}
-
-void logDecodedMessage(const sDecodedCanMessage& message)
-{
-    std::clog << "EVENT type=" << canMessageTypeName(message.type);
-    if (message.floor.has_value())
-    {
-        const char* floorLabel =
-            message.type == CanMessageType::ElevatorStatus ? " reported_floor=" : " requested_floor=";
-        std::clog << floorLabel << static_cast<unsigned int>(*message.floor);
-    }
-    std::clog << '\n';
-}
-
-} // namespace - Logging Helpers
-
-cSupervisoryApplication::cSupervisoryApplication(cSocketCanAdapter& canAdapter)
-    : appCanAdapter_(canAdapter),
-      appStateMachine_(canAdapter)
+cSupervisoryApplication::cSupervisoryApplication(sCanExchange& exchange)
+    : exchange_(exchange)
 {
 }
 
-ecOperationStatus cSupervisoryApplication::initialize()
+ecOperationStatus cSupervisoryApplication::runControlCycle(
+    const std::chrono::milliseconds elapsedMs)
 {
-    const ecOperationStatus canStatus = appCanAdapter_.initialize();
-    if (canStatus != ecOperationStatus::Ok)
+    checkCommsHealth(elapsedMs);
+
+    for (std::size_t count = 0; count < kMaximumEventsPerCycle; ++count)
     {
-        return canStatus;
+        sSupervisoryEvent event{};
+        if (!exchange_.receivedEvents.tryPop(event))
+        {
+            break;
+        }
+        appStateMachine_.handleEvent(event);
+        publishPendingFrame();
     }
 
-    appIsInitialized_ = true;
-    return ecOperationStatus::Ok;
-}
-
-ecOperationStatus cSupervisoryApplication::runLoopOnce(const std::chrono::milliseconds elapsedMs)
-{
-    if (!appIsInitialized_)
-    {
-        return ecOperationStatus::NotInitialized;
-    }
-
-    pollCan();
-    processTimer(elapsedMs);
+    sSupervisoryEvent timerEvent{};
+    timerEvent.type = ecEventType::TimerTick;
+    timerEvent.timestampMs = elapsedMs;
+    appStateMachine_.handleEvent(timerEvent);
+    publishPendingFrame();
 
     return ecOperationStatus::Ok;
 }
 
-void cSupervisoryApplication::pollCan()
+sSupervisoryStateSnapshot cSupervisoryApplication::snapshot() const
 {
-    for (std::size_t frameCount = 0; frameCount < kMaximumCanFramesPerCycle; ++frameCount)
+    return appStateMachine_.snapshot();
+}
+
+sCanCommsHealthSnapshot cSupervisoryApplication::canHealth() const
+{
+    return {
+        exchange_.commsState.load(),
+        exchange_.faultReason.load(),
+        exchange_.heartbeat.load(),
+        exchange_.receivedFrameCount.load(),
+        exchange_.droppedEventCount.load(),
+        exchange_.transmittedFrameCount.load(),
+        exchange_.transmitFailureCount.load()};
+}
+
+void cSupervisoryApplication::publishPendingFrame()
+{
+    if (const std::optional<sCanFrame> frame = appStateMachine_.tryTakePendingCanFrame();
+        frame.has_value() && !exchange_.transmitFrames.tryPush(*frame))
     {
-        const std::optional<sCanFrame> frame = appCanAdapter_.tryReadFrame();
-        if (!frame.has_value())
-        {
-            return;
-        }
-
-        logCanFrame(*frame);
-
-        const std::optional<sDecodedCanMessage> message = decodeCanFrame(*frame);
-        if (!message.has_value())
-        {
-            std::clog << "CAN_RX_REJECTED reason=invalid_protocol_frame\n";
-            continue;
-        }
-
-        logDecodedMessage(*message);
-
-        const std::optional<sSupervisoryEvent> event = toSupervisoryEvent(*message);
-        if (!event.has_value())
-        {
-            std::clog << "CAN_RX_REJECTED reason=no_supervisory_event\n";
-            continue;
-        }
-
-        appStateMachine_.handleEvent(*event);
+        faultComms(ecCanCommsFaultReason::OutboundQueueFull);
     }
 }
 
-void cSupervisoryApplication::processTimer(std::chrono::milliseconds elapsedMs)
+void cSupervisoryApplication::checkCommsHealth(
+    const std::chrono::milliseconds elapsedMs)
 {
-    sSupervisoryEvent saEvent{};
-    saEvent.type = ecEventType::TimerTick;
-    saEvent.timestampMs = elapsedMs;
+    if (isCommsFaultLatched_)
+    {
+        return;
+    }
 
-    appStateMachine_.handleEvent(saEvent);
+    if (const std::uint64_t heartbeat = exchange_.heartbeat.load(); heartbeat != lastHeartbeat_)
+    {
+        lastHeartbeat_ = heartbeat;
+        staleHeartbeatElapsed_ = std::chrono::milliseconds{0};
+    }
+    else if (exchange_.commsState.load() == ecCanCommsState::Running)
+    {
+        staleHeartbeatElapsed_ += elapsedMs;
+    }
+
+    const std::uint64_t droppedEvents = exchange_.droppedEventCount.load();
+    const std::uint64_t transmitFailures = exchange_.transmitFailureCount.load();
+    const bool didDropEvent = droppedEvents != lastDroppedEventCount_;
+    const bool didTransmitFail = transmitFailures != lastTransmitFailureCount_;
+
+    lastDroppedEventCount_ = droppedEvents;
+    lastTransmitFailureCount_ = transmitFailures;
+
+    if (didDropEvent)
+    {
+        faultComms(ecCanCommsFaultReason::InboundQueueFull);
+    }
+    else if (didTransmitFail)
+    {
+        faultComms(ecCanCommsFaultReason::TransmitFailed);
+    }
+    else if (exchange_.commsState.load() == ecCanCommsState::Failed)
+    {
+        const ecCanCommsFaultReason reason = exchange_.faultReason.load();
+        faultComms(
+            reason == ecCanCommsFaultReason::None
+                ? ecCanCommsFaultReason::ThreadFailed
+                : reason);
+    }
+    else if (staleHeartbeatElapsed_ >= kCommsHeartbeatTimeout)
+    {
+        faultComms(ecCanCommsFaultReason::HeartbeatTimeout);
+    }
+}
+
+void cSupervisoryApplication::faultComms(const ecCanCommsFaultReason reason)
+{
+    if (isCommsFaultLatched_)
+    {
+        return;
+    }
+
+    ecCanCommsFaultReason expected = ecCanCommsFaultReason::None;
+    static_cast<void>(exchange_.faultReason.compare_exchange_strong(expected, reason));
+    isCommsFaultLatched_ = true;
+    sSupervisoryEvent event{};
+    event.type = ecEventType::Fault;
+    appStateMachine_.handleEvent(event);
 }
 
 }

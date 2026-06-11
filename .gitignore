@@ -6,6 +6,9 @@ SupervisoryController/src/sim
 SupervisoryController/src/tests
 SupervisoryController/build-rpi/
 
+latex
+html
+
 *.yaml
 *.vcxproj
 *.vcxproj.filters

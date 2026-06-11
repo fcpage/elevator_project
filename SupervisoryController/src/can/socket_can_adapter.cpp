@@ -2,12 +2,13 @@
 * socket_can_adapter.cpp - SocketCAN Adapter
 * Author: Project 6 Team
 * Last Modified: 2026-06-07
+* @file socket_can_adapter.cpp
 * @brief Provides the Linux SocketCAN/USB-CAN adapter boundary.
 ******************************************************************/
 
-#include "project6/supervisory/can/can_adapter.hpp"
+#include "supervisory/can/can_adapter.hpp"
 
-//#define __linux__  // Uncomment for Windows Compilation Testing
+#define __linux__
 
 #ifdef __linux__
 #include <array>
@@ -39,6 +40,17 @@ bool didProcessExitSuccessfully(const int status)
     return WIFEXITED(status) && WEXITSTATUS(status) == 0;
 }
 
+/**
+ * @brief Runs one `ip` command without invoking a shell.
+ *
+ * fork()/execvp() keeps interface names and numeric settings as discrete
+ * arguments, avoiding shell parsing. The parent waits synchronously because the
+ * CAN socket must not be opened until interface configuration is complete.
+ *
+ * @param arguments Null-terminated argv array passed directly to execvp().
+ * @return Ok for a zero exit status, InsufficientPrivileges for a failed
+ *         command run without root privileges, or HardwareUnavailable otherwise.
+ */
 ecOperationStatus runProcess(const std::array<const char*, 11>& arguments)
 {
     const pid_t childProcessId = ::fork();
@@ -72,6 +84,16 @@ ecOperationStatus runProcess(const std::array<const char*, 11>& arguments)
     return ecOperationStatus::Ok;
 }
 
+/**
+ * @brief Applies physical CAN settings through Linux network administration.
+ *
+ * Linux requires a CAN interface to be down before changing bitrate or restart
+ * policy. The sequence is therefore down, configure, then up; failure at any
+ * stage stops initialization.
+ *
+ * @param config Interface name, bitrate, and automatic bus-off restart delay.
+ * @return Status of the first failed `ip link` command, or Ok.
+ */
 ecOperationStatus configureSocketCanInterface(const sSocketCanConfig& config)
 {
     const std::string bitrate = std::to_string(config.bitrateBitsPerSecond);
@@ -154,11 +176,6 @@ cSocketCanAdapter::~cSocketCanAdapter()
 #endif
 }
 
-/**
- * @brief Initializes a CAN Socket Adapter class by opening a socket on the linux hardware
- *
- * @return Enum class status of operation
- */
 ecOperationStatus cSocketCanAdapter::initialize()
 {
     if (socketConfig_.interfaceName == nullptr || socketConfig_.bitrateBitsPerSecond == 0)
@@ -210,15 +227,16 @@ ecOperationStatus cSocketCanAdapter::initialize()
 #endif
 }
 
-std::optional<sCanFrame> cSocketCanAdapter::tryReadFrame() const
+ecOperationStatus cSocketCanAdapter::tryReadFrame(sCanFrame& frame) const
 {
     if (!socketIsInitialized_)
     {
-        return std::nullopt;
+        return ecOperationStatus::NotInitialized;
     }
 
 #ifndef __linux__
-    return std::nullopt;
+    static_cast<void>(frame);
+    return ecOperationStatus::HardwareUnavailable;
 #else
     can_frame linuxFrame{};
     const ssize_t bytesRead = ::read(socketSocketFd_, &linuxFrame, sizeof(linuxFrame));
@@ -226,18 +244,18 @@ std::optional<sCanFrame> cSocketCanAdapter::tryReadFrame() const
     {
         if (errno == EAGAIN || errno == EWOULDBLOCK)
         {
-            return std::nullopt;
+            return ecOperationStatus::WouldBlock;
         }
 
-        return std::nullopt;
+        return ecOperationStatus::HardwareUnavailable;
     }
 
     if (bytesRead != static_cast<ssize_t>(sizeof(linuxFrame)))
     {
-        return std::nullopt;
+        return ecOperationStatus::HardwareUnavailable;
     }
 
-    sCanFrame frame{};
+    frame = {};
     frame.id = static_cast<std::uint16_t>(linuxFrame.can_id & CAN_SFF_MASK);
     frame.dataLength = linuxFrame.can_dlc;
 
@@ -246,7 +264,7 @@ std::optional<sCanFrame> cSocketCanAdapter::tryReadFrame() const
         frame.data[index] = linuxFrame.data[index];
     }
 
-    return frame;
+    return ecOperationStatus::Ok;
 #endif
 }
 
@@ -282,6 +300,11 @@ ecOperationStatus cSocketCanAdapter::sendFrame(const sCanFrame& frame) const
     const ssize_t bytesWritten = ::write(socketSocketFd_, &linuxFrame, sizeof(linuxFrame));
     if (bytesWritten != static_cast<ssize_t>(sizeof(linuxFrame)))
     {
+        if (bytesWritten < 0 && (errno == EAGAIN || errno == EWOULDBLOCK))
+        {
+            return ecOperationStatus::WouldBlock;
+        }
+
         return ecOperationStatus::HardwareUnavailable;
     }
 

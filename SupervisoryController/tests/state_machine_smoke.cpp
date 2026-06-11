@@ -12,16 +12,13 @@
 #include <iostream>
 #include <optional>
 
-#include "project6/supervisory/can/can_adapter.hpp"
+#include "project6/supervisory/can/can_frame.hpp"
 #include "project6/supervisory/common/event.hpp"
 #include "project6/supervisory/control/supervisory_state_machine.hpp"
 #include "project6/supervisory/drivers/supervisory_drivers.hpp"
 
 namespace
 {
-
-std::optional<std::uint8_t> lastCommandedFloor;
-std::size_t commandCount = 0;
 
 void require(const bool condition, const char* message)
 {
@@ -64,16 +61,6 @@ project6::supervisory::sSupervisoryEvent makeElevatorStatus(const std::uint8_t f
 namespace project6::supervisory::drivers
 {
 
-ecOperationStatus commandElevatorToFloor(
-    cSocketCanAdapter& canAdapter,
-    const std::uint8_t targetFloor)
-{
-    static_cast<void>(canAdapter);
-    lastCommandedFloor = targetFloor;
-    ++commandCount;
-    return ecOperationStatus::Ok;
-}
-
 ecOperationStatus commandDoorOpen()
 {
     return ecOperationStatus::Ok;
@@ -94,12 +81,10 @@ ecOperationStatus commandEmergencyStop()
 int main()
 {
     using namespace std::chrono_literals;
-    using project6::supervisory::cSocketCanAdapter;
     using project6::supervisory::ecSupervisoryControlState;
     using project6::supervisory::cSupervisoryStateMachineAPI;
 
-    cSocketCanAdapter canAdapter("test");
-    cSupervisoryStateMachineAPI stateMachine(canAdapter);
+    cSupervisoryStateMachineAPI stateMachine;
 
     stateMachine.handleEvent(makeFloorRequest(3));
     require(
@@ -110,8 +95,16 @@ int main()
     require(
         stateMachine.snapshot().controlState == ecSupervisoryControlState::MovingUp,
         "target above current floor did not enter MovingUp");
-    require(lastCommandedFloor == 3, "movement command used the wrong target floor");
-    require(commandCount == 1, "movement command was not sent exactly once");
+
+    const std::optional<project6::supervisory::sCanFrame> firstCommand =
+        stateMachine.tryTakePendingCanFrame();
+    require(firstCommand.has_value(), "movement did not produce a CAN command");
+    require(firstCommand->id == 0x100, "movement command used the wrong CAN identifier");
+    require(firstCommand->dataLength == 1, "movement command used the wrong DLC");
+    require(firstCommand->data[0] == 0x07, "movement command used the wrong target floor");
+    require(
+        !stateMachine.tryTakePendingCanFrame().has_value(),
+        "movement command was returned more than once");
 
     stateMachine.handleEvent(makeFloorRequest(2));
     stateMachine.handleEvent(makeTimerTick(2999ms));
@@ -152,8 +145,11 @@ int main()
     require(
         stateMachine.snapshot().controlState == ecSupervisoryControlState::MovingDown,
         "queued lower-floor request did not enter MovingDown");
-    require(lastCommandedFloor == 2, "queued request commanded the wrong floor");
-    require(commandCount == 2, "queued request did not produce a second command");
+
+    const std::optional<project6::supervisory::sCanFrame> secondCommand =
+        stateMachine.tryTakePendingCanFrame();
+    require(secondCommand.has_value(), "queued request did not produce a second command");
+    require(secondCommand->data[0] == 0x06, "queued request commanded the wrong floor");
 
     return 0;
 }

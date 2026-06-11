@@ -5,7 +5,7 @@
 * @brief Provides request-priority handling for supervisor scheduling.
 ******************************************************************/
 
-#include "project6/supervisory/scheduler/request_scheduler.hpp"
+#include "supervisory/scheduler/request_scheduler.hpp"
 
 namespace project6::supervisory
 {
@@ -52,17 +52,17 @@ void cRequestScheduler::enqueueEvent(const sSupervisoryEvent& event)
 
 std::optional<sElevatorRequest> cRequestScheduler::tryTakeNextRequest()
 {
-    if (!floorRequests_.empty())
-    {
-        sElevatorRequest request = floorRequests_.front();
-        floorRequests_.pop_front();
-        return request;
-    }
-
     if (!carRequests_.empty())
     {
         sElevatorRequest request = carRequests_.front();
         carRequests_.pop_front();
+        return request;
+    }
+
+    if (!floorRequests_.empty())
+    {
+        sElevatorRequest request = floorRequests_.front();
+        floorRequests_.pop_front();
         return request;
     }
 
