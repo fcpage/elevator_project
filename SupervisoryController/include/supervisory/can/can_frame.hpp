@@ -2,6 +2,7 @@
 * can_frame.hpp - CAN Frame Model
 * Author: Project 6 Team
 * Last Modified: 2026-06-03
+* @file can_frame.hpp
 * @brief Defines the CAN frame data structure used by the supervisor.
 ******************************************************************/
 
@@ -31,7 +32,7 @@ constexpr std::uint16_t kFloorTwoControllerCanId = 0x202;
 constexpr std::uint16_t kFloorThreeControllerCanId = 0x203;
 ///@}
 
-//============ End of Network Mapping ==========
+//=========== End of Network Mapping ==========
 
 /**
  * @brief Maximum payload length of a CAN data frame in bytes.
@@ -42,12 +43,16 @@ constexpr std::size_t kCanPayloadLength = 8;
 
 
 /**
- * @brief Standard CAN frame as seen by the supervisory controller.
+ * @brief Standard supervisor controller CAN frame.
+ *
+ * This type deliberately contains no Linux SocketCAN fields or project-specific
+ * payload interpretation. The adapter handles OS translation and the protocol
+ * codec validates and interprets the payload.
  */
 struct sCanFrame
 {
     /**
-     * @brief Round up for the standard 11-bit CAN identifier.
+     * @brief Standard 11-bit CAN identifier stored in a 16-bit integer.
      */
     std::uint16_t id = 0;
 

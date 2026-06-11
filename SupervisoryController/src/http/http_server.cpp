@@ -12,7 +12,7 @@
 * could be implemented if additional time is found.
 ******************************************************************/
 
-#include "project6/supervisory/http/http_server.hpp"
+#include "supervisory/http/http_server.hpp"
 
 namespace project6::supervisory
 {

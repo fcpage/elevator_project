@@ -11,7 +11,7 @@ Usage:
 
 Examples:
   ./scripts/initialize_can.sh --virtual vcan0
-  ./scripts/initialize_can.sh can0 250000
+  ./scripts/initialize_can.sh can0 125000
   ./scripts/initialize_can.sh can1 500000 100
 USAGE
 }
@@ -96,7 +96,7 @@ setup_virtual_can()
         run_privileged ip link add dev "${interface_name}" type vcan
     fi
 
-    run_privileged ip link set "${interface_name}" up
+    run_privileged ip link set dev "${interface_name}" up
 
     echo "initialize_can.sh: virtual CAN ready on ${interface_name}"
     ip -details -statistics link show "${interface_name}"
@@ -126,9 +126,9 @@ setup_physical_can()
         return 1
     fi
 
-    run_privileged ip link set "${interface_name}" down || true
-    run_privileged ip link set "${interface_name}" type can bitrate "${bitrate}" restart-ms "${restart_ms}"
-    run_privileged ip link set "${interface_name}" up
+    run_privileged ip link set dev "${interface_name}" down || true
+    run_privileged ip link set dev "${interface_name}" type can bitrate "${bitrate}" restart-ms "${restart_ms}"
+    run_privileged ip link set dev "${interface_name}" up
 
     echo "initialize_can.sh: physical CAN ready on ${interface_name} at ${bitrate} bit/s"
     ip -details -statistics link show "${interface_name}"
@@ -146,7 +146,7 @@ main()
         return 0
     fi
 
-    setup_physical_can "${1:-can0}" "${2:-250000}" "${3:-100}"
+    setup_physical_can "${1:-can0}" "${2:-125000}" "${3:-100}"
 }
 
 main "$@"

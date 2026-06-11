@@ -6,6 +6,7 @@
 ******************************************************************/
 
 #include <array>
+#include <concepts>
 #include <cstdlib>
 #include <cstdint>
 #include <iostream>
@@ -25,6 +26,19 @@ concept InitializesThroughConstReference = requires(const Adapter& adapter)
 static_assert(
     !InitializesThroughConstReference<project6::supervisory::cSocketCanAdapter>,
     "SocketCAN initialization mutates adapter state and must not be const");
+
+template <typename Adapter>
+concept ReadsFrameWithStatus = requires(
+    const Adapter& adapter,
+    project6::supervisory::sCanFrame& frame)
+{
+    { adapter.tryReadFrame(frame) } ->
+        std::same_as<project6::supervisory::ecOperationStatus>;
+};
+
+static_assert(
+    ReadsFrameWithStatus<project6::supervisory::cSocketCanAdapter>,
+    "SocketCAN reads must distinguish no data from hardware failure");
 
 void require(const bool condition, const char* message)
 {

@@ -15,8 +15,11 @@ option(
     OFF
 )
 
+find_package(Threads REQUIRED)
+
 add_library(project6_supervisory
     src/app/supervisory_application.cpp
+    src/can/can_comms_service.cpp
     src/can/can_protocol.cpp
     src/can/socket_can_adapter.cpp
     src/control/supervisory_state_machine.cpp
@@ -28,6 +31,11 @@ add_library(project6_supervisory
 target_include_directories(project6_supervisory
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_link_libraries(project6_supervisory
+    PUBLIC
+        Threads::Threads
 )
 
 if(SUPERVISORY_ENABLE_AUTO_ARRIVAL)
@@ -67,7 +75,7 @@ enable_testing()
 
 add_executable(supervisory_state_machine_smoke
     tests/state_machine_smoke.cpp
-    src/can/socket_can_adapter.cpp
+    src/can/can_protocol.cpp
     src/control/supervisory_state_machine.cpp
     src/scheduler/request_scheduler.cpp
 )
@@ -85,7 +93,7 @@ target_compile_definitions(supervisory_state_machine_smoke
 
 add_executable(supervisory_state_machine_production_smoke
     tests/state_machine_smoke.cpp
-    src/can/socket_can_adapter.cpp
+    src/can/can_protocol.cpp
     src/control/supervisory_state_machine.cpp
     src/scheduler/request_scheduler.cpp
 )
@@ -97,11 +105,52 @@ target_include_directories(supervisory_state_machine_production_smoke
 
 add_executable(supervisory_can_protocol_tests
     tests/can_protocol_tests.cpp
+    src/can/can_protocol.cpp
+    src/can/socket_can_adapter.cpp
 )
 
-target_link_libraries(supervisory_can_protocol_tests
+target_include_directories(supervisory_can_protocol_tests
     PRIVATE
-        project6_supervisory
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+add_executable(supervisory_spsc_queue_tests
+    tests/spsc_queue_tests.cpp
+)
+
+target_include_directories(supervisory_spsc_queue_tests
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+add_executable(supervisory_can_comms_service_tests
+    tests/can_comms_service_tests.cpp
+    src/can/can_comms_service.cpp
+    src/can/can_protocol.cpp
+    src/can/socket_can_adapter.cpp
+)
+
+target_include_directories(supervisory_can_comms_service_tests
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_link_libraries(supervisory_can_comms_service_tests
+    PRIVATE
+        Threads::Threads
+)
+
+add_executable(supervisory_control_loop_tests
+    tests/control_loop_tests.cpp
+    src/app/supervisory_application.cpp
+    src/can/can_protocol.cpp
+    src/control/supervisory_state_machine.cpp
+    src/scheduler/request_scheduler.cpp
+)
+
+target_include_directories(supervisory_control_loop_tests
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 add_test(
@@ -117,6 +166,21 @@ add_test(
 add_test(
     NAME supervisory_state_machine_production_smoke
     COMMAND supervisory_state_machine_production_smoke
+)
+
+add_test(
+    NAME supervisory_spsc_queue_tests
+    COMMAND supervisory_spsc_queue_tests
+)
+
+add_test(
+    NAME supervisory_can_comms_service_tests
+    COMMAND supervisory_can_comms_service_tests
+)
+
+add_test(
+    NAME supervisory_control_loop_tests
+    COMMAND supervisory_control_loop_tests
 )
 
 set(ESEPP_EXECUTABLE

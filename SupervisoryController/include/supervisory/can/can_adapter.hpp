@@ -2,16 +2,15 @@
 * can_adapter.hpp - CAN Adapter Boundary
 * Author: Project 6 Team
 * Last Modified: 2026-06-04
+* @file can_adapter.hpp
 * @brief Declares the boundary between supervisor logic and CAN hardware.
 ******************************************************************/
 
 #pragma once
 
 #include <cstdint>
-#include <optional>
-
-#include "project6/supervisory/can/can_frame.hpp"
-#include "project6/supervisory/common/result.hpp"
+#include "supervisory/can/can_frame.hpp"
+#include "supervisory/common/result.hpp"
 
 namespace project6::supervisory
 {
@@ -59,8 +58,9 @@ struct sSocketCanConfig
 /**
  * @brief SocketCAN data used by the Raspberry Pi supervisory controller.
  *
- * The adapter is responsible for the OS CAN socket and moves
- * raw CanFrame values only.
+ * The adapter owns one Linux raw CAN socket and translates between the Linux
+ * can_frame representation and the platform-independent sCanFrame model. It
+ * does not interpret project protocol bits.
  */
 class cSocketCanAdapter
 {
@@ -89,29 +89,48 @@ public:
 
     /**
      * @brief Opens and configures the CAN interface.
+     *
+     * When requested, initialization first invokes Linux `ip link` commands,
+     * then resolves the interface index, binds a PF_CAN raw socket, and enables
+     * non-blocking reads.
+     *
+     * @return ecOperationStatus::Ok on success; otherwise a configuration,
+     *         privilege, or hardware availability status.
      */
     [[nodiscard]] ecOperationStatus initialize();
 
     /**
-     * @brief Attempts to read one CAN frame without blocking indefinitely.
+     * @brief Attempts to read one CAN frame without blocking.
      *
-     * @return A frame when one is available; otherwise std::nullopt.
+     * Linux CAN flags are stripped so the returned identifier contains only the
+     * standard 11-bit node ID.
+     *
+     * @param frame Receives the complete frame when one is available.
+     * @return Ok when frame was populated, WouldBlock when no frame is pending,
+     *         or an initialization/hardware failure status.
      */
-    [[nodiscard]] std::optional<sCanFrame> tryReadFrame() const;
+    [[nodiscard]] ecOperationStatus tryReadFrame(sCanFrame& frame) const;
 
     /**
      * @brief Sends one CAN frame.
      *
      * @param frame Frame to transmit on the configured CAN interface.
-     * @return OperationStatus::Ok when the frame is written successfully.
+     * @return ecOperationStatus::Ok when the complete Linux frame is written;
+     *         otherwise an initialization, validation, or hardware status.
      */
     [[nodiscard]] ecOperationStatus sendFrame(const sCanFrame& frame) const;
 
 private:
+    /** Sentinel used when no Linux socket is owned. */
     static constexpr int kInvalidSocket = -1;
 
+    /** Interface and physical bus settings applied during initialize(). */
     sSocketCanConfig socketConfig_{};
+
+    /** Owned PF_CAN socket descriptor, or kInvalidSocket before initialization. */
     int socketSocketFd_ = kInvalidSocket;
+
+    /** True only after socket creation, binding, and non-blocking setup succeed. */
     bool socketIsInitialized_ = false;
 };
 

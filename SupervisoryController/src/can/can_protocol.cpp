@@ -2,10 +2,11 @@
 * can_protocol.cpp - Shared CAN Protocol Helpers
 * Author: Project 6 Team
 * Last Modified: 2026-06-01
+* @file can_protocol.cpp
 * @brief Implements the shared one-byte CAN frame layout.
 ******************************************************************/
 
-#include "project6/supervisory/can/can_protocol.hpp"
+#include "supervisory/can/can_protocol.hpp"
 
 namespace project6::supervisory
 {

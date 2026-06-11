@@ -17,8 +17,8 @@ Modes:
 
 Examples:
   ./scripts/run_rpi.sh --test
-  ./scripts/run_rpi.sh --hardware can0 250000
-  ./scripts/run_rpi.sh --production can0 250000
+  ./scripts/run_rpi.sh --hardware can0 125000
+  ./scripts/run_rpi.sh --production can0 125000
 USAGE
 }
 
@@ -57,17 +57,9 @@ run_application()
 {
     local executable_path="$1"
     local interface_name="$2"
-    local use_sudo="$3"
-    local log_path="$4"
+    local log_path="$3"
 
     echo "run_rpi.sh: logging to ${log_path}"
-
-    if [[ "${use_sudo}" == "true" ]]; then
-        require_command sudo
-        sudo "${executable_path}" "${interface_name}" 2>&1 | tee "${log_path}"
-        return
-    fi
-
     "${executable_path}" "${interface_name}" 2>&1 | tee "${log_path}"
 }
 
@@ -96,7 +88,19 @@ main()
     script_dir="$(script_directory)"
     local supervisor_root
     supervisor_root="$(cd -- "${script_dir}/.." >/dev/null && pwd)"
-    local executable_path="${supervisor_root}/build-rpi/supervisory_controller"
+    local build_mode
+    case "${mode}" in
+        --test|test)
+            build_mode="test"
+            ;;
+        --hardware|hardware)
+            build_mode="hardware"
+            ;;
+        --production|production)
+            build_mode="production"
+            ;;
+    esac
+    local executable_path="${supervisor_root}/build-rpi/${build_mode}/supervisory_controller"
 
     require_executable "${executable_path}"
 
@@ -108,14 +112,14 @@ main()
         --test|test)
             local interface_name="${2:-vcan0}"
             bash "${script_dir}/initialize_can.sh" --virtual "${interface_name}"
-            run_application "${executable_path}" "${interface_name}" false "${log_path}"
+            run_application "${executable_path}" "${interface_name}" "${log_path}"
             ;;
 
         --hardware|hardware|--production|production)
             local interface_name="${2:-can0}"
-            local bitrate="${3:-250000}"
+            local bitrate="${3:-125000}"
             bash "${script_dir}/initialize_can.sh" "${interface_name}" "${bitrate}"
-            run_application "${executable_path}" "${interface_name}" true "${log_path}"
+            run_application "${executable_path}" "${interface_name}" "${log_path}"
             ;;
 
     esac

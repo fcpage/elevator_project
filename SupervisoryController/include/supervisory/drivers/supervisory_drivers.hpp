@@ -7,24 +7,13 @@
 
 #pragma once
 
-#include <cstdint>
-
-#include "project6/supervisory/common/result.hpp"
+#include "supervisory/common/result.hpp"
 
 namespace project6::supervisory
 {
 
-class cSocketCanAdapter;
-
 namespace drivers
 {
-
-/**
- * @brief Transmits an elevator movement command over CAN.
- */
-ecOperationStatus commandElevatorToFloor(
-    cSocketCanAdapter& canAdapter,
-    std::uint8_t targetFloor);
 
 /**
  * @brief Requests the elevator doors to open.

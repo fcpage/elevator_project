@@ -10,8 +10,8 @@
 #include <cstdint>
 #include <optional>
 
-#include "project6/supervisory/common/event.hpp"
-#include "project6/supervisory/common/result.hpp"
+#include "supervisory/common/event.hpp"
+#include "supervisory/common/result.hpp"
 
 namespace project6::supervisory
 {
@@ -21,7 +21,9 @@ namespace project6::supervisory
  */
 struct HttpServerConfig
 {
+    /** TCP listen port. */
     std::uint16_t port = 8080;
+    /** TCP bind address. */
     const char* bindAddress = "127.0.0.1";
 };
 
@@ -34,8 +36,10 @@ struct HttpServerConfig
 class HttpServer
 {
 public:
+    /** @brief Creates the HTTP stub. */
     explicit HttpServer(HttpServerConfig config);
 
+    /** @brief Validates configuration; server remains unimplemented. */
     ecOperationStatus initialize();
 
     /**
@@ -44,7 +48,9 @@ public:
     std::optional<sSupervisoryEvent> tryReadEvent() const;
 
 private:
+    /** Listener configuration. */
     HttpServerConfig config_{};
+    /** True after configuration validation. */
     bool isInitialized_ = false;
 };
 

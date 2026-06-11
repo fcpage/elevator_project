@@ -5,7 +5,12 @@
 * @brief Runs the supervisory controller service.
 ******************************************************************/
 
-#include "project6/supervisory/app/supervisory_application.hpp"
+/** @file main.cpp - launches and runs the main supervisory application
+ *  @brief Configures SocketCAN and runs the timed supervisory event loop.
+*/
+
+#include "supervisory/app/supervisory_application.hpp"
+#include "supervisory/can/can_comms_service.hpp"
 
 #include <chrono>
 #include <csignal>
@@ -16,14 +21,18 @@
 namespace
 {
 
-constexpr std::uint32_t kDefaultCanBitrateBitsPerSecond = 250000;
+constexpr std::uint32_t kDefaultCanBitrateBitsPerSecond = 125000;
 constexpr std::uint32_t kDefaultCanRestartMs = 100;
 
 #ifdef SUPERVISORY_USE_VIRTUAL_CAN
 constexpr const char* kDefaultCanInterfaceName = "vcan0";
-constexpr bool kConfigureCanInterfaceOnInitialize = false;
 #else
 constexpr const char* kDefaultCanInterfaceName = "can0";
+#endif
+
+#if defined(SUPERVISORY_CAN_INTERFACE_PRECONFIGURED) || defined(SUPERVISORY_USE_VIRTUAL_CAN)
+constexpr bool kConfigureCanInterfaceOnInitialize = false;
+#else
 constexpr bool kConfigureCanInterfaceOnInitialize = true;
 #endif
 
@@ -64,6 +73,18 @@ const char* operationStatusMessage(const project6::supervisory::ecOperationStatu
 
 } // namespace
 
+/**
+ * @brief Starts the supervisory controller and maintains its 10 ms loop pace.
+ *
+ * The optional first argument overrides the default SocketCAN interface. Loop
+ * elapsed time is measured with a monotonic clock and passed into the
+ * application so door and movement timers reflect real scheduling delays.
+ *
+ * @param argumentCount Number of command-line arguments.
+ * @param arguments Argument vector; arguments[1] may name a CAN interface.
+ * @return Zero after signal-driven shutdown, or one after initialization or
+ *         runtime failure.
+ */
 int main(const int argumentCount, char* arguments[])
 {
     using namespace project6::supervisory;
@@ -79,12 +100,20 @@ int main(const int argumentCount, char* arguments[])
         kDefaultCanBitrateBitsPerSecond,
         kDefaultCanRestartMs,
         kConfigureCanInterfaceOnInitialize};
-    cSocketCanAdapter canAdapter(canConfig);
-    cSupervisoryApplication application(canAdapter);
+    sCanExchange canExchange;
+    cCanCommsService commsService(canConfig, canExchange);
+    cSupervisoryApplication application(canExchange);
 
-    if (const ecOperationStatus status = application.initialize(); status != ecOperationStatus::Ok)
+    if (const ecOperationStatus status = commsService.initializeService(); status != ecOperationStatus::Ok)
     {
         std::cerr << "supervisory_controller: initialization failed: "
+                  << operationStatusMessage(status) << '\n';
+        return 1;
+    }
+
+    if (const ecOperationStatus status = commsService.start(); status != ecOperationStatus::Ok)
+    {
+        std::cerr << "supervisory_controller: COMMS start failed: "
                   << operationStatusMessage(status) << '\n';
         return 1;
     }
@@ -107,7 +136,8 @@ int main(const int argumentCount, char* arguments[])
         previousIteration = iterationStart;
         nextIteration += kLoopPeriodMs;
 
-        if (const ecOperationStatus runStatus = application.runLoopOnce(elapsedMs); runStatus != ecOperationStatus::Ok)
+        if (const ecOperationStatus runStatus = application.runControlCycle(elapsedMs);
+            runStatus != ecOperationStatus::Ok)
         {
             std::cerr << "supervisory_controller: runtime failed: "
                       << operationStatusMessage(runStatus) << '\n';
@@ -127,6 +157,7 @@ int main(const int argumentCount, char* arguments[])
         }
     }
 
+    commsService.stop();
     std::clog << "SHUTDOWN reason=signal\n";
     return 0;
 }

@@ -21,6 +21,12 @@ option(
     OFF
 )
 
+option(
+    SUPERVISORY_CAN_INTERFACE_PRECONFIGURED
+    "Do not reconfigure CAN from the controller process."
+    ON
+)
+
 if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/src/main.cpp")
     set(SUPERVISORY_ROOT "${CMAKE_CURRENT_LIST_DIR}")
 elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../src/main.cpp")
@@ -41,6 +47,7 @@ find_package(Threads REQUIRED)
 add_executable(supervisory_controller
     "${SUPERVISORY_ROOT}/src/main.cpp"
     "${SUPERVISORY_ROOT}/src/app/supervisory_application.cpp"
+    "${SUPERVISORY_ROOT}/src/can/can_comms_service.cpp"
     "${SUPERVISORY_ROOT}/src/can/can_protocol.cpp"
     "${SUPERVISORY_ROOT}/src/can/socket_can_adapter.cpp"
     "${SUPERVISORY_ROOT}/src/control/supervisory_state_machine.cpp"
@@ -77,5 +84,11 @@ endif()
 if(SUPERVISORY_USE_VIRTUAL_CAN)
     target_compile_definitions(supervisory_controller PRIVATE
         SUPERVISORY_USE_VIRTUAL_CAN=1
+    )
+endif()
+
+if(SUPERVISORY_CAN_INTERFACE_PRECONFIGURED)
+    target_compile_definitions(supervisory_controller PRIVATE
+        SUPERVISORY_CAN_INTERFACE_PRECONFIGURED=1
     )
 endif()

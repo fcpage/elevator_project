@@ -11,13 +11,13 @@ chmod +x scripts/*.sh
 
 Physical CAN demo with auto-arrival:
 chmod +x scripts/*.sh
-./scripts/build_rpi.sh --hardware can0 250000
-./scripts/run_rpi.sh --hardware can0 250000
+./scripts/build_rpi.sh --hardware can0 125000
+./scripts/run_rpi.sh --hardware can0 125000
 
 Physical CAN production build:
 chmod +x scripts/*.sh
-./scripts/build_rpi.sh --production can0 250000
-./scripts/run_rpi.sh --production can0 250000
+./scripts/build_rpi.sh --production can0 125000
+./scripts/run_rpi.sh --production can0 125000
 
 Run an existing build
 ---------------------
@@ -26,12 +26,14 @@ Virtual CAN test:
 ./scripts/run_rpi.sh --test
 
 Physical CAN demo:
-./scripts/run_rpi.sh --hardware can0 250000
+./scripts/run_rpi.sh --hardware can0 125000
 
 Physical CAN production:
-./scripts/run_rpi.sh --production can0 250000
+./scripts/run_rpi.sh --production can0 125000
 
 Each run writes a timestamped supervisory-YYYYMMDD-HHMMSS.log file.
+Mode-specific binaries are stored under build-rpi/test, build-rpi/hardware,
+and build-rpi/production.
 
 CAN setup only
 --------------
@@ -40,7 +42,7 @@ Virtual CAN:
 ./scripts/initialize_can.sh --virtual vcan0
 
 Physical CAN:
-./scripts/initialize_can.sh can0 250000
+./scripts/initialize_can.sh can0 125000
 
 Traditional CMake builds
 ------------------------
@@ -49,28 +51,25 @@ Dry test with virtual CAN and auto-arrival:
 sudo modprobe vcan
 sudo ip link add vcan0 type vcan
 sudo ip link set vcan0 up
-rm -rf build-rpi
-cmake -S . -B build-rpi -DSUPERVISORY_ENABLE_AUTO_ARRIVAL=ON -DSUPERVISORY_USE_VIRTUAL_CAN=ON
-cmake --build build-rpi
-./build-rpi/supervisory_controller
+cmake -S rpi -B build-rpi/test -DSUPERVISORY_ENABLE_AUTO_ARRIVAL=ON -DSUPERVISORY_USE_VIRTUAL_CAN=ON
+cmake --build build-rpi/test
+./build-rpi/test/supervisory_controller vcan0
 
 Physical CAN demo with auto-arrival:
 sudo modprobe can
 sudo modprobe can_raw
 sudo modprobe peak_usb
 sudo ip link set can0 down
-sudo ip link set can0 type can bitrate 250000 restart-ms 100
+sudo ip link set can0 type can bitrate 125000 restart-ms 100
 sudo ip link set can0 up
-rm -rf build-rpi
-cmake -S . -B build-rpi -DSUPERVISORY_ENABLE_AUTO_ARRIVAL=ON -DSUPERVISORY_USE_VIRTUAL_CAN=OFF
-cmake --build build-rpi
-sudo ./build-rpi/supervisory_controller can0
+cmake -S rpi -B build-rpi/hardware -DSUPERVISORY_ENABLE_AUTO_ARRIVAL=ON
+cmake --build build-rpi/hardware
+./build-rpi/hardware/supervisory_controller can0
 
 Physical CAN production build:
-rm -rf build-rpi
-cmake -S . -B build-rpi -DSUPERVISORY_ENABLE_AUTO_ARRIVAL=OFF -DSUPERVISORY_USE_VIRTUAL_CAN=OFF
-cmake --build build-rpi
-sudo ./build-rpi/supervisory_controller can0
+cmake -S rpi -B build-rpi/production -DSUPERVISORY_ENABLE_AUTO_ARRIVAL=OFF
+cmake --build build-rpi/production
+./build-rpi/production/supervisory_controller can0
 
 Virtual CAN frame injection
 ---------------------------
