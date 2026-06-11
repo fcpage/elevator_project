@@ -80,6 +80,7 @@ target_compile_options(supervisory_controller PRIVATE
     -Wall
     -Wextra
     -Wpedantic
+    -pthread
 )
 
 target_link_libraries(supervisory_controller PRIVATE Threads::Threads)
