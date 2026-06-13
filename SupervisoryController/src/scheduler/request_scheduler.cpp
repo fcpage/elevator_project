@@ -22,17 +22,17 @@ void cRequestScheduler::enqueueEvent(const sSupervisoryEvent& event)
 
     switch (event.type)
     {
-        case ecEventType::CanFloorRequest:
-        {
-            request.source = RequestSource::FloorModule;
-            floorRequests_.push_back(request);
-            break;
-        }
-
         case ecEventType::CanCarRequest:
         {
             request.source = RequestSource::CarModule;
             carRequests_.push_back(request);
+            break;
+        }
+
+        case ecEventType::CanFloorRequest:
+        {
+            request.source = RequestSource::FloorModule;
+            floorRequests_.push_back(request);
             break;
         }
 

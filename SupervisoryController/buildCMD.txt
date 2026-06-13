@@ -1,3 +1,7 @@
+ryan@ryans-ubuntu-pi:~$ sudo modprobe can_raw
+ryan@ryans-ubuntu-pi:~$ sudo modprobe peak_usb
+ryan@ryans-ubuntu-pi:~$ ip link show
+
 Build commands
 ==============
 

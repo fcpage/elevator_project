@@ -12,10 +12,10 @@
 #include <iostream>
 #include <optional>
 
-#include "project6/supervisory/can/can_frame.hpp"
-#include "project6/supervisory/common/event.hpp"
-#include "project6/supervisory/control/supervisory_state_machine.hpp"
-#include "project6/supervisory/drivers/supervisory_drivers.hpp"
+#include "supervisory/can/can_frame.hpp"
+#include "supervisory/common/event.hpp"
+#include "supervisory/control/supervisory_state_machine.hpp"
+#include "supervisory/drivers/supervisory_drivers.hpp"
 
 namespace
 {

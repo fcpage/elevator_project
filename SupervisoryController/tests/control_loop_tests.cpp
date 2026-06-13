@@ -2,9 +2,9 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "project6/supervisory/app/supervisory_application.hpp"
-#include "project6/supervisory/can/can_comms_service.hpp"
-#include "project6/supervisory/drivers/supervisory_drivers.hpp"
+#include "supervisory/app/supervisory_application.hpp"
+#include "supervisory/can/can_comms_service.hpp"
+#include "supervisory/drivers/supervisory_drivers.hpp"
 
 namespace
 {
