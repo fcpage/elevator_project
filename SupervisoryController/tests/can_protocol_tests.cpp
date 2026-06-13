@@ -11,8 +11,8 @@
 #include <cstdint>
 #include <iostream>
 
-#include "project6/supervisory/can/can_adapter.hpp"
-#include "project6/supervisory/can/can_protocol.hpp"
+#include "supervisory/can/can_adapter.hpp"
+#include "supervisory/can/can_protocol.hpp"
 
 namespace
 {

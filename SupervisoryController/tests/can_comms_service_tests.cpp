@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "project6/supervisory/can/can_comms_service.hpp"
+#include "supervisory/can/can_comms_service.hpp"
 
 namespace
 {

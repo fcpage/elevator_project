@@ -8,7 +8,7 @@
 
 #include "supervisory/can/can_adapter.hpp"
 
-#define __linux__
+//#define __linux__
 
 #ifdef __linux__
 #include <array>

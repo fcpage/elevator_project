@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "project6/supervisory/common/spsc_queue.hpp"
+#include "supervisory/common/spsc_queue.hpp"
 
 namespace
 {

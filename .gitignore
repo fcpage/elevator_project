@@ -5,6 +5,8 @@ SupervisoryController/modern_engineering_cpp_style_guide.md
 SupervisoryController/src/sim
 SupervisoryController/src/tests
 SupervisoryController/build-rpi/
+SupervisoryController/out/
+SupervisoryController/.vs/
 
 latex
 html
