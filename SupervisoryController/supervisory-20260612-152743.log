@@ -1,0 +1,111 @@
+START interface=can0 bitrate=125000
+STATE Idle -> Dispatching current=1 target=2 direction=None door_open=false faulted=false
+STATE Dispatching -> MovingUp current=1 target=2 direction=Up door_open=false faulted=false
+STATE MovingUp -> Arrived current=2 target=2 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=2 target=2 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=2 target=1 direction=None door_open=false faulted=false
+STATE Dispatching -> MovingDown current=2 target=1 direction=Down door_open=false faulted=false
+STATE MovingDown -> Arrived current=1 target=1 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=1 target=1 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=1 target=3 direction=None door_open=false faulted=false
+STATE Dispatching -> MovingUp current=1 target=3 direction=Up door_open=false faulted=false
+STATE MovingUp -> MovingUp current=2 target=3 direction=Up door_open=false faulted=false
+STATE MovingUp -> Arrived current=3 target=3 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=3 target=3 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=3 target=2 direction=None door_open=false faulted=false
+STATE Dispatching -> MovingDown current=3 target=2 direction=Down door_open=false faulted=false
+AUTO_ARRIVAL target_floor=2 elapsed_ms=3003
+STATE MovingDown -> Arrived current=2 target=2 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=2 target=2 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=2 target=1 direction=None door_open=false faulted=false
+STATE Dispatching -> MovingDown current=2 target=1 direction=Down door_open=false faulted=false
+STATE MovingDown -> Arrived current=1 target=1 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=1 target=1 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=1 target=1 direction=None door_open=false faulted=false
+STATE Dispatching -> Arrived current=1 target=1 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=1 target=1 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=1 target=3 direction=None door_open=false faulted=false
+STATE Dispatching -> MovingUp current=1 target=3 direction=Up door_open=false faulted=false
+STATE MovingUp -> MovingUp current=2 target=3 direction=Up door_open=false faulted=false
+AUTO_ARRIVAL target_floor=3 elapsed_ms=3008
+STATE MovingUp -> Arrived current=3 target=3 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=3 target=3 direction=None door_open=false faulted=false
+STATE Idle -> Idle current=2 target=3 direction=None door_open=false faulted=false
+STATE Idle -> Idle current=1 target=3 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=1 target=1 direction=None door_open=false faulted=false
+STATE Dispatching -> Arrived current=1 target=1 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=1 target=1 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=1 target=3 direction=None door_open=false faulted=false
+STATE Dispatching -> MovingUp current=1 target=3 direction=Up door_open=false faulted=false
+STATE MovingUp -> MovingUp current=2 target=3 direction=Up door_open=false faulted=false
+AUTO_ARRIVAL target_floor=3 elapsed_ms=3008
+STATE MovingUp -> Arrived current=3 target=3 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=3 target=3 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=3 target=1 direction=None door_open=false faulted=false
+STATE Dispatching -> MovingDown current=3 target=1 direction=Down door_open=false faulted=false
+STATE MovingDown -> MovingDown current=2 target=1 direction=Down door_open=false faulted=false
+AUTO_ARRIVAL target_floor=1 elapsed_ms=3009
+STATE MovingDown -> Arrived current=1 target=1 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=1 target=1 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=1 target=3 direction=None door_open=false faulted=false
+STATE Dispatching -> MovingUp current=1 target=3 direction=Up door_open=false faulted=false
+STATE MovingUp -> MovingUp current=2 target=3 direction=Up door_open=false faulted=false
+AUTO_ARRIVAL target_floor=3 elapsed_ms=3008
+STATE MovingUp -> Arrived current=3 target=3 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=3 target=3 direction=None door_open=false faulted=false
+LOOP_OVERRUN elapsed_ms=0
+LOOP_OVERRUN elapsed_ms=1
+LOOP_OVERRUN elapsed_ms=0
+LOOP_OVERRUN elapsed_ms=0
+LOOP_OVERRUN elapsed_ms=0
+LOOP_OVERRUN elapsed_ms=0
+LOOP_OVERRUN elapsed_ms=1
+STATE Idle -> Dispatching current=3 target=1 direction=None door_open=false faulted=false
+STATE Dispatching -> MovingDown current=3 target=1 direction=Down door_open=false faulted=false
+STATE MovingDown -> MovingDown current=2 target=1 direction=Down door_open=false faulted=false
+AUTO_ARRIVAL target_floor=1 elapsed_ms=3003
+STATE MovingDown -> Arrived current=1 target=1 direction=None door_open=true faulted=false
+STATE Arrived -> Arrived current=2 target=1 direction=None door_open=true faulted=false
+STATE Arrived -> Arrived current=1 target=1 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=1 target=1 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=1 target=1 direction=None door_open=false faulted=false
+STATE Dispatching -> Arrived current=1 target=1 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=1 target=1 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=1 target=1 direction=None door_open=false faulted=false
+STATE Dispatching -> Arrived current=1 target=1 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=1 target=1 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=1 target=1 direction=None door_open=false faulted=false
+STATE Dispatching -> Arrived current=1 target=1 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=1 target=1 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=1 target=3 direction=None door_open=false faulted=false
+STATE Dispatching -> MovingUp current=1 target=3 direction=Up door_open=false faulted=false
+STATE MovingUp -> MovingUp current=2 target=3 direction=Up door_open=false faulted=false
+STATE MovingUp -> Arrived current=3 target=3 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=3 target=3 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=3 target=2 direction=None door_open=false faulted=false
+STATE Dispatching -> MovingDown current=3 target=2 direction=Down door_open=false faulted=false
+AUTO_ARRIVAL target_floor=2 elapsed_ms=3000
+STATE MovingDown -> Arrived current=2 target=2 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=2 target=2 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=2 target=1 direction=None door_open=false faulted=false
+STATE Dispatching -> MovingDown current=2 target=1 direction=Down door_open=false faulted=false
+STATE MovingDown -> Arrived current=1 target=1 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=1 target=1 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=1 target=1 direction=None door_open=false faulted=false
+STATE Dispatching -> Arrived current=1 target=1 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=1 target=1 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=1 target=1 direction=None door_open=false faulted=false
+STATE Dispatching -> Arrived current=1 target=1 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=1 target=1 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=1 target=3 direction=None door_open=false faulted=false
+STATE Dispatching -> MovingUp current=1 target=3 direction=Up door_open=false faulted=false
+STATE MovingUp -> MovingUp current=2 target=3 direction=Up door_open=false faulted=false
+AUTO_ARRIVAL target_floor=3 elapsed_ms=3006
+STATE MovingUp -> Arrived current=3 target=3 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=3 target=3 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=3 target=1 direction=None door_open=false faulted=false
+STATE Dispatching -> MovingDown current=3 target=1 direction=Down door_open=false faulted=false
+STATE MovingDown -> MovingDown current=2 target=1 direction=Down door_open=false faulted=false
+AUTO_ARRIVAL target_floor=1 elapsed_ms=3005
+STATE MovingDown -> Arrived current=1 target=1 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=1 target=1 direction=None door_open=false faulted=false
