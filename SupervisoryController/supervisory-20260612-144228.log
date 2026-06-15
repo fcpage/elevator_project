@@ -1,0 +1,9 @@
+START interface=can0 bitrate=125000
+STATE Idle -> Dispatching current=1 target=2 direction=None door_open=false faulted=false
+STATE Dispatching -> MovingUp current=1 target=2 direction=Up door_open=false faulted=false
+AUTO_ARRIVAL target_floor=2 elapsed_ms=3000
+STATE MovingUp -> Arrived current=2 target=2 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=2 target=2 direction=None door_open=false faulted=false
+STATE Idle -> Dispatching current=2 target=2 direction=None door_open=false faulted=false
+STATE Dispatching -> Arrived current=2 target=2 direction=None door_open=true faulted=false
+STATE Arrived -> Idle current=2 target=2 direction=None door_open=false faulted=false
