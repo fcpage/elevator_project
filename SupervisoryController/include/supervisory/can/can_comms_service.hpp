@@ -84,7 +84,7 @@ struct sCanExchange
     std::atomic<ecCanCommsFaultReason> faultReason{ecCanCommsFaultReason::None};
 };
 
-/** @brief Owns SocketCAN and its worker thread. */
+/** @brief Inits and manages the SocketCAN and its worker thread. */
 class cCanCommsService
 {
 public:
@@ -93,6 +93,7 @@ public:
     /** @brief Stops and joins the worker. */
     ~cCanCommsService();
 
+    /** @brief Prevent the CommsService from being copied. */
     cCanCommsService(const cCanCommsService&) = delete;
     cCanCommsService& operator=(const cCanCommsService&) = delete;
 

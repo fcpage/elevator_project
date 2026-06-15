@@ -121,7 +121,7 @@ int main(const int argumentCount, char* arguments[])
     std::signal(SIGINT, handleShutdownSignal);
     std::signal(SIGTERM, handleShutdownSignal);
 
-    constexpr std::chrono::milliseconds kLoopPeriodMs{10};
+    constexpr std::chrono::milliseconds kLoopPeriodMs{10}; 
     auto previousIteration = std::chrono::steady_clock::now();
     auto nextIteration = previousIteration;
 

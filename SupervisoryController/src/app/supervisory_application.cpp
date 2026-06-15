@@ -8,6 +8,7 @@
 #include "supervisory/app/supervisory_application.hpp"
 
 #include <cstddef>
+#include <iostream>
 
 namespace project6::supervisory
 {
@@ -79,6 +80,7 @@ void cSupervisoryApplication::publishPendingFrame()
 void cSupervisoryApplication::checkCommsHealth(
     const std::chrono::milliseconds elapsedMs)
 {
+    // Duplicate event. Return.
     if (isCommsFaultLatched_)
     {
         return;
@@ -134,6 +136,27 @@ void cSupervisoryApplication::faultComms(const ecCanCommsFaultReason reason)
     ecCanCommsFaultReason expected = ecCanCommsFaultReason::None;
     static_cast<void>(exchange_.faultReason.compare_exchange_strong(expected, reason));
     isCommsFaultLatched_ = true;
+
+    // Try and restart with default configuration.
+    const sSocketCanConfig canConfig;
+    sCanExchange canExchange;
+    cCanCommsService commsService(canConfig, canExchange);
+    cSupervisoryApplication application(canExchange);
+
+    if (const ecOperationStatus status = commsService.initializeService(); status != ecOperationStatus::Ok)
+    {
+        std::cerr << "supervisory_controller: COMMS restart initialization failed." << std::endl;
+    }
+
+    if (const ecOperationStatus status = commsService.start(); status != ecOperationStatus::Ok)
+    {
+        std::cerr << "supervisory_controller: COMMS restart failed." << std::endl;
+    }
+    else {
+        std::clog << "supervisory_controller: Recovery successful. COMMS restarted." << std::endl;
+        return;
+    }
+
     sSupervisoryEvent event{};
     event.type = ecEventType::Fault;
     appStateMachine_.handleEvent(event);

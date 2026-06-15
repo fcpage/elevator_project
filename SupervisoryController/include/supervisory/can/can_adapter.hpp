@@ -69,6 +69,7 @@ public:
      * @brief Creates an adapter with explicit SocketCAN runtime configuration.
      *
      * @param config Linux interface setup used by initialize().
+     * Require passed config variables are explicitly initialized not implicitly converted.
      */
     explicit cSocketCanAdapter(const sSocketCanConfig &config);
 
@@ -76,6 +77,7 @@ public:
      * @brief Creates an adapter for the named SocketCAN network interface.
      *
      * @param interfaceName Null-terminated interface name, such as "can0".
+     * Require passed config variables are explicitly initialized not implicitly converted.
      */
     explicit cSocketCanAdapter(const char* interfaceName);
 
@@ -84,6 +86,7 @@ public:
      */
     ~cSocketCanAdapter();
 
+    /** @brief Prevent copies from being created. */
     cSocketCanAdapter(const cSocketCanAdapter&) = delete;
     cSocketCanAdapter& operator=(const cSocketCanAdapter&) = delete;
 
