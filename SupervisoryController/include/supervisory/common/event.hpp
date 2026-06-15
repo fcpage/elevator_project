@@ -59,7 +59,7 @@ enum class ecTravelDirection
 struct sSupervisoryEvent
 {
     /** Selects how the remaining event fields are interpreted. */
-    ecEventType type = ecEventType::TimerTick;
+    ecEventType type;
 
     /** Destination floor for HTTP, landing, or in-car request events. */
     std::optional<std::uint8_t> requestedFloor;

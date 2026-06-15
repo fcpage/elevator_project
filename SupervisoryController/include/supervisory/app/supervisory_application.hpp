@@ -19,7 +19,7 @@ namespace project6::supervisory
 {
 
 /**
- * @brief Owns one bounded iteration of the deterministic CONTROL loop.
+ * @brief Runs one bounded iteration of the deterministic CONTROL loop.
  */
 class cSupervisoryApplication
 {
