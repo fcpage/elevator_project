@@ -86,9 +86,9 @@ void user_main(void) {
             HAL_Delay(100);
             HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
             HAL_Delay(100);
-            dbglog("Hearbeat request recieved: %s\n", RxData);
+            dbglog(LVL3, "Hearbeat request recieved: %s\n", RxData);
             TxData[0] = HB_OK;
-            dbglog("Sending heartbeat response: %s\n", TxData);
+            dbglog(LVL3, "Sending heartbeat response: %s\n", TxData);
             if(HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK) {
                 panic("Failed to send CAN message");
             }
@@ -98,7 +98,7 @@ void user_main(void) {
         case SC_POS_FLOOR_2: [[ fallthrough ]];
         case SC_POS_FLOOR_3: 
         {
-            dbglog("Received floor status message: %s\n", RxData);
+            dbglog(LVL1, "Received floor status message: %s\n", RxData);
             /* Floor number is indicated by the lower two bits in the node ID 
              * and the MSG (checks if the elevator is at our floor) */
             if( (RxData[0] & 0b11) == (NODE_ID & 0b11) ) {
@@ -108,7 +108,7 @@ void user_main(void) {
         }
 #endif
         default:
-            dbglog("Unknown CAN msg: %s\n", RxData);
+            dbglog(LVL1, "Unknown CAN msg: %s\n", RxData);
         reset_Rx_buffer:
             memset(RxData, 0, sizeof(RxData));  // Reset the buffer
             break;
@@ -116,7 +116,7 @@ void user_main(void) {
 
     /*** Transmit ***/
     if (BUTTON) {
-        dbglog("Button Pressed: %d\n", BUTTON);
+        dbglog(LVL1, "Button Pressed: %d\n", BUTTON);
         if (BUTTON > BLUE_BUTTON_PRESSED) {
             panic("Invalid button");
         } else {
@@ -129,7 +129,7 @@ void user_main(void) {
             if (HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK) {
                 panic("Failed to send CAN message");
             }
-            dbglog("CAN message sent: %d\n", TxData[0]);
+            dbglog(LVL1, "CAN message sent: %d\n", TxData[0]);
             // Turn off shield LED
             HAL_GPIO_TogglePin(floor->led_port, floor->led_pin);  	
         }
@@ -219,7 +219,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         case PB3_IN_Pin: BUTTON = FL3_BUTTON_PRESSED; break;
         default: {
             /* Note: no overhead in release mode */
-            dbglog("ERROR: Unknown button %d pressed", GPIO_Pin);
+            dbglog(LVL1, "ERROR: Unknown button %d pressed", GPIO_Pin);
             break;
         }
     }
