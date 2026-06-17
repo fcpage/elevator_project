@@ -1,9 +1,9 @@
 /**
-******************************************************************************** 
+********************************************************************************
 * @file     : CAN_Protocol.h
 * @brief    : Defines the common CAN protocol
 * By        : Nigel Sinclair
-******************************************************************************** 
+********************************************************************************
 */
 #ifndef __CAN_PROTOCOL_H
 #define __CAN_PROTOCOL_H
@@ -44,6 +44,19 @@ enum CAN_NAMESPACE(Messages) {
     CC_REQ_FLOOR_1  = 0b0001, // "
     CC_REQ_FLOOR_2  = 0b0010, // "
     CC_REQ_FLOOR_3  = 0b0011, // "
+
+    /*** Extended messages (not in common protocol) ***/
+
+    EXTENDED_MSG    = 0b1000000,    // Indicates that the message is not in the common protocol
+    HB_REQ          = 0b1000100,    // Supervisory controller request for heartbeat message
+    HB_OK           = 0b1000100,    // Each node sends this message to report successful operation
+    HB_ERR          = 0b1000000,    // Each node sends this message to report successful operation
+
+    /* Supervisory controller messages to indicate which floor
+     * the elevator has arrived at */
+    SC_POS_FLOOR_1  = 0b1000001,
+    SC_POS_FLOOR_2  = 0b1000010,
+    SC_POS_FLOOR_3  = 0b1000011,
 };
 
 #ifdef __cplusplus
