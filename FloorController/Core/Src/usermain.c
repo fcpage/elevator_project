@@ -6,6 +6,7 @@
 ******************************************************************************** 
 */
 
+#include "stm32f3xx_hal_can.h"
 enum FloorButtons {
     NO_BUTTON_PRESSED	= 0,
     FL1_BUTTON_PRESSED  = 1, 
@@ -37,7 +38,6 @@ static u8   BUTTON = NO_BUTTON_PRESSED;		// Initial value is that no BUTTON has 
 #endif
 
 typedef struct { 
-    bool          transmit;
     GPIO_TypeDef* led_port; 
     u16           led_pin;
     u8            msg;
@@ -71,36 +71,67 @@ static const FloorData event_lookup[] = {
     },
 };
 
+
 static const FloorData* floor = &event_lookup[NO_BUTTON_PRESSED];
 
 void user_main(void) {
-    // Receive
-    if (RxData[0] == FC_FLOOR_REQ) {
-        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);      // Turn on LED2
-        HAL_Delay(2000);					    	// Keep LED on for 2 seconds
-        dbglog("CAN message recieved: %s", RxData);
 
-        memset(RxData, 0, sizeof(RxData));          // Reset the buffer
-
-        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);      // Turn off LED2
-        HAL_Delay(100);								// Need a delay after toggle
+    /*** Recieve ***/
+    switch(RxData[0]) {
+        case 0: break;  // No message recieved
+#ifndef CAN_COMMON      // Ignore the exended messages
+        case HB_REQ: {  // Respond with HB_OK to heartbeat request
+            // Pulse the LED
+            HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+            HAL_Delay(100);
+            HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+            HAL_Delay(100);
+            dbglog("Hearbeat request recieved: %s\n", RxData);
+            TxData[0] = HB_OK;
+            dbglog("Sending heartbeat response: %s\n", TxData);
+            if(HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK) {
+                panic("Failed to send CAN message");
+            }
+            goto reset_Rx_buffer;
+        }
+        case SC_POS_FLOOR_1: [[ fallthrough ]];
+        case SC_POS_FLOOR_2: [[ fallthrough ]];
+        case SC_POS_FLOOR_3: 
+        {
+            dbglog("Received floor status message: %s\n", RxData);
+            /* Floor number is indicated by the lower two bits in the node ID 
+             * and the MSG (checks if the elevator is at our floor) */
+            if( (RxData[0] & 0b11) == (NODE_ID & 0b11) ) {
+                // TODO: turn off button led (unknown at this time)
+            }
+            goto reset_Rx_buffer;
+        }
+#endif
+        default:
+            dbglog("Unknown CAN msg: %s\n", RxData);
+        reset_Rx_buffer:
+            memset(RxData, 0, sizeof(RxData));  // Reset the buffer
+            break;
     }
 
-    // Transmit
+    /*** Transmit ***/
     if (BUTTON) {
-        dbglog("Button Pressed\n");
+        dbglog("Button Pressed: %d\n", BUTTON);
         if (BUTTON > BLUE_BUTTON_PRESSED) {
             panic("Invalid button");
         } else {
             floor = &event_lookup[BUTTON];
-            HAL_GPIO_TogglePin(floor->led_port, floor->led_pin);  	// Turn on LED2
-            HAL_Delay(2000);							            // Leave it on for 2 seconds
-            TxData[0] = floor->msg;						            // Store the 1 character message to transmit into the TxData buffer and transmit over the CAN bus
+            // Turn on shield LED
+            HAL_GPIO_TogglePin(floor->led_port, floor->led_pin);
+            HAL_Delay(2000);
+            // TODO: turn on button led (unknown at this time)
+            TxData[0] = floor->msg;     // Store the appropriate message for the given button
             if (HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK) {
                 panic("Failed to send CAN message");
             }
             dbglog("CAN message sent: %d\n", TxData[0]);
-            HAL_GPIO_TogglePin(floor->led_port, floor->led_pin);  	// Turn off LED2
+            // Turn off shield LED
+            HAL_GPIO_TogglePin(floor->led_port, floor->led_pin);  	
         }
         BUTTON = NO_BUTTON_PRESSED; 								// Reset the BUTTON flag
     }
