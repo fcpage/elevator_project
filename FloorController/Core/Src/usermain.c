@@ -6,7 +6,8 @@
 ******************************************************************************** 
 */
 
-#include "stm32f3xx_hal.h"
+// PSA: ONLY EVER INCLUDE THIS YOU WILL REGRET INCLUDING OTHER HAL HEADERS
+#include "stm32f3xx_hal.h" 
 
 enum FloorButtons {
     NO_BUTTON_PRESSED	= 0,
