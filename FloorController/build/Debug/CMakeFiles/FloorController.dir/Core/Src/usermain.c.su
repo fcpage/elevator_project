@@ -1,7 +1,0 @@
-/home/nigel/Projects/school/ElevatorProject/FloorController/cmake/stm32cubemx/../../Core/Inc/debug_wrappers.h:24:20:__dbg_panic	24	static
-/home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/usermain.c:76:6:user_main	8	static
-/home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/usermain.c:114:6:user_init	4	static
-/home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/usermain.c:121:6:user_CAN_init	80	static
-/home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/usermain.c:171:6:HAL_CAN_RxFifo0MsgPendingCallback	16	static
-/home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/usermain.c:181:6:HAL_GPIO_EXTI_Callback	16	static
-/home/nigel/Projects/school/ElevatorProject/FloorController/Core/Src/usermain.c:203:21:panic	4	static

@@ -1,7 +1,0 @@
-/home/nigel/Projects/school/ElevatorProject/FloorController/build/Release/CMakeFiles/FloorController.dir
-/home/nigel/Projects/school/ElevatorProject/FloorController/build/Release/CMakeFiles/flash.dir
-/home/nigel/Projects/school/ElevatorProject/FloorController/build/Release/CMakeFiles/edit_cache.dir
-/home/nigel/Projects/school/ElevatorProject/FloorController/build/Release/CMakeFiles/rebuild_cache.dir
-/home/nigel/Projects/school/ElevatorProject/FloorController/build/Release/cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir
-/home/nigel/Projects/school/ElevatorProject/FloorController/build/Release/cmake/stm32cubemx/CMakeFiles/edit_cache.dir
-/home/nigel/Projects/school/ElevatorProject/FloorController/build/Release/cmake/stm32cubemx/CMakeFiles/rebuild_cache.dir

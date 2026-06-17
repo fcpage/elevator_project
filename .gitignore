@@ -7,6 +7,7 @@ SupervisoryController/src/tests
 SupervisoryController/build-rpi/
 SupervisoryController/out/
 SupervisoryController/.vs/
+FloorController/build/
 
 latex
 html
