@@ -6,7 +6,8 @@
 ******************************************************************************** 
 */
 
-#include "stm32f3xx_hal_can.h"
+#include "stm32f3xx_hal.h"
+
 enum FloorButtons {
     NO_BUTTON_PRESSED	= 0,
     FL1_BUTTON_PRESSED  = 1, 

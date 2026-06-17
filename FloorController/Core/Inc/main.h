@@ -31,7 +31,8 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "stm32f3xx_hal_def.h"
+#include "stm32f3xx_hal_can.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
