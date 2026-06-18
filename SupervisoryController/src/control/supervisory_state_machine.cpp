@@ -937,7 +937,7 @@ void cSupervisoryStateMachineAPI::handleEvent(const sSupervisoryEvent& event)
 #endif
     }
     
-    if (!state.didElevatorReportArrival && state.movementElapsedMs >= kTravelTimeoutMs)
+    if (!state.didElevatorReportArrival && state.movementElapsedMs >= kTravelTimeoutS)
     {
         state.snapshot.isFaulted = true;
         std::cerr << "Timeout occurred. The target floor was: "
