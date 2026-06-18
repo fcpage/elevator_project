@@ -27,18 +27,18 @@ namespace project6::supervisory
  * handles payload interpretation.
  */
 ///@{
-constexpr std::uint16_t kSupervisoryControllerCanId = 0x100;
-constexpr std::uint16_t kElevatorControllerCanId = 0x101;
-constexpr std::uint16_t kCarControllerCanId = 0x200;
-constexpr std::uint16_t kFloorOneControllerCanId = 0x201;
-constexpr std::uint16_t kFloorTwoControllerCanId = 0x202;
-constexpr std::uint16_t kFloorThreeControllerCanId = 0x203;
+constexpr auto kSupervisoryControllerCanId = static_cast<std::uint16_t>(NodeID::NODE_ID_SC);
+constexpr auto kElevatorControllerCanId    = static_cast<std::uint16_t>(NodeID::NODE_ID_EC);
+constexpr auto kCarControllerCanId         = static_cast<std::uint16_t>(NodeID::NODE_ID_CC);
+constexpr auto kFloorOneControllerCanId    = static_cast<std::uint16_t>(NodeID::NODE_ID_FC1);
+constexpr auto kFloorTwoControllerCanId    = static_cast<std::uint16_t>(NodeID::NODE_ID_FC2);
+constexpr auto kFloorThreeControllerCanId  = static_cast<std::uint16_t>(NodeID::NODE_ID_FC3);
 ///@}
 ///
 /**
  * @brief Maximum payload length of a CAN data frame in bytes.
  */
-constexpr std::size_t kCanPayloadLength = 8;
+constexpr auto kCanPayloadLength = static_cast<std::size_t>(Config::CAN_PAYLOAD_LENGTH);
 
 /**
  * @brief Standard struct of the shared CAN protocol layout.
@@ -85,37 +85,37 @@ struct sCanProtocolConfig
     /**
      * @brief Expected data length code for shared protocol frames.
      */
-    std::uint8_t sharedProtocolDlc = 1;
+    std::uint8_t sharedProtocolDlc = static_cast<std::uint8_t>(Config::DLC);
 
     /**
      * @brief Lowest valid elevator floor number.
      */
-    std::uint8_t minFloor = 1;
+    std::uint8_t minFloor = static_cast<std::uint8_t>(Config::MIN_FLOOR);
 
     /**
      * @brief Highest valid elevator floor number.
      */
-    std::uint8_t maxFloor = 3;
+    std::uint8_t maxFloor = static_cast<std::uint8_t>(Config::MAX_FLOOR);
 
     /**
      * @brief Mask selecting floor bits in byte 0.
      */
-    std::uint8_t floorMask = 0x03;
+    std::uint8_t floorMask = static_cast<std::uint8_t>(Config::FLOOR_MASK);
 
     /**
      * @brief Right shift applied after floorMask to recover the floor value.
      */
-    std::uint8_t floorShift = 0;
+    std::uint8_t floorShift = static_cast<std::uint8_t>(Config::FLOOR_SHIFT);
 
     /**
      * @brief Bit used as supervisor enable, elevator status, or car metadata.
      */
-    std::uint8_t statusOrEnableMask = 0x04;
+    std::uint8_t statusOrEnableMask = static_cast<std::uint8_t>(Config::STATUS_OR_ENABLE_MASK);
 
     /**
      * @brief Bit used by floor controllers to indicate an active request.
      */
-    std::uint8_t floorModuleRequestMask = 0x01;
+    std::uint8_t floorModuleRequestMask = static_cast<std::uint8_t>(Config::FC_REQ_MASK);
 };
 
 /**
