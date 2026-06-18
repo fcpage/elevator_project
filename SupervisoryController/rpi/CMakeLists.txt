@@ -70,6 +70,7 @@ add_executable(supervisory_controller
 target_include_directories(supervisory_controller
     PRIVATE
         "${SUPERVISORY_ROOT}/include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Common/"
 )
 
 target_compile_features(supervisory_controller PRIVATE cxx_std_20)

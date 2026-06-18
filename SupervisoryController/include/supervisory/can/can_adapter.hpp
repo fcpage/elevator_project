@@ -9,7 +9,7 @@
 #pragma once
 
 #include <cstdint>
-#include "supervisory/can/can_frame.hpp"
+#include "supervisory/can/can_protocol.hpp"
 #include "supervisory/common/result.hpp"
 
 namespace project6::supervisory

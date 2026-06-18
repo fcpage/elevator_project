@@ -11,11 +11,34 @@
 #include <cstdint>
 #include <optional>
 
-#include "supervisory/can/can_frame.hpp"
 #include "supervisory/common/event.hpp"
+#include "CAN_protocol.h"
 
 namespace project6::supervisory
 {
+    using namespace CAN;
+
+//=========== Begin Network Mapping ===========
+/**
+ * @name Project CAN Node Identifiers
+ *
+ * Standard 11-bit CAN identifiers assigned by the Project 6 protocol.
+ * These constants identify nodes on the physical bus. The protocol codec
+ * handles payload interpretation.
+ */
+///@{
+constexpr std::uint16_t kSupervisoryControllerCanId = 0x100;
+constexpr std::uint16_t kElevatorControllerCanId = 0x101;
+constexpr std::uint16_t kCarControllerCanId = 0x200;
+constexpr std::uint16_t kFloorOneControllerCanId = 0x201;
+constexpr std::uint16_t kFloorTwoControllerCanId = 0x202;
+constexpr std::uint16_t kFloorThreeControllerCanId = 0x203;
+///@}
+///
+/**
+ * @brief Maximum payload length of a CAN data frame in bytes.
+ */
+constexpr std::size_t kCanPayloadLength = 8;
 
 /**
  * @brief Standard struct of the shared CAN protocol layout.
