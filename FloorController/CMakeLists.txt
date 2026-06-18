@@ -36,6 +36,40 @@ enable_language(C ASM)
 # Create an executable object type
 add_executable(${CMAKE_PROJECT_NAME})
 
+# Verbosity level option
+set(VERBOSITY "medium" CACHE STRING "Level for VERBOSITY (none, low, medium, high)")
+
+if(VERBOSITY STREQUAL "none")
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE VERBOSITY=0) 
+elseif(VERBOSITY STREQUAL "low")
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE VERBOSITY=1) 
+elseif(VERBOSITY STREQUAL "medium")
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE VERBOSITY=2) 
+elseif(VERBOSITY STREQUAL "high")
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE VERBOSITY=3) 
+else()
+    message(FATAL_ERROR "Unsupported VERBOSITY level: ${VERBOSITY}")
+endif()
+
+# Node ID Option
+set(NODE_ID "car" CACHE STRING "Nodes for NODE_ID (car, floor1, floor2, floor3)")
+
+if(NODE_ID STREQUAL "car")
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE NODE_ID=NODE_ID_CC) 
+    message("NODE_ID: NODE_ID_CC") 
+elseif(NODE_ID STREQUAL "floor1")
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE NODE_ID=NODE_ID_FC1) 
+    message("NODE_ID: NODE_ID_FC1") 
+elseif(NODE_ID STREQUAL "floor2")
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE NODE_ID=NODE_ID_FC2) 
+    message("NODE_ID: NODE_ID_FC2") 
+elseif(NODE_ID STREQUAL "floor3")
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE NODE_ID=NODE_ID_FC3) 
+    message("NODE_ID: NODE_ID_FC3") 
+else()
+    message(FATAL_ERROR "Unsupported NODE_ID: ${NODE_ID}")
+endif()
+
 # Setting the correct file type for ST-Link utility (does not support .elf)
 set(CMAKE_EXECUTABLE_SUFFIX_ASM     ".elf")
 set(CMAKE_EXECUTABLE_SUFFIX_C       ".elf")
