@@ -1,2 +1,17 @@
 To do list:
-- [] Add logging to the program
+- [x] Add logging to the program
+- [] Update the can_frame.hpp to redirect to the common can frame header in the root
+        Major work:
+            1. Update the decode/encode funcs to accept the new header
+            2. Verify changes are backwards compatible
+
+- [] Update TX/RX can functions to transmit standardTransmit/standardReceive which uses the common class protocol
+- [] Create extended messages for group-only use:
+        Key ideas:
+            1. check if MSB is set to a 1, if 1, use the extended messages
+            2. implement common node heartbeat checking
+            3. elevator light messages
+            4. must be backwards compatible with existing protocol
+            5. message based extended messages (only group-specific messages are sent using extend messages)
+
+- [] Add timeout to the dispatching system (if it takes longer than X seconds, enter a fault condition)

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CidrCTestProjectState">
+    <ctestState>
+      <lineNumber testId="path:CMakeLists.txt test:supervisory_can_comms_service_tests" value="175" />
+      <lineNumber testId="path:CMakeLists.txt test:supervisory_can_protocol_tests" value="160" />
+      <lineNumber testId="path:CMakeLists.txt test:supervisory_control_loop_tests" value="180" />
+      <lineNumber testId="path:CMakeLists.txt test:supervisory_spsc_queue_tests" value="170" />
+      <lineNumber testId="path:CMakeLists.txt test:supervisory_state_machine_production_smoke" value="165" />
+      <lineNumber testId="path:CMakeLists.txt test:supervisory_state_machine_smoke" value="155" />
+    </ctestState>
+  </component>
+</project>

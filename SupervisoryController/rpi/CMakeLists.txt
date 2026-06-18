@@ -5,7 +5,7 @@ project(Project6SupervisoryController
     LANGUAGES CXX
 )
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -70,7 +70,7 @@ target_include_directories(supervisory_controller
         "${SUPERVISORY_ROOT}/include"
 )
 
-target_compile_features(supervisory_controller PRIVATE cxx_std_23)
+target_compile_features(supervisory_controller PRIVATE cxx_std_20)
 
 set_target_properties(supervisory_controller PROPERTIES
     CXX_EXTENSIONS OFF
@@ -83,7 +83,10 @@ target_compile_options(supervisory_controller PRIVATE
     -pthread
 )
 
-target_link_libraries(supervisory_controller PRIVATE Threads::Threads)
+target_link_libraries(supervisory_controller PRIVATE
+        Threads::Threads
+        atomic
+)
 
 if(SUPERVISORY_ENABLE_AUTO_ARRIVAL)
     target_compile_definitions(supervisory_controller PRIVATE
