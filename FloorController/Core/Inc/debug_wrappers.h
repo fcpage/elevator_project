@@ -64,7 +64,10 @@ static inline void __dbg_panic(const char* file, int line, const char* msg) {
 
 #else
 
-#define dbglog(unused, unused, ...)
+#define dbglog(unused1, unused2, ...)
+#define dbglog_LVL1(unused, ...)
+#define dbglog_LVL2(unused, ...)
+#define dbglog_LVL3(unused, ...)
 #define panic(unused) panic()
 
 #endif
