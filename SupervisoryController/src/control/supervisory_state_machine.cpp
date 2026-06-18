@@ -64,7 +64,7 @@ namespace
 
 /** Door dwell time before the Arrived state releases the serviced request. */
 constexpr std::chrono::milliseconds kDoorOpenDurationMs{3000};
-constexpr std::chrono::seconds kTravelTimeoutMs{10};
+constexpr std::chrono::seconds kTravelTimeoutS{10};
 #ifdef SUPERVISORY_ENABLE_AUTO_ARRIVAL
 constexpr std::chrono::seconds kSimulatedTravelDuration{3};
 #endif
