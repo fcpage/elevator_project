@@ -83,10 +83,9 @@ target_compile_options(supervisory_controller PRIVATE
     -pthread
 )
 
-target_link_libraries(supervisory_controller PRIVATE 
+target_link_libraries(supervisory_controller PRIVATE
     Threads::Threads
     atomic
-
 )
 
 if(SUPERVISORY_ENABLE_AUTO_ARRIVAL)

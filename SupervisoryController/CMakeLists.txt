@@ -5,7 +5,7 @@ project(Project6SupervisoryController
     LANGUAGES CXX
 )
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -143,7 +143,9 @@ target_link_libraries(supervisory_can_comms_service_tests
 add_executable(supervisory_control_loop_tests
     tests/control_loop_tests.cpp
     src/app/supervisory_application.cpp
+    src/can/can_comms_service.cpp
     src/can/can_protocol.cpp
+    src/can/socket_can_adapter.cpp
     src/control/supervisory_state_machine.cpp
     src/scheduler/request_scheduler.cpp
 )
@@ -151,6 +153,11 @@ add_executable(supervisory_control_loop_tests
 target_include_directories(supervisory_control_loop_tests
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_link_libraries(supervisory_control_loop_tests
+    PRIVATE
+        Threads::Threads
 )
 
 add_test(
