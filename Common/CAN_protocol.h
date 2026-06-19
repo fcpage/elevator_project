@@ -15,7 +15,7 @@
 namespace CAN {
 #define CAN_NAMESPACE(name, type) class name : std::type
 #else
-#define CAN_NAMESPACE(name) CAN_##name : type
+#define CAN_NAMESPACE(name, unused) CAN_##name
 #include <stdint.h>
 #endif
 
@@ -80,7 +80,7 @@ enum CAN_NAMESPACE(Messages, uint8_t) {
 
     /*** Extended messages (not in common protocol) ***/
 #ifndef CAN_COMMON
-    EXTENDED_MSG    = 0b10000000,    // Indicates that the message is not in the common protocol
+    EXTENDED_MSG    = 0b10000000,               // Indicates that the message is not in the common protocol
     HB_FLAG         = EXTENDED_MSG  | 0b100,    // Indicates the message is a heartbeat message
     HB_OK           = HB_FLAG       | 0,        // Each node sends this message to report successful operation
     HB_SC_REQ       = HB_FLAG       | 1,        // Supervisory controller request for heartbeat message
