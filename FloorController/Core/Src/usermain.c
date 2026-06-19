@@ -82,7 +82,7 @@ void user_main(void) {
     switch(RxData[0]) {
         case 0: break;  // No message recieved
 #ifndef CAN_COMMON      // Ignore the exended messages
-        case HB_REQ: {  // Respond with HB_OK to heartbeat request
+        case HB_SC_REQ: {  // Respond with HB_OK to heartbeat request
             // Pulse the LED
             HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
             HAL_Delay(100);

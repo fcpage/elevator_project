@@ -12,7 +12,7 @@
 #include <memory>
 #include <optional>
 
-#include "supervisory/can/can_frame.hpp"
+#include "supervisory/can/can_protocol.hpp"
 #include "supervisory/common/event.hpp"
 
 namespace project6::supervisory

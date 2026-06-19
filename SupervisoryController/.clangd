@@ -1,0 +1,9 @@
+CompileFlags:
+  Add: 
+    - -xc++
+    - -Wall
+    - -Wextra
+    - -Wpedantic
+    - --include-directory=./../Common/ # for common CAN header file
+  CompilationDatabase: ./build-rpi/hardware/
+
