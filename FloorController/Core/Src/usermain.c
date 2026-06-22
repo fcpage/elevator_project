@@ -8,6 +8,7 @@
 
 // PSA: ONLY EVER INCLUDE THIS YOU WILL REGRET INCLUDING OTHER HAL HEADERS
 #include "stm32f3xx_hal.h" 
+#include "stm32f3xx_hal_gpio.h"
 
 enum FloorButtons {
     NO_BUTTON_PRESSED	= 0,
@@ -40,12 +41,13 @@ static u8   BUTTON = NO_BUTTON_PRESSED;		// Initial value is that no BUTTON has 
 #endif
 
 typedef struct { 
-    GPIO_TypeDef* led_port; 
-    u16           led_pin;
-    u8            msg;
+    GPIO_TypeDef*       led_port;   // Will not change but function calls discard const
+    const u16           led_pin;
+    const u8            msg;
+    bool                pending_request;
 } FloorData;
 
-static const FloorData event_lookup[] = {
+static FloorData event_lookup[] = {
     { /* NO_BUTTON_PRESSED   */ },
     /* FL1_BUTTON_PRESSED  */ 
     { 
@@ -74,13 +76,13 @@ static const FloorData event_lookup[] = {
 };
 
 
-static const FloorData* floor = &event_lookup[NO_BUTTON_PRESSED];
+static FloorData* floor = &event_lookup[NO_BUTTON_PRESSED];
 
 void user_main(void) {
 
     /*** Recieve ***/
     switch(RxData[0]) {
-        case 0: break;  // No message recieved
+        case 0: goto reset_Rx_buffer;  // No message recieved
 #ifndef CAN_COMMON      // Ignore the exended messages
         case HB_SC_REQ: {  // Respond with HB_OK to heartbeat request
             // Pulse the LED
@@ -88,9 +90,9 @@ void user_main(void) {
             HAL_Delay(100);
             HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
             HAL_Delay(100);
-            dbglog(LVL3, "Hearbeat request recieved: %s\n", RxData);
+            dbglog(LVL3, "Hearbeat request recieved: %d\n", RxData[0]);
             TxData[0] = HB_OK;
-            dbglog(LVL3, "Sending heartbeat response: %s\n", TxData);
+            dbglog(LVL3, "Sending heartbeat response: %d\n", TxData[0]);
             if(HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK) {
                 panic("Failed to send CAN message");
             }
@@ -100,17 +102,20 @@ void user_main(void) {
         case SC_POS_FLOOR_2: [[ fallthrough ]];
         case SC_POS_FLOOR_3: 
         {
-            dbglog(LVL1, "Received floor status message: %s\n", RxData);
+            dbglog(LVL1, "Received floor status message: %d\n", RxData[0]);
             /* Floor number is indicated by the lower two bits in the node ID 
              * and the MSG (checks if the elevator is at our floor) */
             if( (RxData[0] & 0b11) == (NODE_ID & 0b11) ) {
-                // TODO: turn off button led (unknown at this time)
+                if(floor->pending_request) {
+                    HAL_GPIO_TogglePin(floor->led_port, floor->led_pin);
+                    floor->pending_request = false;
+                }
             }
             goto reset_Rx_buffer;
         }
 #endif
         default:
-            dbglog(LVL1, "Unknown CAN msg: %s\n", RxData);
+            dbglog(LVL1, "Ignoring CAN msg: %d\n", RxData[0]);
         reset_Rx_buffer:
             memset(RxData, 0, sizeof(RxData));  // Reset the buffer
             break;
@@ -123,17 +128,25 @@ void user_main(void) {
             panic("Invalid button");
         } else {
             floor = &event_lookup[BUTTON];
-            // Turn on shield LED
-            HAL_GPIO_TogglePin(floor->led_port, floor->led_pin);
-            HAL_Delay(2000);
-            // TODO: turn on button led (unknown at this time)
+#ifndef CAN_COMMON
+            if (floor->pending_request) {
+                dbglog(LVL2, "Request for current floor pending, ignoring request");
+                BUTTON = NO_BUTTON_PRESSED;
+                return;
+            }
+#endif
+            // Turn on button LED
+            HAL_GPIO_TogglePin(floor->led_port, floor->led_pin);     // Discards const, does not matter here
+            floor->pending_request = true;
             TxData[0] = floor->msg;     // Store the appropriate message for the given button
             if (HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK) {
                 panic("Failed to send CAN message");
             }
             dbglog(LVL1, "CAN message sent: %d\n", TxData[0]);
-            // Turn off shield LED
-            HAL_GPIO_TogglePin(floor->led_port, floor->led_pin);  	
+#ifdef CAN_COMMON
+            HAL_Delay(2000);
+            HAL_GPIO_TogglePin(floor->led_port, floor->led_pin);
+#endif
         }
         BUTTON = NO_BUTTON_PRESSED; 								// Reset the BUTTON flag
     }
