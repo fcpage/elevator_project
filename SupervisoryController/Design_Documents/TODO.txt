@@ -15,3 +15,5 @@ To do list:
             5. message based extended messages (only group-specific messages are sent using extend messages)
 
 - [] Add timeout to the dispatching system (if it takes longer than X seconds, enter a fault condition)
+
+- [] Supervisory heartbeat to the CAN bus (every 3 seconds), node heartbeat to supervisor (every 5 seconds)

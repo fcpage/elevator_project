@@ -37,7 +37,11 @@ enum class ecCanCommsFaultReason
     TransmitFailed,
     InboundQueueFull,
     OutboundQueueFull,
-    HeartbeatTimeout,
+    CommsProgressTimeout,
+    /** Expected node heartbeat replies did not arrive within the verification window. */
+    NodeHeartbeatTimeout,
+    /** A node explicitly reported heartbeat communication failure. */
+    NodeHeartbeatError,
     ThreadFailed
 };
 
@@ -49,7 +53,7 @@ struct sCanCommsHealthSnapshot
     /** First detected failure. */
     ecCanCommsFaultReason faultReason = ecCanCommsFaultReason::None;
     /** Worker progress counter. */
-    std::uint64_t heartbeat = 0;
+    std::uint64_t commsProgress = 0;
     /** Frames read from SocketCAN. */
     std::uint64_t receivedFrameCount = 0;
     /** Events rejected by a full queue. */
@@ -58,6 +62,14 @@ struct sCanCommsHealthSnapshot
     std::uint64_t transmittedFrameCount = 0;
     /** Failed SocketCAN writes. */
     std::uint64_t transmitFailureCount = 0;
+    /** Nodes expected to reply to the active heartbeat request. */
+    std::uint8_t expectedNodeHbReplyMask = 0;
+    /** Nodes that replied to the active or most recent heartbeat request. */
+    std::uint8_t receivedNodeHbReplyMask = 0;
+    /** Nodes missing when the latest heartbeat verification window expired. */
+    std::uint8_t missedNodeHbReplyMask = 0;
+    /** True while CONTROL is waiting for node heartbeat replies. */
+    bool isNodeHbReplyWindowOpen = false;
 };
 
 /** @brief Lock-free data exchange between COMMS and CONTROL. */
@@ -65,11 +77,13 @@ struct sCanExchange
 {
     /** COMMS-to-CONTROL events. */
     cSpscQueue<sSupervisoryEvent, 64> receivedEvents;
+    /** COMMS-to-CONTROL node heartbeat messages. */
+    cSpscQueue<sNodeHbMessage, 32> receivedNodeHbMessages;
     /** CONTROL-to-COMMS frames. */
     cSpscQueue<sCanFrame, 16> transmitFrames;
 
     /** Worker progress counter. */
-    std::atomic<std::uint64_t> heartbeat{0};
+    std::atomic<std::uint64_t> commsProgress{0};
     /** Frames read from SocketCAN. */
     std::atomic<std::uint64_t> receivedFrameCount{0};
     /** Events rejected by a full queue. */

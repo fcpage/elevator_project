@@ -127,6 +127,30 @@ constexpr std::uint8_t kSharedProtocolDlc = kDefaultCanProtocolConfig.sharedProt
 constexpr std::uint8_t kFloorMask = kDefaultCanProtocolConfig.floorMask;
 constexpr std::uint8_t kStatusOrEnableMask = kDefaultCanProtocolConfig.statusOrEnableMask;
 constexpr std::uint8_t kFloorModuleRequestMask = kDefaultCanProtocolConfig.floorModuleRequestMask;
+/**
+ * @brief Byte 0 bit marking project-internal payload extensions.
+ *
+ * This is not a CAN extended identifier flag. Frames still use standard
+ * 11-bit CAN IDs; the protocol extension is detected from the payload MSB.
+ */
+constexpr std::uint8_t kInternalProtocolFlagMask = static_cast<std::uint8_t>(Messages::EXTENDED_MSG);
+
+/**
+ * @brief Node heartbeat payload values after project-internal decode.
+ */
+enum class ecNodeHb
+{
+    /** Payload is MSB-set but not a known heartbeat command. */
+    Unknown,
+    /** Node reports that heartbeat communication is healthy. */
+    Ok,
+    /** Supervisory controller requests heartbeat replies from all scoped nodes. */
+    SupervisorRequest,
+    /** A node asks the supervisory controller to prove it can still respond. */
+    NodeRequest,
+    /** Node reports a heartbeat-related communication error. */
+    Error
+};
 
 enum class CanMessageType
 {
@@ -170,6 +194,21 @@ struct sDecodedCanMessage
 };
 
 /**
+ * @brief Project-internal payload extension decoded from byte 0.
+ */
+struct sNodeHbMessage
+{
+    /** Node heartbeat message type selected from the full byte 0 value. */
+    ecNodeHb type = ecNodeHb::Unknown;
+
+    /** Standard CAN ID of the node that transmitted the frame. */
+    std::uint16_t sourceId = 0;
+
+    /** Raw byte 0 payload retained for diagnostics and future extension. */
+    std::uint8_t payload = 0;
+};
+
+/**
  * @brief Decodes one raw CAN frame using the supplied protocol configuration.
  *
  * Validation is fail-closed: an unexpected DLC, unknown source ID, invalid
@@ -181,6 +220,22 @@ struct sDecodedCanMessage
  *         std::nullopt.
  */
 std::optional<sDecodedCanMessage> decodeCanFrame(
+    const sCanFrame& frame,
+    const sCanProtocolConfig& config = kDefaultCanProtocolConfig);
+
+/**
+ * @brief Decodes project-internal payload extension frames.
+ *
+ * Only known node heartbeat payloads are accepted. Unknown MSB-set payloads
+ * return std::nullopt so future internal message types cannot silently enter
+ * the heartbeat path.
+ *
+ * @param frame Raw CAN frame from hardware, simulator, or tests.
+ * @param config Protocol layout and DLC expectation to apply.
+ * @return Decoded node heartbeat message, or std::nullopt for non-heartbeat
+ *         frames, invalid DLC, or unknown internal payloads.
+ */
+std::optional<sNodeHbMessage> decodeNodeHbFrame(
     const sCanFrame& frame,
     const sCanProtocolConfig& config = kDefaultCanProtocolConfig);
 
@@ -209,6 +264,19 @@ std::optional<sSupervisoryEvent> toSupervisoryEvent(const sDecodedCanMessage& me
 std::optional<sCanFrame> makeSupervisorCommandFrame(
     std::uint8_t targetFloor,
     bool enable,
+    const sCanProtocolConfig& config = kDefaultCanProtocolConfig);
+
+/**
+ * @brief Builds a one-byte heartbeat frame for the project-internal protocol.
+ *
+ * @param sourceId Standard 11-bit CAN ID to put on the outgoing frame.
+ * @param type Heartbeat payload to encode into byte 0.
+ * @param config Protocol layout and DLC expectation to apply.
+ * @return Encoded heartbeat frame, or std::nullopt when type is Unknown.
+ */
+std::optional<sCanFrame> makeNodeHbFrame(
+    std::uint16_t sourceId,
+    ecNodeHb type,
     const sCanProtocolConfig& config = kDefaultCanProtocolConfig);
 
 } // namespace project6::supervisory
