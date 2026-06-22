@@ -174,7 +174,7 @@ void user_CAN_init(void) {
         /* Set FilterIdHigh bits by choosing an ID and aligning the bits in the filter register 
          * with the receive register by shifting << 5  
          * (See Second lecture in CAN series - last few slides) */
-        .FilterIdHigh = 0x0100 << 5,      			
+        .FilterIdHigh = NODE_ID_SC << 5,      			
         /* Same as example in lecture 
          * (this gives a range of ID's that will be accepted of between 0x100 and 0x103). 
          * Must also align the bits in the Mask register with those in the receive register. */
