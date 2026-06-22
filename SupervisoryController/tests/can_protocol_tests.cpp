@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <cstdint>
 #include <iostream>
+#include <utility>
 
 #include "supervisory/can/can_adapter.hpp"
 #include "supervisory/can/can_protocol.hpp"
@@ -54,9 +55,20 @@ void require(const bool condition, const char* message)
 int main()
 {
     using project6::supervisory::sCanFrame;
+    using project6::supervisory::CanMessageType;
+    using project6::supervisory::decodeNodeHbFrame;
+    using project6::supervisory::decodeCanFrame;
+    using project6::supervisory::ecNodeHb;
+    using project6::supervisory::makeNodeHbFrame;
     using project6::supervisory::makeSupervisorCommandFrame;
 
     constexpr std::array<std::uint8_t, 3> kExpectedPayloads{0x05, 0x06, 0x07};
+    constexpr std::array<std::pair<std::uint8_t, ecNodeHb>, 4> kExpectedNodeHbPayloads{{
+        {0x84, ecNodeHb::Ok},
+        {0x85, ecNodeHb::SupervisorRequest},
+        {0x86, ecNodeHb::NodeRequest},
+        {0x87, ecNodeHb::Error},
+    }};
 
     for (std::uint8_t floor = 1; floor <= kExpectedPayloads.size(); ++floor)
     {
@@ -72,6 +84,62 @@ int main()
 
     require(!makeSupervisorCommandFrame(0, true).has_value(), "floor zero was accepted");
     require(!makeSupervisorCommandFrame(4, true).has_value(), "floor four was accepted");
+
+    for (const auto [payload, expectedType] : kExpectedNodeHbPayloads)
+    {
+        sCanFrame nodeHbFrame{};
+        nodeHbFrame.id = 0x201;
+        nodeHbFrame.dataLength = 1;
+        nodeHbFrame.data[0] = payload;
+
+        const auto decodedNodeHb = decodeNodeHbFrame(nodeHbFrame);
+        require(decodedNodeHb.has_value(), "node heartbeat frame was not decoded");
+        require(decodedNodeHb->type == expectedType, "node heartbeat decoded to the wrong type");
+        require(decodedNodeHb->sourceId == 0x201, "node heartbeat source ID was not preserved");
+        require(decodedNodeHb->payload == payload, "node heartbeat payload was not preserved");
+    }
+
+    sCanFrame standardFrame{};
+    standardFrame.id = 0x201;
+    standardFrame.dataLength = 1;
+    standardFrame.data[0] = 0x01;
+    require(
+        !decodeNodeHbFrame(standardFrame).has_value(),
+        "standard shared-protocol frame was decoded as an internal frame");
+    const auto decodedStandard = decodeCanFrame(standardFrame);
+    require(decodedStandard.has_value(), "standard shared-protocol frame stopped decoding");
+    require(
+        decodedStandard->type == CanMessageType::FloorModuleRequest,
+        "standard shared-protocol frame decoded to the wrong type");
+
+    const auto nodeHbOk = makeNodeHbFrame(
+        project6::supervisory::kFloorOneControllerCanId,
+        ecNodeHb::Ok);
+    require(nodeHbOk.has_value(), "valid node heartbeat frame was not encoded");
+    require(nodeHbOk->id == 0x201, "node heartbeat frame used the wrong CAN ID");
+    require(nodeHbOk->dataLength == 1, "node heartbeat frame used the wrong DLC");
+    require(nodeHbOk->data[0] == 0x84, "node heartbeat frame used the wrong payload");
+
+    const auto nodeHbRequest = makeNodeHbFrame(
+        project6::supervisory::kSupervisoryControllerCanId,
+        ecNodeHb::SupervisorRequest);
+    require(nodeHbRequest.has_value(), "valid node heartbeat request was not encoded");
+    require(nodeHbRequest->id == 0x100, "node heartbeat request used the wrong CAN ID");
+    require(nodeHbRequest->data[0] == 0x85, "node heartbeat request used the wrong payload");
+
+    sCanFrame invalidLength{};
+    invalidLength.id = 0x201;
+    invalidLength.dataLength = 2;
+    invalidLength.data[0] = 0x84;
+    require(!decodeNodeHbFrame(invalidLength).has_value(), "invalid node heartbeat DLC was accepted");
+
+    sCanFrame unknownInternal{};
+    unknownInternal.id = 0x201;
+    unknownInternal.dataLength = 1;
+    unknownInternal.data[0] = 0x80;
+    require(!decodeNodeHbFrame(unknownInternal).has_value(), "unknown internal payload was accepted");
+    require(!decodeCanFrame(unknownInternal).has_value(), "internal payload reached standard decoder");
+    require(!makeNodeHbFrame(0x201, ecNodeHb::Unknown).has_value(), "unknown node heartbeat was encoded");
 
     return 0;
 }

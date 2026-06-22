@@ -111,6 +111,21 @@ void cCanCommsService::run(const std::stop_token stopToken) const noexcept
 
                 didWork = true;
                 exchange_.receivedFrameCount.fetch_add(1);
+
+                // We try and decode the Hb frame first since we only need to check the first bit.
+                // Upon failure, we immediately know it's not an internal message and is decoded
+                // by the standard CAN decoder.
+                if (const std::optional<sNodeHbMessage> nodeHbMessage = decodeNodeHbFrame(frame);
+                    nodeHbMessage.has_value())
+                {
+                    if (!exchange_.receivedNodeHbMessages.tryPush(*nodeHbMessage))
+                    {
+                        exchange_.droppedEventCount.fetch_add(1);
+                        recordFault(exchange_, ecCanCommsFaultReason::InboundQueueFull);
+                    }
+                    continue;
+                }
+
                 const std::optional<sDecodedCanMessage> message = decodeCanFrame(frame);
                 if (!message.has_value())
                 {
@@ -155,7 +170,7 @@ void cCanCommsService::run(const std::stop_token stopToken) const noexcept
                 exchange_.transmittedFrameCount.fetch_add(1);
             }
 
-            exchange_.heartbeat.fetch_add(1);
+            exchange_.commsProgress.fetch_add(1);
             if (!didWork)
             {
                 std::this_thread::sleep_for(kIdleDelay);
