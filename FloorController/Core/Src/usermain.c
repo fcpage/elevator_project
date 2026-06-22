@@ -82,7 +82,7 @@ void user_main(void) {
 
     /*** Recieve ***/
     switch(RxData[0]) {
-        case 0: goto reset_Rx_buffer;  // No message recieved
+        case 0: break;  // No message recieved
 #ifndef CAN_COMMON      // Ignore the exended messages
         case HB_SC_REQ: {  // Respond with HB_OK to heartbeat request
             // Pulse the LED
@@ -92,6 +92,7 @@ void user_main(void) {
             HAL_Delay(100);
             dbglog(LVL3, "Hearbeat request recieved: %d\n", RxData[0]);
             TxData[0] = HB_OK;
+            // HAL_Delay(100 * (NODE_ID & 0b11));
             dbglog(LVL3, "Sending heartbeat response: %d\n", TxData[0]);
             if(HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK) {
                 panic("Failed to send CAN message");
