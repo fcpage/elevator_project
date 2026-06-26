@@ -24,3 +24,5 @@ html
 *.exe.recipe
 *.bin
 *.rule
+
+.simbuild.json
