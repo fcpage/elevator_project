@@ -7,6 +7,7 @@
 ******************************************************************/
 
 #include "supervisory/can/can_adapter.hpp"
+#include "supervisory/can/can_protocol.hpp"
 
 //#define __linux__
 

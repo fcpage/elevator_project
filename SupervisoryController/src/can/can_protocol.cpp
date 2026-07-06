@@ -17,7 +17,7 @@ namespace
 bool isValidFloor(const std::uint8_t floor, const sCanProtocolConfig& config)
 {
     return floor >= config.minFloor && floor <= config.maxFloor;
-} // namespace
+}
 
 std::optional<std::uint8_t> floorFromPayload(
     const std::uint8_t payload,
@@ -64,7 +64,7 @@ bool isFloorControllerId(const std::uint16_t id, const sCanProtocolConfig& confi
     return floorFromFloorControllerId(id, config).has_value();
 }
 
-}
+} // namespace
 
 std::optional<sDecodedCanMessage> decodeCanFrame(const sCanFrame& frame, const sCanProtocolConfig& config)
 {

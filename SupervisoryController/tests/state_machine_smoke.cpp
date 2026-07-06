@@ -12,7 +12,6 @@
 #include <iostream>
 #include <optional>
 
-#include "supervisory/can/can_frame.hpp"
 #include "supervisory/common/event.hpp"
 #include "supervisory/control/supervisory_state_machine.hpp"
 #include "supervisory/drivers/supervisory_drivers.hpp"

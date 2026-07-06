@@ -141,7 +141,6 @@ void cSupervisoryApplication::faultComms(const ecCanCommsFaultReason reason)
     const sSocketCanConfig canConfig;
     sCanExchange canExchange;
     cCanCommsService commsService(canConfig, canExchange);
-    cSupervisoryApplication application(canExchange);
 
     if (const ecOperationStatus status = commsService.initializeService(); status != ecOperationStatus::Ok)
     {

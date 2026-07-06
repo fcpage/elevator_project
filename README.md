@@ -26,11 +26,30 @@ The presets also prevent the need for defining the toolchain manually. If no pre
 cmake -B build/<name> -S . -DCMAKE_TOOLCHAIN_FILE=toolchainfile.cmake
 ```
 
+The other thing to remember when configuring a build is that the source code is the same between the floor controllers and the car controller. Thus you must set the `NODE_ID` at the preset stage. 
+
+For example:
+
+```bash
+cmake --preset Debug -DNODE_ID=car 
+```
+
+Valid values are: `car, floor1, floor2, floor3`
+
+Another option that may be useful to set when debugging is the verbosity level of the UART logging.
+
+```bash
+cmake --preset Debug -DVERBOSITY=low 
+```
+
+Valid values are: `none, low, medium, high`. These levels are set when you call the debug logging function `dbglog()` by passing the first parameter as `LVL1`, `LVL2` , or `LVL3`. These messages will be compiled in or ignored according to the value of VERBOSITY.
+
+>[!note]
+>Verbosity has no effect in release builds as debug logging is disabled entirely. Debug logging can be disabled in Debug builds with `-DVERBOSITY=none`.
+
 ### Flashing
 
-The build process will output a `.elf` file. This cannot be directly flashed to the STM32
-because of metadata that ST-Link does not expect. It must first be converted to a `.bin`
-file using the toolchain specific `objcopy` (`arm-none-eabi-objcopy`). 
+The build process will output a `.elf` file. This cannot be directly flashed to the STM32 because of metadata that ST-Link does not expect. It must first be converted to a `.bin` file using the toolchain specific `objcopy` (`arm-none-eabi-objcopy`). 
 
 ```bash
 arm-none-eabi-objcopy -O binary FloorController.elf FloorController.bin

@@ -8,6 +8,8 @@ project(Project6SupervisoryController
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
+# set(CMAKE_EXPORT_COMPILE_COMMANDS)
 
 project(Project6SupervisoryControllerRpi
     VERSION 0.1.0
@@ -68,6 +70,7 @@ add_executable(supervisory_controller
 target_include_directories(supervisory_controller
     PRIVATE
         "${SUPERVISORY_ROOT}/include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Common/"
 )
 
 target_compile_features(supervisory_controller PRIVATE cxx_std_20)
@@ -83,10 +86,9 @@ target_compile_options(supervisory_controller PRIVATE
     -pthread
 )
 
-target_link_libraries(supervisory_controller PRIVATE 
+target_link_libraries(supervisory_controller PRIVATE
     Threads::Threads
     atomic
-
 )
 
 if(SUPERVISORY_ENABLE_AUTO_ARRIVAL)

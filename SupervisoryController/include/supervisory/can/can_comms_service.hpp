@@ -11,8 +11,8 @@
 #include <cstdint>
 #include <thread>
 
+#include "CAN_protocol.h"
 #include "supervisory/can/can_adapter.hpp"
-#include "supervisory/can/can_frame.hpp"
 #include "supervisory/common/event.hpp"
 #include "supervisory/common/result.hpp"
 #include "supervisory/common/spsc_queue.hpp"

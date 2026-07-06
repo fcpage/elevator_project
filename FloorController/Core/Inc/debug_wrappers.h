@@ -13,7 +13,37 @@
 #include <stdio.h>
 #include "main.h"
 
-#define dbglog(str, ...) printf(str __VA_OPT__(,) __VA_ARGS__)
+#define dbglog(lvl, str, ...) dbglog_##lvl(str, __VA_ARGS__)
+
+#ifndef VERBOSITY
+#define VERBOSITY 3
+#endif
+
+#if VERBOSITY == 0
+
+#define dbglog_LVL1(str, ...) 
+#define dbglog_LVL2(str, ...)
+#define dbglog_LVL3(str, ...) 
+
+#elif VERBOSITY == 1
+
+#define dbglog_LVL1(str, ...) printf(str __VA_OPT__(,) __VA_ARGS__)
+#define dbglog_LVL2(str, ...)
+#define dbglog_LVL3(str, ...)
+
+#elif VERBOSITY == 2
+
+#define dbglog_LVL1(str, ...) printf(str __VA_OPT__(,) __VA_ARGS__)
+#define dbglog_LVL2(str, ...) printf(str __VA_OPT__(,) __VA_ARGS__)
+#define dbglog_LVL3(str, ...) 
+
+#elif VERBOSITY == 3
+
+#define dbglog_LVL1(str, ...) printf(str __VA_OPT__(,) __VA_ARGS__)
+#define dbglog_LVL2(str, ...) printf(str __VA_OPT__(,) __VA_ARGS__)
+#define dbglog_LVL3(str, ...) printf(str __VA_OPT__(,) __VA_ARGS__)
+
+#endif
 
 /**
  * @brief:  Debug panic handler wrapper for printing location of panic
@@ -22,7 +52,7 @@
  * @param:  Message to print
  */
 static inline void __dbg_panic(const char* file, int line, const char* msg) {
-    dbglog("ERROR: in file %s on line %d - '%s'\n", file, line, msg);
+    dbglog(LVL1, "ERROR: in file %s on line %d - '%s'\n", file, line, msg);
     panic();
 }
 
@@ -34,7 +64,10 @@ static inline void __dbg_panic(const char* file, int line, const char* msg) {
 
 #else
 
-#define dbglog(unused, ...)
+#define dbglog(unused1, unused2, ...)
+#define dbglog_LVL1(unused, ...)
+#define dbglog_LVL2(unused, ...)
+#define dbglog_LVL3(unused, ...)
 #define panic(unused) panic()
 
 #endif
