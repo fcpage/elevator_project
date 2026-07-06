@@ -9,6 +9,25 @@ wait_fn()
     sleep 0.5	                            #a moment's hesitation
 }
 
+sudo mysql -u root -p -P 3306 #give root access to all databases
+wait_fn #let that sink in
+echo "password: ese"	#you probably should change at least one of your passwords...
+wait_fn #HOLD IT RIGHT THERE!
+sudo mysql -u phpmyadmin -p -P 3306 #give phpmyadmin access to all databases
+echo "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('ese')" | mysql -u root #setting password for the root in mysql
+
+#creating ese user so we aren't in root all the time
+mysql -u root -p << POM 
+	USE mysql;
+	CREATE USER 'ese'@'%' IDENTIFIED BY 'ese';
+	GRANT ALL PRIVILEGES ON *.* TO 'ese'@'%' WITH GRANT OPTION;
+	FLUSH PRIVILEGES;
+	quit;
+POM
+
+#multi-line input sequence... the commands are pretty self-evident
+sudo service mysql restart #restart mysql so that the changes can take effect
+
 #remove gaps in following heredoc before running
 mysql -u ese -p << POM
 CREATE SCHEMA elevatorg1;
@@ -23,7 +42,6 @@ CREATE TABLE log (
 	receiver TINYINT UNSIGNED NOT NULL,
 	currentFloor BIT(2) NOT NULL,
 	requestFloor BIT(2) NOT NULL,
-	doorStatus BOOL NOT NULL,
 	status BIT(2) NOT NULL,
     queued BOOL NOT NULL,
 	served BOOL NOT NULL
@@ -48,15 +66,15 @@ CREATE TABLE log (
 	DESC CAN_subNetwork;
 POM
 
-#index INT NOT NULL,					#RPi or web write
-#date DATE NOT NULL,					#RPi or web write
-#time TIME NOT NULL,					#RPi or web write
-#nodeID INT NOT NULL,					#RPi or web write
-#sender TINYINT UNSIGNED NOT NULL,		#Floor or web ID
-#receiver TINYINT UNSIGNED NOT NULL,	#RPi write only
-#currentFloor BIT(2) NOT NULL,			#RPi write only
-#requestFloor BIT(2) NOT NULL,			#RPi or web write
-#doorStatus BOOL NOT NULL,				#RPi write only
-#status BIT(2) NOT NULL,				#RPi write only
-#queued BOOL NOT NULL,					#RPi write only
-#served BOOL NOT NULL					#RPi write only
+mysql -u ese -p << POM
+	INSERT INTO elevatorg1 (column1, column2, etc) VALUES (value1, value2, etc);
+POM
+#index int,			#RPi or web write
+#date date,			#RPi or web write
+#time time,			#PRi or web write
+#sender char(5),	#Floor or web ID
+#receiver char(5),	#RPi write only
+#call bit(2),		#RPi or web write, floor ID
+#current bit(2),	#RPi write only, floor ID
+#queued bool,		#RPi write only
+#served bool		#RPi write only
