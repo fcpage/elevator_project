@@ -64,6 +64,54 @@ bool isFloorControllerId(const std::uint16_t id, const sCanProtocolConfig& confi
     return floorFromFloorControllerId(id, config).has_value();
 }
 
+ecNodeHb nodeHbFromPayload(const std::uint8_t payload)
+{
+    if (payload == static_cast<std::uint8_t>(Messages::HB_OK))
+    {
+        return ecNodeHb::Ok;
+    }
+
+    if (payload == static_cast<std::uint8_t>(Messages::HB_SC_REQ))
+    {
+        return ecNodeHb::SupervisorRequest;
+    }
+
+    if (payload == static_cast<std::uint8_t>(Messages::HB_NODE_REQ))
+    {
+        return ecNodeHb::NodeRequest;
+    }
+
+    if (payload == static_cast<std::uint8_t>(Messages::HB_ERR))
+    {
+        return ecNodeHb::Error;
+    }
+
+    return ecNodeHb::Unknown;
+}
+
+std::optional<std::uint8_t> payloadFromNodeHb(const ecNodeHb type)
+{
+    switch (type)
+    {
+        case ecNodeHb::Ok:
+            return static_cast<std::uint8_t>(Messages::HB_OK);
+
+        case ecNodeHb::SupervisorRequest:
+            return static_cast<std::uint8_t>(Messages::HB_SC_REQ);
+
+        case ecNodeHb::NodeRequest:
+            return static_cast<std::uint8_t>(Messages::HB_NODE_REQ);
+
+        case ecNodeHb::Error:
+            return static_cast<std::uint8_t>(Messages::HB_ERR);
+
+        case ecNodeHb::Unknown:
+            return std::nullopt;
+    }
+
+    return std::nullopt;
+}
+
 } // namespace
 
 std::optional<sDecodedCanMessage> decodeCanFrame(const sCanFrame& frame, const sCanProtocolConfig& config)
@@ -74,6 +122,11 @@ std::optional<sDecodedCanMessage> decodeCanFrame(const sCanFrame& frame, const s
     }
 
     const std::uint8_t payload = frame.data[0];
+    if ((payload & kInternalProtocolFlagMask) != 0)
+    {
+        return std::nullopt;
+    }
+
     sDecodedCanMessage message{};
     message.sourceId = frame.id;
 
@@ -118,6 +171,30 @@ std::optional<sDecodedCanMessage> decodeCanFrame(const sCanFrame& frame, const s
     }
 
     return std::nullopt;
+}
+
+std::optional<sNodeHbMessage> decodeNodeHbFrame(
+    const sCanFrame& frame,
+    const sCanProtocolConfig& config)
+{
+    if (frame.dataLength != config.sharedProtocolDlc)
+    {
+        return std::nullopt;
+    }
+
+    const std::uint8_t payload = frame.data[0];
+    if ((payload & kInternalProtocolFlagMask) == 0)
+    {
+        return std::nullopt;
+    }
+
+    const ecNodeHb type = nodeHbFromPayload(payload);
+    if (type == ecNodeHb::Unknown)
+    {
+        return std::nullopt;
+    }
+
+    return sNodeHbMessage{type, frame.id, payload};
 }
 
 std::optional<sSupervisoryEvent> toSupervisoryEvent(const sDecodedCanMessage& message)
@@ -191,6 +268,24 @@ std::optional<sCanFrame> makeSupervisorCommandFrame(
     const std::uint8_t encodedEnable = enable ? config.statusOrEnableMask : 0;
 
     frame.data[0] = static_cast<std::uint8_t>(encodedEnable | encodedFloor);
+    return frame;
+}
+
+std::optional<sCanFrame> makeNodeHbFrame(
+    const std::uint16_t sourceId,
+    const ecNodeHb type,
+    const sCanProtocolConfig& config)
+{
+    const std::optional<std::uint8_t> payload = payloadFromNodeHb(type);
+    if (!payload.has_value())
+    {
+        return std::nullopt;
+    }
+
+    sCanFrame frame{};
+    frame.id = sourceId;
+    frame.dataLength = config.sharedProtocolDlc;
+    frame.data[0] = *payload;
     return frame;
 }
 

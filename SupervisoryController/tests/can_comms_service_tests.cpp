@@ -38,6 +38,24 @@ int main()
     require(exchange.receivedEvents.tryPop(receivedEvent), "inbound event was lost");
     require(receivedEvent.requestedFloor == 2, "inbound event changed in transit");
 
+    sNodeHbMessage nodeHb{};
+    nodeHb.type = ecNodeHb::Ok;
+    nodeHb.sourceId = kFloorOneControllerCanId;
+    nodeHb.payload = 0x84;
+    require(
+        exchange.receivedNodeHbMessages.tryPush(nodeHb),
+        "node heartbeat message was rejected");
+
+    sNodeHbMessage receivedNodeHb{};
+    require(
+        exchange.receivedNodeHbMessages.tryPop(receivedNodeHb),
+        "node heartbeat message was lost");
+    require(receivedNodeHb.type == ecNodeHb::Ok, "node heartbeat type changed in transit");
+    require(
+        receivedNodeHb.sourceId == kFloorOneControllerCanId,
+        "node heartbeat source changed in transit");
+    require(receivedNodeHb.payload == 0x84, "node heartbeat payload changed in transit");
+
     sCanFrame frame{};
     frame.id = kSupervisoryControllerCanId;
     frame.dataLength = 1;

@@ -18,6 +18,11 @@ void require(const bool condition, const char* message)
     }
 }
 
+void markCommsProgress(project6::supervisory::sCanExchange& exchange)
+{
+    exchange.commsProgress.fetch_add(1);
+}
+
 } // namespace
 
 namespace project6::supervisory::drivers
@@ -47,7 +52,7 @@ int main()
 
     sCanExchange exchange;
     exchange.commsState.store(ecCanCommsState::Running);
-    exchange.heartbeat.store(1);
+    exchange.commsProgress.store(1);
 
     cSupervisoryApplication application(exchange);
 
@@ -68,7 +73,7 @@ int main()
 
     require(
         application.runControlCycle(249ms) == ecOperationStatus::Ok,
-        "control cycle stopped while COMMS heartbeat was stale");
+        "control cycle stopped while COMMS progress was stale");
     require(
         application.snapshot().controlState != ecSupervisoryControlState::Faulted,
         "COMMS froze before the timeout");
@@ -78,10 +83,164 @@ int main()
         "control cycle stopped after COMMS timeout");
     require(
         application.snapshot().controlState == ecSupervisoryControlState::Faulted,
-        "stale COMMS heartbeat did not fault the state machine");
+        "stale COMMS progress did not fault the state machine");
     require(
-        application.canHealth().faultReason == ecCanCommsFaultReason::HeartbeatTimeout,
+        application.canHealth().faultReason == ecCanCommsFaultReason::CommsProgressTimeout,
         "operator health did not identify the frozen COMMS thread");
+
+    sCanExchange heartbeatExchange;
+    heartbeatExchange.commsState.store(ecCanCommsState::Running);
+    heartbeatExchange.commsProgress.store(1);
+    cSupervisoryApplication heartbeatApplication(heartbeatExchange);
+
+    markCommsProgress(heartbeatExchange);
+    require(
+        heartbeatApplication.runControlCycle(2999ms) == ecOperationStatus::Ok,
+        "node heartbeat warmup cycle failed");
+    require(
+        !heartbeatExchange.transmitFrames.tryPop(command),
+        "node heartbeat request was sent before the interval elapsed");
+
+    markCommsProgress(heartbeatExchange);
+    require(
+        heartbeatApplication.runControlCycle(1ms) == ecOperationStatus::Ok,
+        "node heartbeat request cycle failed");
+    require(
+        heartbeatExchange.transmitFrames.tryPop(command),
+        "node heartbeat request was not published after the interval elapsed");
+    require(command.id == kSupervisoryControllerCanId, "node heartbeat request used the wrong ID");
+    require(command.dataLength == 1, "node heartbeat request used the wrong DLC");
+    require(command.data[0] == 0x85, "node heartbeat request used the wrong payload");
+
+    require(
+        heartbeatApplication.canHealth().isNodeHbReplyWindowOpen,
+        "node heartbeat reply window did not open");
+    require(
+        heartbeatApplication.canHealth().expectedNodeHbReplyMask == kExpectedNodeHbReplyMask,
+        "node heartbeat expected mask was not exposed");
+
+    require(heartbeatExchange.receivedNodeHbMessages.tryPush(
+        sNodeHbMessage{ecNodeHb::NodeRequest, kFloorOneControllerCanId, 0x86}),
+        "node heartbeat request setup failed");
+    markCommsProgress(heartbeatExchange);
+    require(
+        heartbeatApplication.runControlCycle(10ms) == ecOperationStatus::Ok,
+        "node heartbeat reply cycle failed");
+    require(
+        heartbeatExchange.transmitFrames.tryPop(command),
+        "supervisor did not reply to node heartbeat request");
+    require(command.id == kSupervisoryControllerCanId, "node heartbeat reply used the wrong ID");
+    require(command.data[0] == 0x84, "node heartbeat reply used the wrong payload");
+
+    sCanExchange allReplyExchange;
+    allReplyExchange.commsState.store(ecCanCommsState::Running);
+    allReplyExchange.commsProgress.store(1);
+    cSupervisoryApplication allReplyApplication(allReplyExchange);
+
+    markCommsProgress(allReplyExchange);
+    require(allReplyApplication.runControlCycle(3s) == ecOperationStatus::Ok,
+        "node heartbeat request setup cycle failed");
+    require(allReplyExchange.transmitFrames.tryPop(command), "node heartbeat request setup missing");
+
+    require(allReplyExchange.receivedNodeHbMessages.tryPush(
+        sNodeHbMessage{ecNodeHb::Ok, kCarControllerCanId, 0x84}),
+        "car controller heartbeat reply setup failed");
+    require(allReplyExchange.receivedNodeHbMessages.tryPush(
+        sNodeHbMessage{ecNodeHb::Ok, kFloorOneControllerCanId, 0x84}),
+        "floor 1 heartbeat reply setup failed");
+    require(allReplyExchange.receivedNodeHbMessages.tryPush(
+        sNodeHbMessage{ecNodeHb::Ok, kFloorTwoControllerCanId, 0x84}),
+        "floor 2 heartbeat reply setup failed");
+    require(allReplyExchange.receivedNodeHbMessages.tryPush(
+        sNodeHbMessage{ecNodeHb::Ok, kFloorThreeControllerCanId, 0x84}),
+        "floor 3 heartbeat reply setup failed");
+
+    markCommsProgress(allReplyExchange);
+    require(allReplyApplication.runControlCycle(1000ms) == ecOperationStatus::Ok,
+        "all heartbeat replies cycle failed");
+    require(
+        !allReplyApplication.canHealth().isNodeHbReplyWindowOpen,
+        "complete node heartbeat reply set did not close the window");
+    require(
+        allReplyApplication.canHealth().receivedNodeHbReplyMask == kExpectedNodeHbReplyMask,
+        "complete node heartbeat reply set did not update the mask");
+    require(
+        allReplyApplication.snapshot().controlState != ecSupervisoryControlState::Faulted,
+        "complete node heartbeat reply set faulted the state machine");
+
+    sCanExchange missedReplyExchange;
+    missedReplyExchange.commsState.store(ecCanCommsState::Running);
+    missedReplyExchange.commsProgress.store(1);
+    cSupervisoryApplication missedReplyApplication(missedReplyExchange);
+
+    markCommsProgress(missedReplyExchange);
+    require(missedReplyApplication.runControlCycle(3s) == ecOperationStatus::Ok,
+        "missed heartbeat request setup cycle failed");
+    require(missedReplyExchange.transmitFrames.tryPop(command), "missed heartbeat request missing");
+    require(missedReplyExchange.receivedNodeHbMessages.tryPush(
+        sNodeHbMessage{ecNodeHb::Ok, kCarControllerCanId, 0x84}),
+        "partial heartbeat reply setup failed");
+
+    markCommsProgress(missedReplyExchange);
+    require(missedReplyApplication.runControlCycle(999ms) == ecOperationStatus::Ok,
+        "node heartbeat verification window closed early");
+    require(
+        missedReplyApplication.snapshot().controlState != ecSupervisoryControlState::Faulted,
+        "node heartbeat faulted before the verification window elapsed");
+
+    markCommsProgress(missedReplyExchange);
+    require(missedReplyApplication.runControlCycle(1ms) == ecOperationStatus::Ok,
+        "node heartbeat timeout cycle failed");
+    require(
+        missedReplyApplication.snapshot().controlState == ecSupervisoryControlState::Faulted,
+        "missing node heartbeat replies did not fault control");
+    require(
+        missedReplyApplication.canHealth().faultReason == ecCanCommsFaultReason::NodeHeartbeatTimeout,
+        "node heartbeat timeout was not reported");
+    require(
+        missedReplyApplication.canHealth().missedNodeHbReplyMask ==
+            static_cast<std::uint8_t>(kExpectedNodeHbReplyMask & ~kNodeHbCcMask),
+        "missed node heartbeat mask did not identify missing nodes");
+
+    sCanExchange nodeErrorExchange;
+    nodeErrorExchange.commsState.store(ecCanCommsState::Running);
+    nodeErrorExchange.commsProgress.store(1);
+    cSupervisoryApplication nodeErrorApplication(nodeErrorExchange);
+
+    require(nodeErrorExchange.receivedNodeHbMessages.tryPush(
+        sNodeHbMessage{ecNodeHb::Error, kFloorTwoControllerCanId, 0x87}),
+        "node heartbeat error setup failed");
+    markCommsProgress(nodeErrorExchange);
+    require(nodeErrorApplication.runControlCycle(10ms) == ecOperationStatus::Ok,
+        "node heartbeat error cycle failed");
+    require(
+        nodeErrorApplication.snapshot().controlState == ecSupervisoryControlState::Faulted,
+        "node heartbeat error did not fault control");
+    require(
+        nodeErrorApplication.canHealth().faultReason == ecCanCommsFaultReason::NodeHeartbeatError,
+        "node heartbeat error was not reported");
+    require(
+        nodeErrorApplication.canHealth().missedNodeHbReplyMask == kNodeHbFc2Mask,
+        "node heartbeat error did not identify the source node");
+
+    sCanExchange logOnlyExchange;
+    logOnlyExchange.commsState.store(ecCanCommsState::Running);
+    logOnlyExchange.commsProgress.store(1);
+    cSupervisoryApplication logOnlyApplication(logOnlyExchange, ecNodeHbFailureMode::LogOnly);
+
+    markCommsProgress(logOnlyExchange);
+    require(logOnlyApplication.runControlCycle(3s) == ecOperationStatus::Ok,
+        "log-only heartbeat request setup failed");
+    require(logOnlyExchange.transmitFrames.tryPop(command), "log-only heartbeat request missing");
+    markCommsProgress(logOnlyExchange);
+    require(logOnlyApplication.runControlCycle(1000ms) == ecOperationStatus::Ok,
+        "log-only heartbeat timeout cycle failed");
+    require(
+        logOnlyApplication.snapshot().controlState != ecSupervisoryControlState::Faulted,
+        "log-only node heartbeat timeout faulted control");
+    require(
+        logOnlyApplication.canHealth().missedNodeHbReplyMask == kExpectedNodeHbReplyMask,
+        "log-only node heartbeat timeout was not reported");
 
     return 0;
 }
