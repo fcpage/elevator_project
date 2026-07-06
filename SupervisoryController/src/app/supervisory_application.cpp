@@ -136,6 +136,7 @@ sCanCommsHealthSnapshot cSupervisoryApplication::canHealth() const
 
 void cSupervisoryApplication::publishPendingFrame()
 {
+    // If we have a frame, and we cannot push that frame to the transmit queue fault.
     if (const std::optional<sCanFrame> frame = appStateMachine_.tryTakePendingCanFrame();
         frame.has_value() && !exchange_.transmitFrames.tryPush(*frame))
     {
@@ -152,16 +153,19 @@ void cSupervisoryApplication::checkCommsHealth(
         return;
     }
 
+    // Reset stale progress counter if the progress counter has changed since last check
     if (const std::uint64_t progress = exchange_.commsProgress.load(); progress != lastCommsProgress_)
     {
         lastCommsProgress_ = progress;
         staleCommsProgressElapsed_ = std::chrono::milliseconds{0};
     }
+    // Else if it is the same value the comms are hanging, add the elapsed ms.
     else if (exchange_.commsState.load() == ecCanCommsState::Running)
     {
         staleCommsProgressElapsed_ += elapsedMs;
     }
 
+    // Check for standard comm failures
     const std::uint64_t droppedEvents = exchange_.droppedEventCount.load();
     const std::uint64_t transmitFailures = exchange_.transmitFailureCount.load();
     const bool didDropEvent = droppedEvents != lastDroppedEventCount_;
@@ -196,6 +200,8 @@ void cSupervisoryApplication::processNodeHbCycle(
     const std::chrono::milliseconds elapsedMs)
 {
     sNodeHbMessage message{};
+
+    // Pull received HB messages from the SPSC queue
     while (exchange_.receivedNodeHbMessages.tryPop(message))
     {
         handleNodeHbMessage(message);
@@ -223,6 +229,7 @@ void cSupervisoryApplication::processNodeHbCycle(
     }
 }
 
+//
 void cSupervisoryApplication::handleNodeHbMessage(const sNodeHbMessage& message)
 {
     if (message.type == ecNodeHb::NodeRequest)
@@ -258,6 +265,7 @@ void cSupervisoryApplication::handleNodeHbMessage(const sNodeHbMessage& message)
     }
 }
 
+// Publish a HB request to the CAN bus
 void cSupervisoryApplication::startNodeHbRequest()
 {
     expectedNodeHbReplyMask_ = kExpectedNodeHbReplyMask;
@@ -271,6 +279,7 @@ void cSupervisoryApplication::startNodeHbRequest()
 
 void cSupervisoryApplication::publishNodeHbFrame(const ecNodeHb type)
 {
+    // If we have Hb frames to transmit and they fail to push to the outbound queue fault
     if (const std::optional<sCanFrame> frame = makeNodeHbFrame(kSupervisoryControllerCanId, type);
         frame.has_value() && !exchange_.transmitFrames.tryPush(*frame))
     {
@@ -319,6 +328,17 @@ void cSupervisoryApplication::faultControl(const ecCanCommsFaultReason reason)
     }
 
     ecCanCommsFaultReason expected = ecCanCommsFaultReason::None;
+
+    /****************************************************************************************
+     * Note to other contributors:
+     *  compare_exchange_strong is an atomic read-modify-write operation used for lock-free
+     *  syncrhronization. If the compared values match, the function overwrites the atomic val
+     *  with the desired val. If they're not equal, the "expected" value is overwritten with the
+     *  actual atomic value.
+     *
+     *  We're using the strong variant over the weak variant to protect against spurious failures.
+     *  Note: it compares the object representation (until C++20, and value representation after).
+    *******************************************************************************************/
     static_cast<void>(exchange_.faultReason.compare_exchange_strong(expected, reason));
     isControlFaultLatched_ = true;
 

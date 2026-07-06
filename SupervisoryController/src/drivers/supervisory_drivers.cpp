@@ -10,6 +10,7 @@
 namespace project6::supervisory::drivers
 {
 
+    // change to say arrive command -> floor controllers turn on light and open door
 ecOperationStatus commandDoorOpen()
 {
     return ecOperationStatus::Ok;
