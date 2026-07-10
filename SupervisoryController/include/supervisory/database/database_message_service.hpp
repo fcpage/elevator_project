@@ -29,6 +29,7 @@ public:
     ~DBMessageService();
     /** @brief: forbid copying */
     DBMessageService(const DBMessageService&) = delete;
+    DBMessageService& operator=(const DBMessageService&) = delete;
     /** @brief: forbid moving */
     DBMessageService(const DBMessageService&&) = delete;
     DBMessageService& operator=(const DBMessageService&&) = delete;
@@ -42,7 +43,9 @@ public:
      *          code and optionally the query result - nullopt on error)
      */
     ecResult<sql::ResultSet*> query(const char* query) noexcept;
-    /** @brief: start the database connection */
+    /** @brief: stop the database connection (can be called manually but is
+     *          also called automatically by the destructor) 
+     */
     void stop();
 
 private:

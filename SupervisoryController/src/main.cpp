@@ -67,6 +67,8 @@ const char* operationStatusMessage(const project6::supervisory::ecOperationStatu
             return "required network service is unavailable";
         case ecOperationStatus::NotImplemented:
             return "requested operation is not implemented";
+        case ecOperationStatus::DatabaseException:
+            return "database exception thrown";
     }
 
     return "unknown operation status";
@@ -116,6 +118,13 @@ int main(const int argumentCount, char* arguments[])
     if (const ecOperationStatus status = commsService.start(); status != ecOperationStatus::Ok)
     {
         std::cerr << "supervisory_controller: COMMS start failed: "
+                  << operationStatusMessage(status) << '\n';
+        return 1;
+    }
+
+    if (const ecOperationStatus status = database.start(); status != ecOperationStatus::Ok)
+    {
+        std::cerr << "supervisory_controller: database service start failed: "
                   << operationStatusMessage(status) << '\n';
         return 1;
     }
