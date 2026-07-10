@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include <optional>
 #include <mysql_driver.h>
 #include <mysql_connection.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
+#include "supervisory/common/result.hpp"
 
 namespace project6::supervisory
 {
@@ -18,7 +18,7 @@ namespace project6::supervisory
 class DBMessageService
 {
 public:
-    /** @brief: starts the database connection */
+    /** @brief: initializes database config info */
     DBMessageService(
         const char* url = "tcp://127.0.0.1:3306", 
         const char* user =  "pi", 
@@ -32,9 +32,18 @@ public:
     /** @brief: forbid moving */
     DBMessageService(const DBMessageService&&) = delete;
     DBMessageService& operator=(const DBMessageService&&) = delete;
-
-    /** @brief: query the database */
-    std::optional<sql::ResultSet*> query(const char* query) noexcept;
+    
+    /** @brief: start the database connection */
+    [[nodiscard]] ecOperationStatus start() noexcept;
+    /** 
+     * @brief query the database 
+     * @param query String literal containing query
+     * @return The result of the query wrapped in ecResult (contains status
+     *          code and optionally the query result - nullopt on error)
+     */
+    ecResult<sql::ResultSet*> query(const char* query) noexcept;
+    /** @brief: start the database connection */
+    void stop();
 
 private:
     sql::Driver*        DBDriver;

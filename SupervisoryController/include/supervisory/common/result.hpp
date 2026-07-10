@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <optional>
 namespace project6::supervisory
 {
 
@@ -23,7 +24,18 @@ enum class ecOperationStatus
     InsufficientPrivileges,
     HardwareUnavailable,
     NetworkUnavailable,
-    NotImplemented
+    NotImplemented,
+    DatabaseException
+};
+
+/** @brief Wraps funciton return in struct containing the status and 
+ *         optionally a return value */
+template<typename T>
+struct ecResult {
+    ecOperationStatus status;
+    std::optional<T>  value; 
+    ecResult(ecOperationStatus s) : status(s), value(std::nullopt) {}
+    ecResult(T v) : status(ecOperationStatus::Ok), value(v) {}
 };
 
 } // namespace project6::supervisory

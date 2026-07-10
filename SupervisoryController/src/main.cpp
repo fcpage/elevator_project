@@ -11,6 +11,7 @@
 
 #include "supervisory/app/supervisory_application.hpp"
 #include "supervisory/can/can_comms_service.hpp"
+#include "supervisory/database/database_message_service.hpp"
 
 #include <chrono>
 #include <csignal>
@@ -103,6 +104,7 @@ int main(const int argumentCount, char* arguments[])
     sCanExchange canExchange;
     cCanCommsService commsService(canConfig, canExchange);
     cSupervisoryApplication application(canExchange);
+    DBMessageService database;
 
     if (const ecOperationStatus status = commsService.initializeService(); status != ecOperationStatus::Ok)
     {
@@ -117,6 +119,7 @@ int main(const int argumentCount, char* arguments[])
                   << operationStatusMessage(status) << '\n';
         return 1;
     }
+
 
     std::signal(SIGINT, handleShutdownSignal);
     std::signal(SIGTERM, handleShutdownSignal);

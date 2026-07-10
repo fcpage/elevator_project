@@ -6,6 +6,7 @@
 
 #include "supervisory/database/database_message_service.hpp"
 #include <iostream>
+#include "supervisory/common/result.hpp"
 
 namespace project6::supervisory
 {
@@ -21,14 +22,31 @@ DBMessageService::DBMessageService(
     DBUser = user;
     DBPassword = password;
     DBName = database;
+    DBConnection = nullptr;
+    DBDriver = nullptr;
+}
 
+DBMessageService::~DBMessageService() 
+{
+    this->stop();
+    delete DBConnection; // Connect allocates memory
+    DBConnection = nullptr;
+}
+
+[[nodiscard]] ecOperationStatus DBMessageService::start() noexcept
+{
+    if(DBConnection != nullptr && !DBConnection->isClosed()) {
+        DBConnection->setSchema(DBName);
+        return ecOperationStatus::Ok;
+    }
     try {
         DBDriver = sql::mysql::get_driver_instance();
-        std::cout << "Creating database session on url: " << url << "...\n" << std::endl;
+        std::cout << "Creating database session on url: " << kDBUrl << "...\n" << std::endl;
 
         DBConnection = DBDriver->connect(kDBUrl, DBUser, DBPassword);
 
         DBConnection->setSchema(DBName);
+        return ecOperationStatus::Ok;
     } 
     catch (sql::SQLException& e) {
         /*  handles these:
@@ -41,21 +59,20 @@ DBMessageService::DBMessageService(
         std::cout << "ERROR: " << e.what();
         std::cout << "(MySQL error code: " << e.getErrorCode();
         std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
-        exit(EXIT_FAILURE);
+        return ecOperationStatus::DatabaseException;
     }
-
 }
 
-DBMessageService::~DBMessageService() 
-{
-    delete DBConnection; // Connect allocates memory
-}
 
-std::optional<sql::ResultSet*> DBMessageService::query(const char* query) noexcept 
+ecResult<sql::ResultSet*> DBMessageService::query(const char* query) noexcept 
 {
+    if(DBConnection == nullptr || DBDriver == nullptr) [[unlikely]] {
+        std::cout << "ERROR: Uninitialized driver or connection.";
+        return { ecOperationStatus::DatabaseException };
+    }
     try {
         std::unique_ptr<sql::Statement>stmt{DBConnection->createStatement()}; 
-        return std::optional<sql::ResultSet*>{stmt->executeQuery(query)};
+        return { stmt->executeQuery(query) };
     } catch (sql::SQLException& e) {
         /*  handles these:
          * sql::MethodNotImplementedException (derived from sql::SQLException), 
@@ -67,7 +84,14 @@ std::optional<sql::ResultSet*> DBMessageService::query(const char* query) noexce
         std::cout << "ERROR: " << e.what();
         std::cout << "(MySQL error code: " << e.getErrorCode();
         std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
-        return std::nullopt;
+        return { ecOperationStatus::DatabaseException };
+    }
+}
+
+void DBMessageService::stop() {
+    if(DBConnection == nullptr) return;
+    if(!DBConnection->isClosed()) {
+        DBConnection->close();
     }
 }
 
