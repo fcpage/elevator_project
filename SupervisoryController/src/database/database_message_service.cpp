@@ -64,8 +64,9 @@ DBMessageService::~DBMessageService()
 }
 
 
-ecResult<sql::ResultSet*> DBMessageService::query(const char* query) noexcept 
+[[nodiscard]] ecResult<sql::ResultSet*> DBMessageService::query(const char* query) noexcept 
 {
+    // Unlikely attribute helps branch prediction for unlikely control flow
     if(DBConnection == nullptr || DBDriver == nullptr) [[unlikely]] {
         std::cout << "ERROR: Uninitialized driver or connection.";
         return { ecOperationStatus::DatabaseException };

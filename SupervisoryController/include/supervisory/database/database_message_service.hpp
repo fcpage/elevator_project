@@ -42,7 +42,7 @@ public:
      * @return The result of the query wrapped in ecResult (contains status
      *          code and optionally the query result - nullopt on error)
      */
-    ecResult<sql::ResultSet*> query(const char* query) noexcept;
+    [[nodiscard]] ecResult<sql::ResultSet*> query(const char* query) noexcept;
     /** @brief: stop the database connection (can be called manually but is
      *          also called automatically by the destructor) 
      */
