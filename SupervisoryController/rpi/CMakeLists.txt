@@ -65,6 +65,7 @@ add_executable(supervisory_controller
     "${SUPERVISORY_ROOT}/src/drivers/supervisory_drivers.cpp"
     "${SUPERVISORY_ROOT}/src/http/http_server.cpp"
     "${SUPERVISORY_ROOT}/src/scheduler/request_scheduler.cpp"
+    "${SUPERVISORY_ROOT}/src/database/database_message_service.cpp"
 )
 
 target_include_directories(supervisory_controller
@@ -89,6 +90,8 @@ target_compile_options(supervisory_controller PRIVATE
 target_link_libraries(supervisory_controller PRIVATE
     Threads::Threads
     atomic
+    resolv
+    mysqlcppconn
 )
 
 if(SUPERVISORY_ENABLE_AUTO_ARRIVAL)

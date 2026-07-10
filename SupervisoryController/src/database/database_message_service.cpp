@@ -5,64 +5,70 @@
  */
 
 #include "supervisory/database/database_message_service.hpp"
-#include <memory>
+#include <iostream>
 
 namespace project6::supervisory
 {
 
-namespace
-{
-
 DBMessageService::DBMessageService(
-    const char* url = "tcp://127.0.0.1", 
-    const char* user =  "pi", 
-    const char* password = "ese",
-    const char* database = "elevator_network") noexcept 
+    const char* url, 
+    const char* user, 
+    const char* password,
+    const char* database 
+) noexcept 
 {
-
     kDBUrl = url;
-    kDBUser = user;
-    kDBPassword = password;
-    kDBName = database;
-    
+    DBUser = user;
+    DBPassword = password;
+    DBName = database;
+
     try {
-        kDBDriver = sql::mysql::get_driver_instance();
-        cout << "Creating database session on url: " << url << "...\n" << std::endl;
+        DBDriver = sql::mysql::get_driver_instance();
+        std::cout << "Creating database session on url: " << url << "...\n" << std::endl;
 
-        kDBConnection = kDBDriver->connect(kDBUrl, kDBUser, kDBPassword);
+        DBConnection = DBDriver->connect(kDBUrl, DBUser, DBPassword);
 
-        connection->setSchema(kDBName);
+        DBConnection->setSchema(DBName);
     } 
-    catch (sql::SQLException e&) {
-        /* TODO: handle these:
+    catch (sql::SQLException& e) {
+        /*  handles these:
          * sql::MethodNotImplementedException (derived from sql::SQLException), 
          * sql::InvalidArgumentException (derived from sql::SQLException), 
          * sql::SQLException (derived from std::runtime_error)
          */
+        std::cout << "ERROR: SQLEception in " << __FUNCTION__;
+        std::cout << "from file " << __FILE__ << "on line " << __LINE__ << std::endl;
+        std::cout << "ERROR: " << e.what();
+        std::cout << "(MySQL error code: " << e.getErrorCode();
+        std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
+        exit(EXIT_FAILURE);
     }
-    
+
 }
 
-~DBMessageService::DBMessageService() 
+DBMessageService::~DBMessageService() 
 {
-    delete kDBConnection;
+    delete DBConnection; // Connect allocates memory
 }
 
 std::optional<sql::ResultSet*> DBMessageService::query(const char* query) noexcept 
 {
     try {
-        std::unique_ptr<sql::Statement>stmt{kDBConnection->createStatement()}; 
+        std::unique_ptr<sql::Statement>stmt{DBConnection->createStatement()}; 
         return std::optional<sql::ResultSet*>{stmt->executeQuery(query)};
-    } catch (sql::SQLException e&) {
-        /* TODO: handle these:
+    } catch (sql::SQLException& e) {
+        /*  handles these:
          * sql::MethodNotImplementedException (derived from sql::SQLException), 
          * sql::InvalidArgumentException (derived from sql::SQLException), 
          * sql::SQLException (derived from std::runtime_error)
          */
+        std::cout << "ERROR: SQLEception in " << __FUNCTION__;
+        std::cout << "from file " << __FILE__ << "on line " << __LINE__ << std::endl;
+        std::cout << "ERROR: " << e.what();
+        std::cout << "(MySQL error code: " << e.getErrorCode();
+        std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
+        return std::nullopt;
     }
-}
-
-
 }
 
 } // project6::supervisory

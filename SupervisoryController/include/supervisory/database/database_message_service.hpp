@@ -6,10 +6,11 @@
 
 #pragma once
 
-#include <string>
-#include <iostream>
 #include <optional>
-#include <mysql/jdbc.h>
+#include <mysql_driver.h>
+#include <mysql_connection.h>
+#include <cppconn/resultset.h>
+#include <cppconn/statement.h>
 
 namespace project6::supervisory
 {
@@ -23,7 +24,7 @@ public:
         const char* user =  "pi", 
         const char* password = "ese",
         const char* database = "elevtor_network"
-    );
+    ) noexcept;
     /** @brief: stops the database connection */
     ~DBMessageService();
     /** @brief: forbid copying */
@@ -33,15 +34,15 @@ public:
     DBMessageService& operator=(const DBMessageService&&) = delete;
 
     /** @brief: query the database */
-    std::optional<sql::ResultSet*> query(const char* query);
+    std::optional<sql::ResultSet*> query(const char* query) noexcept;
 
 private:
-    const sql::Driver*  kDBDriver;
-    sql::Connection*    kDBConnection;
+    sql::Driver*        DBDriver;
+    sql::Connection*    DBConnection;
     const char*         kDBUrl;
-    const std::string   kDBUser;
-    const std::string   kDBPassword;
-    const std::string   kDBName;
+    sql::SQLString      DBUser;
+    sql::SQLString      DBPassword;
+    sql::SQLString      DBName;
 };
 
 }
