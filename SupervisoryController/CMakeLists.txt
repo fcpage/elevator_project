@@ -1,3 +1,8 @@
+# WINDOWS CMakeLists.txt DO NOT USE TO BUILD Linux
+# This script is used to build the executable on Windows,
+# it purposely leaves out features that aren't necessary for
+# Windows testing.
+
 cmake_minimum_required(VERSION 3.14)
 
 project(Project6SupervisoryController
@@ -17,6 +22,8 @@ option(
 
 find_package(Threads REQUIRED)
 
+set(SUPERVISORY_COMMON_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../Common")
+
 add_library(project6_supervisory
     src/app/supervisory_application.cpp
     src/can/can_comms_service.cpp
@@ -31,6 +38,7 @@ add_library(project6_supervisory
 target_include_directories(project6_supervisory
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        "${SUPERVISORY_COMMON_DIR}"
 )
 
 target_link_libraries(project6_supervisory
@@ -83,7 +91,7 @@ add_executable(supervisory_state_machine_smoke
 target_include_directories(supervisory_state_machine_smoke
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
-        ${CMAKE_CURRENT_SOURCE_DIR}../Common/
+        "${SUPERVISORY_COMMON_DIR}"
 )
 
 target_compile_definitions(supervisory_state_machine_smoke
@@ -102,6 +110,7 @@ add_executable(supervisory_state_machine_production_smoke
 target_include_directories(supervisory_state_machine_production_smoke
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        "${SUPERVISORY_COMMON_DIR}"
 )
 
 add_executable(supervisory_can_protocol_tests
@@ -113,6 +122,7 @@ add_executable(supervisory_can_protocol_tests
 target_include_directories(supervisory_can_protocol_tests
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        "${SUPERVISORY_COMMON_DIR}"
 )
 
 add_executable(supervisory_spsc_queue_tests
@@ -134,6 +144,7 @@ add_executable(supervisory_can_comms_service_tests
 target_include_directories(supervisory_can_comms_service_tests
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        "${SUPERVISORY_COMMON_DIR}"
 )
 
 target_link_libraries(supervisory_can_comms_service_tests
@@ -154,6 +165,7 @@ add_executable(supervisory_control_loop_tests
 target_include_directories(supervisory_control_loop_tests
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        "${SUPERVISORY_COMMON_DIR}"
 )
 
 target_link_libraries(supervisory_control_loop_tests
