@@ -27,4 +27,4 @@ html
 *.rule
 *.log
 
-.simbuild.json
+*.simbuild.json
