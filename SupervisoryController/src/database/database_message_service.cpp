@@ -11,41 +11,54 @@
 namespace project6::supervisory
 {
 
-DBMessageService::DBMessageService(
-    const char* url, 
-    const char* user, 
-    const char* password,
-    const char* database 
-) noexcept 
+cDBMessageService::cDBMessageService(const sDBServiceConfig& config, sDBMessageExchange& exchange) 
+: config_(config), exchange_(exchange)
 {
-    kDBUrl = url;
-    DBUser = user;
-    DBPassword = password;
-    DBName = database;
-    DBConnection = nullptr;
-    DBDriver = nullptr;
+    connection_ = nullptr;
+    driver_ = nullptr;
 }
 
-DBMessageService::~DBMessageService() 
+cDBMessageService::~cDBMessageService() 
 {
     this->stop();
-    delete DBConnection; // Connect allocates memory
-    DBConnection = nullptr;
+    delete connection_; // Connect allocates memory
+    connection_ = nullptr;
 }
 
-[[nodiscard]] ecOperationStatus DBMessageService::start() noexcept
+void cDBMessageService::run(const std::stop_token stopToken) const noexcept {
+    try 
+    {
+        exchange_.databaseState.store(ecDBServiceState::Running);
+
+        while(!stopToken.stop_requested()) {
+            bool didWork = false;
+
+        }
+    } 
+    catch (...) 
+    {
+
+    }
+}
+
+[[nodiscard]] ecOperationStatus cDBMessageService::start() noexcept
 {
-    if(DBConnection != nullptr && !DBConnection->isClosed()) {
-        DBConnection->setSchema(DBName);
+    if(connection_ != nullptr && !connection_->isClosed()) {
+        connection_->setSchema(config_.database);
         return ecOperationStatus::Ok;
     }
+    if(worker_.joinable()) {
+        return ecOperationStatus::InvalidArgument;
+    }
+
+    // Database initialization
     try {
-        DBDriver = sql::mysql::get_driver_instance();
-        std::cout << "Creating database session on url: " << kDBUrl << "...\n" << std::endl;
+        driver_ = sql::mysql::get_driver_instance();
+        std::cout << "Creating database session on url: " << config_.url << "...\n" << std::endl;
 
-        DBConnection = DBDriver->connect(kDBUrl, DBUser, DBPassword);
+        connection_ = driver_->connect(config_.url, config_.user, config_.password);
 
-        DBConnection->setSchema(DBName);
+        connection_->setSchema(config_.database);
         return ecOperationStatus::Ok;
     } 
     catch (sql::SQLException& e) {
@@ -61,18 +74,23 @@ DBMessageService::~DBMessageService()
         std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
         return ecOperationStatus::DatabaseException;
     }
+
+    // Worker thread initialization
+    worker_ = std::jthread([this](const std::stop_token stopToken){
+        run(stopToken);
+    });
+
 }
 
-
-[[nodiscard]] ecResult<sql::ResultSet*> DBMessageService::query(const char* query) noexcept 
+[[nodiscard]] sChoice<ecOperationStatus, sql::ResultSet*> cDBMessageService::query(const char* query) noexcept
 {
     // Unlikely attribute helps branch prediction for unlikely control flow
-    if(DBConnection == nullptr || DBDriver == nullptr) [[unlikely]] {
+    if(connection_ == nullptr || driver_ == nullptr) [[unlikely]] {
         std::cout << "ERROR: Uninitialized driver or connection.";
         return { ecOperationStatus::DatabaseException };
     }
     try {
-        std::unique_ptr<sql::Statement>stmt{DBConnection->createStatement()}; 
+        std::unique_ptr<sql::Statement>stmt{connection_->createStatement()}; 
         return { stmt->executeQuery(query) };
     } catch (sql::SQLException& e) {
         /*  handles these:
@@ -89,10 +107,10 @@ DBMessageService::~DBMessageService()
     }
 }
 
-void DBMessageService::stop() {
-    if(DBConnection == nullptr) return;
-    if(!DBConnection->isClosed()) {
-        DBConnection->close();
+void cDBMessageService::stop() {
+    if(connection_ == nullptr) return;
+    if(!connection_->isClosed()) {
+        connection_->close();
     }
 }
 

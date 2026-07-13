@@ -103,10 +103,12 @@ int main(const int argumentCount, char* arguments[])
         kDefaultCanBitrateBitsPerSecond,
         kDefaultCanRestartMs,
         kConfigureCanInterfaceOnInitialize};
+    const sDBServiceConfig dbConfig{};
+    sDBMessageExchange dbExchange;
     sCanExchange canExchange;
     cCanCommsService commsService(canConfig, canExchange);
     cSupervisoryApplication application(canExchange);
-    DBMessageService database;
+    cDBMessageService database(dbConfig, dbExchange);
 
     if (const ecOperationStatus status = commsService.initializeService(); status != ecOperationStatus::Ok)
     {
@@ -129,6 +131,15 @@ int main(const int argumentCount, char* arguments[])
         return 1;
     }
 
+    /* TEMP: Test query to test connection with database */
+    if(auto choice = database.query("SELECT 'Hello there!' AS _message"); choice.err()) {
+        std::cerr << "query failed: " << operationStatusMessage(choice.status()) << '\n';
+    } else {
+        std::unique_ptr<sql::ResultSet>result{choice.value()};
+        while (result->next()) {
+            std::cout << "MySQL Reply: " << result->getString("_message") << std::endl;
+        }
+    }
 
     std::signal(SIGINT, handleShutdownSignal);
     std::signal(SIGTERM, handleShutdownSignal);

@@ -10,51 +10,100 @@
 #include <mysql_connection.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
+#include <thread>
+#include "supervisory/common/event.hpp"
 #include "supervisory/common/result.hpp"
+#include "supervisory/common/spsc_queue.hpp"
 
 namespace project6::supervisory
 {
 
-class DBMessageService
+struct sDBServiceConfig {
+    const char*    url      = "tcp://127.0.0.1:3306";
+    sql::SQLString user     = "pi";
+    sql::SQLString password = "ese";
+    sql::SQLString database = "elevator_network";
+};
+
+/** @brief database worker lifecycle state */
+enum class ecDBServiceState {
+    Stopped,
+    Running,
+    Failed
+};
+
+/** @brief First detected DATABASE failure*/
+enum class ecDBServiceFaultReason {
+    None,
+    InitializationFailed,
+    FailedWrite,
+    FailedRead,
+    InboundQueueFull,
+    OutboundQueueFull,
+    DatabaseProgressTimeout,
+    ThreadFailure
+};
+
+/** @brief Lock-free data exchange between DATABASE and CONTROL */
+struct sDBMessageExchange {
+    /** @brief DATABASE-to-CONTROL events. */
+    cSpscQueue<sSupervisoryEvent, 64> readEvents;
+    /** @brief CONTROL-to-DATABASE messages. */
+    cSpscQueue<sSupervisoryEvent, 64> writtenMessages;
+    /** Messages read from Database. */
+    std::atomic<std::uint64_t> readCount{0};
+    /** Events rejected by a full queue. */
+    std::atomic<std::uint64_t> droppedEventCount{0};
+    /** Messages written to Database. */
+    std::atomic<std::uint64_t> writeCount{0};
+    /** Failed Database writes. */
+    std::atomic<std::uint64_t> writeFailureCount{0};
+    /** Current worker state. */
+    std::atomic<ecDBServiceState> databaseState{ecDBServiceState::Stopped};
+    /** First detected failure. */
+    std::atomic<ecDBServiceFaultReason> faultReason{ecDBServiceFaultReason::None};
+};
+
+class cDBMessageService
 {
 public:
     /** @brief: initializes database config info */
-    DBMessageService(
-        const char* url = "tcp://127.0.0.1:3306", 
-        const char* user =  "pi", 
-        const char* password = "ese",
-        const char* database = "elevtor_network"
-    ) noexcept;
+    cDBMessageService(const sDBServiceConfig& config, sDBMessageExchange& exchange);
     /** @brief: stops the database connection */
-    ~DBMessageService();
+    ~cDBMessageService();
     /** @brief: forbid copying */
-    DBMessageService(const DBMessageService&) = delete;
-    DBMessageService& operator=(const DBMessageService&) = delete;
+    cDBMessageService(const cDBMessageService&) = delete;
+    cDBMessageService& operator=(const cDBMessageService&) = delete;
     /** @brief: forbid moving */
-    DBMessageService(const DBMessageService&&) = delete;
-    DBMessageService& operator=(const DBMessageService&&) = delete;
+    cDBMessageService(const cDBMessageService&&) = delete;
+    cDBMessageService& operator=(const cDBMessageService&&) = delete;
     
     /** @brief: start the database connection */
     [[nodiscard]] ecOperationStatus start() noexcept;
     /** 
      * @brief query the database 
      * @param query String literal containing query
-     * @return The result of the query wrapped in ecResult (contains status
+     * @return The result of the query wrapped in sResult (contains status
      *          code and optionally the query result - nullopt on error)
      */
-    [[nodiscard]] ecResult<sql::ResultSet*> query(const char* query) noexcept;
+    [[nodiscard]] sChoice<ecOperationStatus, sql::ResultSet*> query(const char* query) noexcept;
     /** @brief: stop the database connection (can be called manually but is
      *          also called automatically by the destructor) 
      */
     void stop();
 
 private:
-    sql::Driver*        DBDriver;
-    sql::Connection*    DBConnection;
-    const char*         kDBUrl;
-    sql::SQLString      DBUser;
-    sql::SQLString      DBPassword;
-    sql::SQLString      DBName;
+    // database data
+    sql::Driver*            driver_;
+    sql::Connection*        connection_;
+    const sDBServiceConfig& config_;
+    // thread data
+    // WARNING: NO THREAD LOGIC YET
+    sDBMessageExchange& exchange_;
+    std::jthread        worker_;
+
+    /*** Private methods ***/
+    void run(std::stop_token stopToken) const noexcept;
 };
 
 }

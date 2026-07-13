@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <optional>
+#include <cassert>
 namespace project6::supervisory
 {
 
@@ -28,14 +28,29 @@ enum class ecOperationStatus
     DatabaseException
 };
 
-/** @brief Wraps funciton return in struct containing the status and 
- *         optionally a return value */
-template<typename T>
-struct ecResult {
-    ecOperationStatus status;
-    std::optional<T>  value; 
-    ecResult(ecOperationStatus s) : status(s), value(std::nullopt) {}
-    ecResult(T v) : status(ecOperationStatus::Ok), value(v) {}
+/** @brief Wraps funciton return in struct containing the status or 
+ *         a return value */
+template<typename S, typename V>
+struct sChoice {
+    constexpr bool err() { 
+        return fail_; 
+    };
+    constexpr S status() { 
+        assert(fail);
+        return status_; 
+    };
+    constexpr V value() { 
+        assert(!fail);
+        return value_;
+    };
+    sChoice(S s) : fail_(true), status_(s) {}
+    sChoice(V v) : fail_(false), value_(v) {}
+private:
+    bool fail_;
+    union {
+        S status_;
+        V value_;
+    };
 };
 
 } // namespace project6::supervisory
