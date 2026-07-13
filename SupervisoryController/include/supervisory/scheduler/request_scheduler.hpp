@@ -22,8 +22,8 @@ namespace project6::supervisory
  */
 enum class RequestSource
 {
-    FloorModule,
     CarModule,
+    FloorModule,
     WebInterface
 };
 
@@ -32,7 +32,7 @@ enum class RequestSource
  */
 struct sElevatorRequest
 {
-    /** Validated destination floor requested by the source module. */
+    /** Validated destination floor requested by the source module. Default value to 1. */
     std::uint8_t floor = 1;
 
     /** Origin category used by the scheduler's fixed priority policy. */
@@ -43,7 +43,7 @@ struct sElevatorRequest
  * @brief Stores pending requests and chooses the next request to service.
  *
  * Requests remain FIFO within each source category. Selection priority is
- * landing modules first, then the car module, then the web interface.
+ * the car module first, then the floor modules, then the web interface.
  */
 class cRequestScheduler
 {

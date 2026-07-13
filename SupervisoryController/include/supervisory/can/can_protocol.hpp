@@ -152,6 +152,13 @@ enum class ecNodeHb
     Error
 };
 
+/** Project-internal commands sent by the supervisor to the door controller. */
+enum class ecDoorCommand
+{
+    Open,
+    Close
+};
+
 enum class CanMessageType
 {
     /** Outbound command produced by the supervisory controller. */
@@ -264,6 +271,28 @@ std::optional<sSupervisoryEvent> toSupervisoryEvent(const sDecodedCanMessage& me
 std::optional<sCanFrame> makeSupervisorCommandFrame(
     std::uint8_t targetFloor,
     bool enable,
+    const sCanProtocolConfig& config = kDefaultCanProtocolConfig);
+
+/**
+ * @brief Builds a serviced-floor notification for hall-light clearing.
+ *
+ * @param servicedFloor Floor whose hall request has been completed.
+ * @param config Protocol layout and node IDs to apply.
+ * @return Encoded frame when the floor is valid; otherwise std::nullopt.
+ */
+std::optional<sCanFrame> makeSupervisorArrivalFrame(
+    std::uint8_t servicedFloor,
+    const sCanProtocolConfig& config = kDefaultCanProtocolConfig);
+
+/**
+ * @brief Builds a project-internal door command from the supervisor.
+ *
+ * @param command Requested door action.
+ * @param config Protocol layout and node IDs to apply.
+ * @return Encoded door command, or std::nullopt for an unknown command.
+ */
+std::optional<sCanFrame> makeSupervisorDoorFrame(
+    ecDoorCommand command,
     const sCanProtocolConfig& config = kDefaultCanProtocolConfig);
 
 /**
