@@ -11,6 +11,19 @@
 namespace project6::supervisory
 {
 
+namespace
+{
+
+constexpr std::chrono::milliseconds kIdleDelay{1}; // Not a timeout! See application file.
+
+void recordFault(sDBMessageExchange& exchange, const ecDBServiceFaultReason reason) {
+    ecDBServiceFaultReason expected = ecDBServiceFaultReason::None;
+    static_cast<void>(exchange.faultReason.compare_exchange_strong(expected, reason));
+}
+
+} // namespace
+
+
 cDBMessageService::cDBMessageService(const sDBServiceConfig& config, sDBMessageExchange& exchange) 
 : config_(config), exchange_(exchange)
 {
@@ -21,24 +34,9 @@ cDBMessageService::cDBMessageService(const sDBServiceConfig& config, sDBMessageE
 cDBMessageService::~cDBMessageService() 
 {
     this->stop();
+    this->close();
     delete connection_; // Connect allocates memory
     connection_ = nullptr;
-}
-
-void cDBMessageService::run(const std::stop_token stopToken) const noexcept {
-    try 
-    {
-        exchange_.databaseState.store(ecDBServiceState::Running);
-
-        while(!stopToken.stop_requested()) {
-            bool didWork = false;
-
-        }
-    } 
-    catch (...) 
-    {
-
-    }
 }
 
 [[nodiscard]] ecOperationStatus cDBMessageService::start() noexcept
@@ -76,13 +74,13 @@ void cDBMessageService::run(const std::stop_token stopToken) const noexcept {
     }
 
     // Worker thread initialization
-    worker_ = std::jthread([this](const std::stop_token stopToken){
+    worker_ = std::jthread([this](const std::stop_token& stopToken){
         run(stopToken);
     });
-
+    return ecOperationStatus::Ok;
 }
 
-[[nodiscard]] sChoice<ecOperationStatus, sql::ResultSet*> cDBMessageService::query(const char* query) noexcept
+[[nodiscard]] sChoice<ecOperationStatus, sql::ResultSet*> cDBMessageService::query(const char* query) const noexcept
 {
     // Unlikely attribute helps branch prediction for unlikely control flow
     if(connection_ == nullptr || driver_ == nullptr) [[unlikely]] {
@@ -108,9 +106,48 @@ void cDBMessageService::run(const std::stop_token stopToken) const noexcept {
 }
 
 void cDBMessageService::stop() {
+    if(worker_.joinable()) {
+        worker_.request_stop();
+        worker_.join();
+    }
+
+    if(exchange_.databaseState.load() != ecDBServiceState::Failed) {
+        exchange_.databaseState.store(ecDBServiceState::Stopped);
+    }
+}
+
+void cDBMessageService::close() {
     if(connection_ == nullptr) return;
     if(!connection_->isClosed()) {
         connection_->close();
+    }
+}
+
+void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
+    std::cout << "Hello from database thread!" << '\n';
+    try 
+    {
+        exchange_.databaseState.store(ecDBServiceState::Running);
+
+        while(!stopToken.stop_requested()) {
+            if(auto choice = query("SELECT * FROM elevatorNetwork"); choice.err()) {
+                std::cerr << "query failed: " << operationStatusMessage(choice.status()) << '\n';
+            } else {
+                std::unique_ptr<sql::ResultSet>result{choice.value()};
+                while (result->next()) {
+                    int id = result->getInt("nodeID");
+                    if(result->wasNull()) break;
+                    std::cout << "nodeID: " << id << std::endl;
+                }
+            }
+        }
+
+        exchange_.databaseState.store(ecDBServiceState::Stopped);
+    } 
+    catch (...) 
+    {
+        recordFault(exchange_, ecDBServiceFaultReason::ThreadFailure);
+        exchange_.databaseState.store(ecDBServiceState::Failed);
     }
 }
 

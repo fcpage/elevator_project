@@ -53,4 +53,34 @@ private:
     };
 };
 
+constexpr const char* operationStatusMessage(const project6::supervisory::ecOperationStatus status)
+{
+    using project6::supervisory::ecOperationStatus;
+
+    switch (status)
+    {
+        case ecOperationStatus::Ok:
+            return "operation completed successfully";
+        case ecOperationStatus::NotInitialized:
+            return "a required module was not initialized";
+        case ecOperationStatus::InvalidArgument:
+            return "invalid runtime configuration";
+        case ecOperationStatus::WouldBlock:
+            return "operation would block";
+        case ecOperationStatus::InsufficientPrivileges:
+            return "permission denied while configuring CAN; run as root or grant CAP_NET_ADMIN";
+        case ecOperationStatus::HardwareUnavailable:
+            return "required hardware or SocketCAN interface is unavailable";
+        case ecOperationStatus::NetworkUnavailable:
+            return "required network service is unavailable";
+        case ecOperationStatus::NotImplemented:
+            return "requested operation is not implemented";
+        case ecOperationStatus::DatabaseException:
+            return "database exception thrown";
+    }
+
+    return "unknown operation status";
+}
+
+
 } // namespace project6::supervisory

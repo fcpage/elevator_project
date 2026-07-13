@@ -86,11 +86,16 @@ public:
      * @return The result of the query wrapped in sResult (contains status
      *          code and optionally the query result - nullopt on error)
      */
-    [[nodiscard]] sChoice<ecOperationStatus, sql::ResultSet*> query(const char* query) noexcept;
-    /** @brief: stop the database connection (can be called manually but is
+    [[nodiscard]] sChoice<ecOperationStatus, sql::ResultSet*> query(
+        const char* query) const noexcept;
+    /** @brief: stop the worker thread (can be called manually but is
      *          also called automatically by the destructor) 
      */
     void stop();
+    /** @brief: close the database connection (can be called manually but is
+     *          also called automatically by the destructor) 
+     */
+    void close();
 
 private:
     // database data
@@ -103,7 +108,7 @@ private:
     std::jthread        worker_;
 
     /*** Private methods ***/
-    void run(std::stop_token stopToken) const noexcept;
+    void run(const std::stop_token& stopToken) const noexcept;
 };
 
 }
