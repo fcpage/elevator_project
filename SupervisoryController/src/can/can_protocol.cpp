@@ -112,6 +112,56 @@ std::optional<std::uint8_t> payloadFromNodeHb(const ecNodeHb type)
     return std::nullopt;
 }
 
+std::optional<std::uint8_t> payloadFromSupervisorArrivalFloor(
+    const std::uint8_t servicedFloor,
+    const sCanProtocolConfig& config)
+{
+    if (!isValidFloor(servicedFloor, config))
+    {
+        return std::nullopt;
+    }
+
+    switch (servicedFloor)
+    {
+        case 1:
+            return static_cast<std::uint8_t>(Messages::SC_POS_FLOOR_1);
+
+        case 2:
+            return static_cast<std::uint8_t>(Messages::SC_POS_FLOOR_2);
+
+        case 3:
+            return static_cast<std::uint8_t>(Messages::SC_POS_FLOOR_3);
+
+        default:
+            return std::nullopt;
+    }
+}
+
+std::optional<std::uint8_t> payloadFromDoorCommand(const ecDoorCommand command)
+{
+    switch (command)
+    {
+        case ecDoorCommand::Open:
+            return static_cast<std::uint8_t>(Messages::SC_DOOR_OPEN);
+
+        case ecDoorCommand::Close:
+            return static_cast<std::uint8_t>(Messages::SC_DOOR_CLOSE);
+    }
+
+    return std::nullopt;
+}
+
+sCanFrame makeSupervisorInternalFrame(
+    const std::uint8_t payload,
+    const sCanProtocolConfig& config)
+{
+    sCanFrame frame{};
+    frame.id = config.supervisoryControllerCanId;
+    frame.dataLength = config.sharedProtocolDlc;
+    frame.data[0] = payload;
+    return frame;
+}
+
 } // namespace
 
 std::optional<sDecodedCanMessage> decodeCanFrame(const sCanFrame& frame, const sCanProtocolConfig& config)
@@ -269,6 +319,33 @@ std::optional<sCanFrame> makeSupervisorCommandFrame(
 
     frame.data[0] = static_cast<std::uint8_t>(encodedEnable | encodedFloor);
     return frame;
+}
+
+std::optional<sCanFrame> makeSupervisorArrivalFrame(
+    const std::uint8_t servicedFloor,
+    const sCanProtocolConfig& config)
+{
+    const std::optional<std::uint8_t> payload =
+        payloadFromSupervisorArrivalFloor(servicedFloor, config);
+    if (!payload.has_value())
+    {
+        return std::nullopt;
+    }
+
+    return makeSupervisorInternalFrame(*payload, config);
+}
+
+std::optional<sCanFrame> makeSupervisorDoorFrame(
+    const ecDoorCommand command,
+    const sCanProtocolConfig& config)
+{
+    const std::optional<std::uint8_t> payload = payloadFromDoorCommand(command);
+    if (!payload.has_value())
+    {
+        return std::nullopt;
+    }
+
+    return makeSupervisorInternalFrame(*payload, config);
 }
 
 std::optional<sCanFrame> makeNodeHbFrame(

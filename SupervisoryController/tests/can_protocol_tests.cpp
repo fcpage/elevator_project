@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <cstdint>
 #include <iostream>
+#include <optional>
 #include <utility>
 
 #include "supervisory/can/can_adapter.hpp"
@@ -58,11 +59,15 @@ int main()
     using project6::supervisory::CanMessageType;
     using project6::supervisory::decodeNodeHbFrame;
     using project6::supervisory::decodeCanFrame;
+    using project6::supervisory::ecDoorCommand;
     using project6::supervisory::ecNodeHb;
     using project6::supervisory::makeNodeHbFrame;
+    using project6::supervisory::makeSupervisorArrivalFrame;
     using project6::supervisory::makeSupervisorCommandFrame;
+    using project6::supervisory::makeSupervisorDoorFrame;
 
     constexpr std::array<std::uint8_t, 3> kExpectedPayloads{0x05, 0x06, 0x07};
+    constexpr std::array<std::uint8_t, 3> kExpectedArrivalPayloads{0x81, 0x82, 0x83};
     constexpr std::array<std::pair<std::uint8_t, ecNodeHb>, 4> kExpectedNodeHbPayloads{{
         {0x84, ecNodeHb::Ok},
         {0x85, ecNodeHb::SupervisorRequest},
@@ -84,6 +89,36 @@ int main()
 
     require(!makeSupervisorCommandFrame(0, true).has_value(), "floor zero was accepted");
     require(!makeSupervisorCommandFrame(4, true).has_value(), "floor four was accepted");
+
+    for (std::uint8_t floor = 1; floor <= kExpectedArrivalPayloads.size(); ++floor)
+    {
+        const std::optional<sCanFrame> frame = makeSupervisorArrivalFrame(floor);
+
+        require(frame.has_value(), "valid arrival floor did not produce a frame");
+        require(frame->id == 0x100, "arrival frame used the wrong CAN identifier");
+        require(frame->dataLength == 1, "arrival frame used the wrong DLC");
+        require(
+            frame->data[0] == kExpectedArrivalPayloads[floor - 1],
+            "arrival frame used the wrong payload");
+    }
+
+    require(!makeSupervisorArrivalFrame(0).has_value(), "arrival floor zero was accepted");
+    require(!makeSupervisorArrivalFrame(4).has_value(), "arrival floor four was accepted");
+
+    const std::optional<sCanFrame> doorOpenFrame = makeSupervisorDoorFrame(ecDoorCommand::Open);
+    require(doorOpenFrame.has_value(), "door-open command was not encoded");
+    require(doorOpenFrame->id == 0x100, "door-open command used the wrong CAN identifier");
+    require(doorOpenFrame->dataLength == 1, "door-open command used the wrong DLC");
+    require(doorOpenFrame->data[0] == 0x88, "door-open command used the wrong payload");
+
+    const std::optional<sCanFrame> doorCloseFrame = makeSupervisorDoorFrame(ecDoorCommand::Close);
+    require(doorCloseFrame.has_value(), "door-close command was not encoded");
+    require(doorCloseFrame->id == 0x100, "door-close command used the wrong CAN identifier");
+    require(doorCloseFrame->dataLength == 1, "door-close command used the wrong DLC");
+    require(doorCloseFrame->data[0] == 0x89, "door-close command used the wrong payload");
+    require(
+        !makeSupervisorDoorFrame(static_cast<ecDoorCommand>(99)).has_value(),
+        "unknown door command was encoded");
 
     for (const auto [payload, expectedType] : kExpectedNodeHbPayloads)
     {

@@ -43,7 +43,7 @@ struct sElevatorRequest
  * @brief Stores pending requests and chooses the next request to service.
  *
  * Requests remain FIFO within each source category. Selection priority is
- * landing modules first, then the car module, then the web interface.
+ * the car module first, then the floor modules, then the web interface.
  */
 class cRequestScheduler
 {
