@@ -8,6 +8,7 @@
 
 // PSA: ONLY EVER INCLUDE THIS YOU WILL REGRET INCLUDING OTHER HAL HEADERS
 #include "stm32f3xx_hal.h" 
+#include "stm32f3xx_hal_gpio.h"
 
 enum FloorButtons {
     NO_BUTTON_PRESSED	= 0,
@@ -134,7 +135,7 @@ static void handleRxFrame(const CanRxFrame* frame)
             /* Floor number is indicated by the lower two bits in the node ID 
              * and the MSG (checks if the elevator is at our floor) */
             if( (payload & 0b11) == (NODE_ID & 0b11) ) {
-                // TODO: turn off button led (unknown at this time)
+                HAL_GPIO_WritePin(floor->led_port, floor->led_pin, GPIO_PIN_SET);
             }
             break;
         }
@@ -163,13 +164,14 @@ void user_main(void) {
             floor = &event_lookup[BUTTON];
             // The receive FIFO must remain serviceable while a button request is sent.
             HAL_GPIO_WritePin(floor->led_port, floor->led_pin, GPIO_PIN_SET);
-            // TODO: turn on button led (unknown at this time)
             TxData[0] = floor->msg;     // Store the appropriate message for the given button
             if (HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK) {
                 panic("Failed to send CAN message");
             }
             dbglog(LVL1, "CAN message sent: %d\n", TxData[0]);
+#ifdef CAN_COMMON
             HAL_GPIO_WritePin(floor->led_port, floor->led_pin, GPIO_PIN_RESET);
+#endif
         }
         BUTTON = NO_BUTTON_PRESSED; 								// Reset the BUTTON flag
     }
