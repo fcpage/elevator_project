@@ -21,23 +21,35 @@ enum FloorButtons {
 #include "basic_defs.h"
 #include "CAN_protocol.h"
 #include "debug_wrappers.h"
-#include <string.h>
 
 /* HAL Handles defined in main.c */
 extern CAN_HandleTypeDef  hcan; 
 extern UART_HandleTypeDef huart; 
 
 CAN_TxHeaderTypeDef		TxHeader;		// TxHeader is a variable of type CAN_TxHeaderTypeDef
-CAN_RxHeaderTypeDef		RxHeader;
 
 static u8	TxData[8];		// 8 bytes of data per frame
-static u8	RxData[8];
 static u32	TxMailbox;
-static u8   BUTTON = NO_BUTTON_PRESSED;		// Initial value is that no BUTTON has been pressed
+static volatile u8 BUTTON = NO_BUTTON_PRESSED;		// Initial value is that no BUTTON has been pressed
 
 #ifndef NODE_ID
 #define NODE_ID NODE_ID_CC
 #endif
+
+enum {
+    CAN_RX_QUEUE_CAPACITY = 8,
+    CAN_RX_QUEUE_STORAGE_SIZE = CAN_RX_QUEUE_CAPACITY + 1,
+};
+
+typedef struct {
+    CAN_RxHeaderTypeDef header;
+    u8                  data[CAN_PAYLOAD_LENGTH];
+} CanRxFrame;
+
+static CanRxFrame RxQueue[CAN_RX_QUEUE_STORAGE_SIZE];
+static volatile u8 RxQueueHead;
+static volatile u8 RxQueueTail;
+static volatile u32 DroppedRxFrameCount;
 
 typedef struct { 
     GPIO_TypeDef* led_port; 
@@ -76,44 +88,70 @@ static const FloorData event_lookup[] = {
 
 static const FloorData* floor = &event_lookup[NO_BUTTON_PRESSED];
 
-void user_main(void) {
+static u8 advanceRxQueueIndex(const u8 index)
+{
+    return (u8)((index + 1U) % CAN_RX_QUEUE_STORAGE_SIZE);
+}
 
-    /*** Recieve ***/
-    switch(RxData[0]) {
-        case 0: break;  // No message recieved
+static u8 tryTakeRxFrame(CanRxFrame* frame)
+{
+    const u8 tail = RxQueueTail;
+    if (tail == RxQueueHead)
+    {
+        return 0U;
+    }
+
+    __DMB();
+    *frame = RxQueue[tail];
+    __DMB();
+    RxQueueTail = advanceRxQueueIndex(tail);
+    return 1U;
+}
+
+static void handleRxFrame(const CanRxFrame* frame)
+{
+    const u8 payload = frame->data[0];
+
+    switch(payload) {
+        case 0: break;
 #ifndef CAN_COMMON      // Ignore the exended messages
         case HB_SC_REQ: {  // Respond with HB_OK to heartbeat request
-            // Pulse the LED
+            // Do not block the receive loop while acknowledging a heartbeat.
             HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-            HAL_Delay(100);
-            HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-            HAL_Delay(100);
-            dbglog(LVL3, "Hearbeat request recieved: %s\n", RxData);
+            dbglog(LVL3, "Heartbeat request received: %u\n", payload);
             TxData[0] = HB_OK;
-            dbglog(LVL3, "Sending heartbeat response: %s\n", TxData);
+            dbglog(LVL3, "Sending heartbeat response: %u\n", TxData[0]);
             if(HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK) {
                 panic("Failed to send CAN message");
             }
-            goto reset_Rx_buffer;
+            break;
         }
         case SC_POS_FLOOR_1: [[ fallthrough ]];
         case SC_POS_FLOOR_2: [[ fallthrough ]];
         case SC_POS_FLOOR_3: 
         {
-            dbglog(LVL1, "Received floor status message: %s\n", RxData);
+            dbglog(LVL1, "Received floor status message: %u\n", payload);
             /* Floor number is indicated by the lower two bits in the node ID 
              * and the MSG (checks if the elevator is at our floor) */
-            if( (RxData[0] & 0b11) == (NODE_ID & 0b11) ) {
+            if( (payload & 0b11) == (NODE_ID & 0b11) ) {
                 // TODO: turn off button led (unknown at this time)
             }
-            goto reset_Rx_buffer;
+            break;
         }
 #endif
         default:
-            dbglog(LVL1, "Unknown CAN msg: %s\n", RxData);
-        reset_Rx_buffer:
-            memset(RxData, 0, sizeof(RxData));  // Reset the buffer
+            dbglog(LVL1, "Unknown CAN msg: %u\n", payload);
             break;
+    }
+}
+
+void user_main(void) {
+    CanRxFrame frame;
+
+    /*** Receive ***/
+    while (tryTakeRxFrame(&frame) != 0U)
+    {
+        handleRxFrame(&frame);
     }
 
     /*** Transmit ***/
@@ -123,17 +161,15 @@ void user_main(void) {
             panic("Invalid button");
         } else {
             floor = &event_lookup[BUTTON];
-            // Turn on shield LED
-            HAL_GPIO_TogglePin(floor->led_port, floor->led_pin);
-            HAL_Delay(2000);
+            // The receive FIFO must remain serviceable while a button request is sent.
+            HAL_GPIO_WritePin(floor->led_port, floor->led_pin, GPIO_PIN_SET);
             // TODO: turn on button led (unknown at this time)
             TxData[0] = floor->msg;     // Store the appropriate message for the given button
             if (HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK) {
                 panic("Failed to send CAN message");
             }
             dbglog(LVL1, "CAN message sent: %d\n", TxData[0]);
-            // Turn off shield LED
-            HAL_GPIO_TogglePin(floor->led_port, floor->led_pin);  	
+            HAL_GPIO_WritePin(floor->led_port, floor->led_pin, GPIO_PIN_RESET);
         }
         BUTTON = NO_BUTTON_PRESSED; 								// Reset the BUTTON flag
     }
@@ -203,11 +239,23 @@ void user_CAN_init(void) {
 // This is called when the interrupt for FIFO0 is triggered.
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
-	/* Get RX message and store in RxData[] buffer */
-	if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
+	CanRxFrame frame;
+	if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &frame.header, frame.data) != HAL_OK)
 	{
 		panic("Failed to get message in Rx callback");
 	}
+
+    const u8 head = RxQueueHead;
+    const u8 nextHead = advanceRxQueueIndex(head);
+    if (nextHead == RxQueueTail)
+    {
+        ++DroppedRxFrameCount;
+        return;
+    }
+
+    RxQueue[head] = frame;
+    __DMB();
+    RxQueueHead = nextHead;
 }
 
 // Override the HAL_GPIO Callback -- 1. light up LED2 and 2. Transmit message when the blue button is pushed

@@ -34,7 +34,7 @@ void cRequestScheduler::enqueueEvent(const sSupervisoryEvent& event)
         case ecEventType::CanFloorRequest:
         {
             request.source = RequestSource::FloorModule;
-            floorRequests_.push_back(request);            // Request scheduler class private member for floor requests
+            floorRequests_.push_back(request);          // Request scheduler class private member for floor requests
             break;
         }
 

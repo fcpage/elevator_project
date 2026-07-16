@@ -106,6 +106,7 @@ machine ElevatorController {
     initial Idle;
 
     state Idle {
+        on faultOccurred -> Faulted;
         on physicalRequestPending -> DispatchPhysical;
         on remoteRequestPending -> DispatchRemote;
     }
@@ -140,6 +141,9 @@ machine ElevatorController {
     state MovingDown {
         on reachedTargetFloor -> Arrived;
     }
+
+    state Faulted {
+    }
 }
 
 conditionals ElevatorController {
@@ -151,9 +155,15 @@ conditionals ElevatorController {
     targetAboveCurrentFloor = targetFloor > currentFloor;
     targetBelowCurrentFloor = targetFloor < currentFloor;
     reachedTargetFloor = currentFloor == targetFloor;
+    faultOccurred = commsFailed();
 }
 
 actions ElevatorController {
+
+    enter Idle {
+        writeReport();
+    }
+
     enter DispatchPhysical {
         acceptNextPhysicalRequest();
     }
@@ -211,7 +221,8 @@ public:
         Arrived,
         DispatchCarCommand,
         MovingUp,
-        MovingDown
+        MovingDown,
+        Faulted
     };
 
     ElevatorController()
@@ -265,6 +276,12 @@ public:
                 break;
             }
 
+            case State::Faulted:
+            {
+                updateFaulted();
+                break;
+            }
+
         }
     }
 
@@ -278,6 +295,11 @@ private:
 
     void updateIdle()
     {
+        if (conditionFaultOccurred())
+        {
+            transitionTo(State::Faulted);
+            return;
+        }
         if (conditionPhysicalRequestPending())
         {
             transitionTo(State::DispatchPhysical);
@@ -379,6 +401,10 @@ private:
         }
     }
 
+    void updateFaulted()
+    {
+    }
+
     bool conditionPhysicalRequestPending()
     {
         return hasPhysicalRequest();
@@ -417,6 +443,11 @@ private:
     bool conditionReachedTargetFloor()
     {
         return currentFloor == targetFloor;
+    }
+
+    bool conditionFaultOccurred()
+    {
+        return commsFailed();
     }
 
     void transitionTo(State nextState)
@@ -470,6 +501,12 @@ private:
                 break;
             }
 
+            case State::Faulted:
+            {
+                exitFaulted();
+                break;
+            }
+
         }
 
         currentState = nextState;
@@ -518,11 +555,18 @@ private:
                 break;
             }
 
+            case State::Faulted:
+            {
+                enterFaulted();
+                break;
+            }
+
         }
     }
 
     void enterIdle()
     {
+        writeReport();
     }
 
     void enterDispatchPhysical()
@@ -559,6 +603,10 @@ private:
                 commandMotorDown();
     }
 
+    void enterFaulted()
+    {
+    }
+
     void exitIdle()
     {
     }
@@ -590,9 +638,14 @@ private:
         stopMotor();
     }
 
+    void exitFaulted()
+    {
+    }
+
 };
 
 // #ESE-GENERATED-END: ElevatorController
+
 
 //========================================================
 // General printing helpers

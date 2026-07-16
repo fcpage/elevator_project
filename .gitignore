@@ -8,6 +8,7 @@ SupervisoryController/build-rpi/
 SupervisoryController/out/
 SupervisoryController/.vs/
 FloorController/build/
+SupervisoryController/.idea/
 
 latex
 html
@@ -26,4 +27,4 @@ html
 *.rule
 *.log
 
-.simbuild.json
+*.simbuild.json

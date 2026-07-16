@@ -130,10 +130,29 @@ int main()
 
     require(stateMachine.snapshot().currentFloor == 3, "arrival recorded the wrong floor");
 
+    const std::optional<project6::supervisory::sCanFrame> servicedFloorFrame =
+        stateMachine.tryTakePendingCanFrame();
+    require(servicedFloorFrame.has_value(), "arrival did not clear the serviced hall light");
+    require(servicedFloorFrame->data[0] == 0x83, "arrival cleared the wrong hall light");
+
+    const std::optional<project6::supervisory::sCanFrame> doorOpenFrame =
+        stateMachine.tryTakePendingCanFrame();
+    require(doorOpenFrame.has_value(), "arrival did not request the doors to open");
+    require(doorOpenFrame->data[0] == 0x88, "arrival used the wrong door-open command");
+
+    require(
+        !stateMachine.tryTakePendingCanFrame().has_value(),
+        "arrival produced an unexpected extra CAN frame");
+
     stateMachine.handleEvent(makeTimerTick(3000ms));
     require(
         stateMachine.snapshot().controlState == ecSupervisoryControlState::Idle,
         "door timer did not return the state machine to Idle");
+
+    const std::optional<project6::supervisory::sCanFrame> doorCloseFrame =
+        stateMachine.tryTakePendingCanFrame();
+    require(doorCloseFrame.has_value(), "arrival exit did not request the doors to close");
+    require(doorCloseFrame->data[0] == 0x89, "arrival exit used the wrong door-close command");
 
     stateMachine.handleEvent(makeTimerTick(1ms));
     require(
