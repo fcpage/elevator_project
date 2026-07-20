@@ -26,5 +26,21 @@ struct sDBSnapshot {
     bool served;
 };
 
+static inline std::ostream& operator<<(std::ostream& os, const sDBSnapshot& snap) {
+    os  << "sDBSnapshot = {\n" 
+        << "\tindex = " << snap.index
+        << "\tdate = " << snap.date
+        << "\ttime = " << snap.time
+        << "\tnodeID = " << snap.nodeID
+        << "\tsender = " << snap.sender
+        << "\treceiver = " << snap.receiver
+        << "\tcurrentFloor = " << snap.currentFloor
+        << "\trequestFloor = " << snap.requestFloor
+        << "\tstatus = " << snap.status
+        << "\tqueued = " << snap.queued
+        << "};\n";
+    return os;
+}
+
 
 } // namespace project6::supervisory

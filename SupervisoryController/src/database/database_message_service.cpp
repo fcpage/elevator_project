@@ -130,6 +130,11 @@ void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
         exchange_.databaseState.store(ecDBServiceState::Running);
 
         while(!stopToken.stop_requested()) {
+            std::optional<sDBSnapshot> snap = getDBSnapshot();
+            if(snap == std::nullopt) throw;
+            sDBSnapshot snap_value = snap.value();
+            std::cout << snap_value << std::endl;
+            // TODO: Send the snapshot to main thread
         }
 
         exchange_.databaseState.store(ecDBServiceState::Stopped);
@@ -141,26 +146,32 @@ void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
     }
 }
 
-sDBSnapshot getDBState(void) const {
+std::optional<sDBSnapshot> cDBMessageService::getDBSnapshot() const {
     if(auto choice = query("SELECT * FROM elevatorNetwork"); choice.err()) {
         std::cerr << "query failed: " << operationStatusMessage(choice.status()) << '\n';
     } else {
         std::unique_ptr<sql::ResultSet>result{choice.value()};
         // TODO: Handle null result
-        return {
-            .index = result.getInt("index"),
-            .date = result.getDate("date"), // ?
-            .time = result.getTime("time"), // ?
-            .nodeID = result.getInt("nodeID"),
-            .sender = result.getTinyInt("sender"),
-            .reciever = result.getTinyInt("reciever"),
-            .currentFloor = result.getTinyInt("currentFloor"),
-            .requestFloor = result.getTinyInt("requestFloor"),
-            .status = result.getTinyInt("status"),
-            .queued = result.getBool("queued"),
-            .served = result.getBool("served"),
+        sDBSnapshot snap = {
+            .index = result->getInt("index"),
+            // .date = result->getDate("date"), // TODO: what type should this be?
+            // .time = result->getTime("time"), // TODO: what type should this be?
+            .nodeID = result->getInt("nodeID"),
+            .sender = static_cast<uint8_t>(result->getUInt("sender")),
+            .receiver = static_cast<uint8_t>(result->getInt("reciever")),
+            .currentFloor = static_cast<uint8_t>(result->getInt("currentFloor")),
+            .requestFloor = static_cast<uint8_t>(result->getInt("requestFloor")),
+            .status = static_cast<uint8_t>(result->getInt("status")),
+            .queued = result->getBoolean("queued"),
+            .served = result->getBoolean("served"),
         };
+        return std::optional<sDBSnapshot>{snap};
     }
+    return std::nullopt;
+}
+
+sSupervisoryEvent cDBMessageService::snapshotToSupervisoryEvent(sDBSnapshot snap) const {
+     
 }
 
 } // project6::supervisory

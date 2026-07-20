@@ -14,6 +14,7 @@
 #include "supervisory/common/event.hpp"
 #include "supervisory/common/result.hpp"
 #include "supervisory/common/spsc_queue.hpp"
+#include "supervisory/database/database_tables.hpp"
 
 namespace project6::supervisory
 {
@@ -103,13 +104,13 @@ private:
     sql::Connection*        connection_;
     const sDBServiceConfig& config_;
     // thread data
-    // WARNING: NO THREAD LOGIC YET
     sDBMessageExchange& exchange_;
     std::jthread        worker_;
 
     /*** Private methods ***/
     void run(const std::stop_token& stopToken) const noexcept;
-    sDBSnapshot getDBState(void) const;
+    [[nodiscard]] std::optional<sDBSnapshot> getDBSnapshot() const;
+    [[nodiscard]] sSupervisoryEvent snapshotToSupervisoryEvent(sDBSnapshot snap) const;
 };
 
 }
