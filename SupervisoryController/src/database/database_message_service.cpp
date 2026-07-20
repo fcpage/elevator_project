@@ -56,7 +56,7 @@ cDBMessageService::~cDBMessageService()
         std::cout << "Creating database session on url: " << config_.url << "...\n" << std::endl;
 
         connection_ = driver_->connect(config_.url, config_.user, config_.password);
-
+        std::cout << "here!\n";
         connection_->setSchema(config_.database);
         return ecOperationStatus::Ok;
     } 
@@ -81,7 +81,7 @@ cDBMessageService::~cDBMessageService()
         run(stopToken);
     });
 
-    if(!worker_.joinable()) return ecOperationStatus::InvalidArgument;
+    if(!worker_.joinable()) return ecOperationStatus::NotInitialized;
     return ecOperationStatus::Ok;
 }
 
