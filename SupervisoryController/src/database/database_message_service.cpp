@@ -53,11 +53,11 @@ cDBMessageService::~cDBMessageService()
     // Database initialization
     try {
         driver_ = sql::mysql::get_driver_instance();
-        std::cout << "Creating database session on url: " << config_.url << "...\n" << std::endl;
+        std::cout << "Creating database session on url: " << config_.url << "...\n";
 
         connection_ = driver_->connect(config_.url, config_.user, config_.password);
-        std::cout << "Database connection active" << std::endl;
         connection_->setSchema(config_.database);
+        std::cout << "Database connection active." << std::endl;
     } 
     catch (sql::SQLException& e) {
         /*  handles these:
