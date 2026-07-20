@@ -74,7 +74,7 @@ cDBMessageService::~cDBMessageService()
     }
 
     // Worker thread initialization
-    worker_ = std::jthread([this](const std::stop_token& stopToken){
+    worker_ = std::jthread([this](const std::stop_token stopToken){
         run(stopToken);
     });
     return ecOperationStatus::Ok;
