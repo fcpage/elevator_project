@@ -117,6 +117,7 @@ void cDBMessageService::stop() {
 }
 
 void cDBMessageService::close() {
+    std::cout << "Database service terminated." << std::endl;
     if(connection_ == nullptr) return;
     if(!connection_->isClosed()) {
         connection_->close();
