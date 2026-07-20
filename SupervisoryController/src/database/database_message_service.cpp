@@ -73,8 +73,9 @@ cDBMessageService::~cDBMessageService()
         std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
         return ecOperationStatus::DatabaseException;
     }
-    std::ofstream outputFile("text.txt");
-    outputFile << "starting worker thread" << '\n';
+    // std::ofstream outputFile("text.txt");
+    // outputFile << "starting worker thread" << '\n';
+    std::cerr << "WHAT THE FUCK IS GOING ON?!?" << '\n';
     // Worker thread initialization
     worker_ = std::jthread([this](const std::stop_token stopToken){
         run(stopToken);
