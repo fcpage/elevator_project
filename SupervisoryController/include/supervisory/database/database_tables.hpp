@@ -7,13 +7,15 @@
 #pragma once
 
 #include <cstdint>
+#include <chrono>
+
 namespace project6::supervisory
 {
 
-struct sDBTable {
+struct sDBSnapshot {
     std::int32_t index;
-    // date DATE NOT NULL,
-    // time TIME NOT NULL,
+    std::time_t  date;
+    std::time_t  time;
     std::int32_t nodeID;
     std::uint8_t sender;
     std::uint8_t receiver;

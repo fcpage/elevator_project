@@ -109,6 +109,7 @@ private:
 
     /*** Private methods ***/
     void run(const std::stop_token& stopToken) const noexcept;
+    sDBSnapshot getDBState(void) const;
 };
 
 }

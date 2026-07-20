@@ -130,16 +130,6 @@ void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
         exchange_.databaseState.store(ecDBServiceState::Running);
 
         while(!stopToken.stop_requested()) {
-            if(auto choice = query("SELECT * FROM elevatorNetwork"); choice.err()) {
-                std::cerr << "query failed: " << operationStatusMessage(choice.status()) << '\n';
-            } else {
-                std::unique_ptr<sql::ResultSet>result{choice.value()};
-                while (result->next()) {
-                    int id = result->getInt("nodeID");
-                    if(result->wasNull()) break;
-                    std::cout << "nodeID: " << id << std::endl;
-                }
-            }
         }
 
         exchange_.databaseState.store(ecDBServiceState::Stopped);
@@ -148,6 +138,28 @@ void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
     {
         recordFault(exchange_, ecDBServiceFaultReason::ThreadFailure);
         exchange_.databaseState.store(ecDBServiceState::Failed);
+    }
+}
+
+sDBSnapshot getDBState(void) const {
+    if(auto choice = query("SELECT * FROM elevatorNetwork"); choice.err()) {
+        std::cerr << "query failed: " << operationStatusMessage(choice.status()) << '\n';
+    } else {
+        std::unique_ptr<sql::ResultSet>result{choice.value()};
+        // TODO: Handle null result
+        return {
+            .index = result.getInt("index"),
+            .date = result.getDate("date"), // ?
+            .time = result.getTime("time"), // ?
+            .nodeID = result.getInt("nodeID"),
+            .sender = result.getTinyInt("sender"),
+            .reciever = result.getTinyInt("reciever"),
+            .currentFloor = result.getTinyInt("currentFloor"),
+            .requestFloor = result.getTinyInt("requestFloor"),
+            .status = result.getTinyInt("status"),
+            .queued = result.getBool("queued"),
+            .served = result.getBool("served"),
+        };
     }
 }
 
