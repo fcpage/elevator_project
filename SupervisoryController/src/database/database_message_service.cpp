@@ -56,6 +56,7 @@ cDBMessageService::~cDBMessageService()
         std::cout << "Creating database session on url: " << config_.url << "...\n" << std::endl;
 
         connection_ = driver_->connect(config_.url, config_.user, config_.password);
+        std::cout << "Database connection active" << std::endl;
         connection_->setSchema(config_.database);
     } 
     catch (sql::SQLException& e) {
