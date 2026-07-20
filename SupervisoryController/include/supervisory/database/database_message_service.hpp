@@ -23,7 +23,7 @@ struct sDBServiceConfig {
     const char*    url      = "tcp://127.0.0.1:3306";
     sql::SQLString user     = "pi";
     sql::SQLString password = "ese";
-    sql::SQLString database = "elevator_network";
+    sql::SQLString database = "elevatorg1";
 };
 
 /** @brief database worker lifecycle state */
