@@ -72,7 +72,7 @@ cDBMessageService::~cDBMessageService()
         std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
         return ecOperationStatus::DatabaseException;
     }
-    std::clog << "starting worker thread" << std::endl;
+    std::clog << "starting worker thread" << '\n';
     // Worker thread initialization
     worker_ = std::jthread([this](const std::stop_token stopToken){
         run(stopToken);
