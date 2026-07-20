@@ -127,7 +127,8 @@ void cDBMessageService::close() {
 }
 
 void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
-    std::cout << "Hello from database thread!" << '\n';
+    std::ofstream file("test.txt");
+    file << "Hello from database thread!" << '\n';
     try 
     {
         exchange_.databaseState.store(ecDBServiceState::Running);
@@ -136,7 +137,6 @@ void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
             std::optional<sDBSnapshot> snap = getDBSnapshot();
             if(snap == std::nullopt) throw;
             sDBSnapshot snap_value = snap.value();
-            std::cout << "Database state: \n";
             std::cout << snap_value << std::endl;
             // TODO: Send the snapshot to main thread
         }
