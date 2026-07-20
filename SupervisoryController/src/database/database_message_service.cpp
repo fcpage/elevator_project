@@ -136,6 +136,7 @@ void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
             std::optional<sDBSnapshot> snap = getDBSnapshot();
             if(snap == std::nullopt) throw;
             sDBSnapshot snap_value = snap.value();
+            std::cout << "Database state: \n";
             std::cout << snap_value << std::endl;
             // TODO: Send the snapshot to main thread
         }
