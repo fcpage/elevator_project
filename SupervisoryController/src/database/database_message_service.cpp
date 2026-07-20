@@ -43,8 +43,8 @@ cDBMessageService::~cDBMessageService()
 [[nodiscard]] ecOperationStatus cDBMessageService::start() noexcept
 {
     if(connection_ != nullptr && !connection_->isClosed()) {
-        connection_->setSchema(config_.database);
-        return ecOperationStatus::Ok;
+        // connection_->setSchema(config_.database);
+        return ecOperationStatus::InvalidArgument;
     }
     if(worker_.joinable()) {
         return ecOperationStatus::InvalidArgument;
