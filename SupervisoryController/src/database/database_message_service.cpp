@@ -80,6 +80,8 @@ cDBMessageService::~cDBMessageService()
     worker_ = std::jthread([this](const std::stop_token stopToken){
         run(stopToken);
     });
+
+    if(!worker_.joinable()) return ecOperationStatus::InvalidArgument;
     return ecOperationStatus::Ok;
 }
 
