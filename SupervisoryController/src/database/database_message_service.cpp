@@ -56,9 +56,7 @@ cDBMessageService::~cDBMessageService()
         std::cout << "Creating database session on url: " << config_.url << "...\n" << std::endl;
 
         connection_ = driver_->connect(config_.url, config_.user, config_.password);
-        std::cout << "here!\n";
         connection_->setSchema(config_.database);
-        return ecOperationStatus::Ok;
     } 
     catch (sql::SQLException& e) {
         /*  handles these:
@@ -73,9 +71,7 @@ cDBMessageService::~cDBMessageService()
         std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
         return ecOperationStatus::DatabaseException;
     }
-    // std::ofstream outputFile("text.txt");
-    // outputFile << "starting worker thread" << '\n';
-    std::cerr << "WHAT THE FUCK IS GOING ON?!?" << '\n';
+
     // Worker thread initialization
     worker_ = std::jthread([this](const std::stop_token stopToken){
         run(stopToken);
