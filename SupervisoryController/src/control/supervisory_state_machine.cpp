@@ -873,14 +873,13 @@ void logStateChange(const sSupervisoryStateSnapshot& previous, const sSupervisor
         return;
     }
 
-    std::clog << '\r'
-              << "STATE=" << controlStateName(current.controlState)
+    std::clog << "STATE=" << controlStateName(current.controlState)
               << " CURRENT=" << static_cast<unsigned int>(current.currentFloor)
               << " TARGET=" << static_cast<unsigned int>(current.targetFloor)
               << " DIRECTION=" << directionName(current.direction)
               << " DOOR_OPEN=" << (current.isDoorOpen ? "true" : "false")
               << " FAULTED=" << (current.isFaulted ? "true" : "false")
-              << "        " << std::flush;
+              << "\n";
 }
 
     /**
