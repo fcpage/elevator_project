@@ -16,8 +16,6 @@ namespace project6::supervisory
 namespace
 {
 
-constexpr std::chrono::milliseconds kIdleDelay{1}; // Not a timeout! See application file.
-
 void recordFault(sDBMessageExchange& exchange, const ecDBServiceFaultReason reason) {
     ecDBServiceFaultReason expected = ecDBServiceFaultReason::None;
     static_cast<void>(exchange.faultReason.compare_exchange_strong(expected, reason));
@@ -145,14 +143,22 @@ void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
 
         while(!stopToken.stop_requested()) 
         {
-            // TODO: change from throw to better handling
-
             /*** Read ***/
             std::optional<sDBInboundSnapshot> maybeInSnap = readSnapshot();
-            if(!maybeInSnap.has_value()) throw;
+            if(!maybeInSnap.has_value()) 
+            {
+                exchange_.droppedEventCount.fetch_add(1);
+                recordFault(exchange_, ecDBServiceFaultReason::FailedRead);
+                continue;
+            }
             sDBInboundSnapshot snap = maybeInSnap.value();
             std::optional<sSupervisoryEvent> maybeEvent = inboundSnapshotToSupervisoryEvent(snap);
-            if(!maybeEvent.has_value()) throw;
+            if(!maybeEvent.has_value())
+            {
+                exchange_.droppedEventCount.fetch_add(1);
+                recordFault(exchange_, ecDBServiceFaultReason::FailedRead);
+                continue;
+            }
             sSupervisoryEvent event = maybeEvent.value();
             if(!exchange_.readEvents.tryPush(event)) 
             {
@@ -169,11 +175,23 @@ void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
                 recordFault(exchange_, ecDBServiceFaultReason::OutboundQueueFull);
             } else {
                 std::optional<sDBOutboundSnapshot> maybeOutSnap = supervisoryStateToOutboundSnapshot(state);
-                if(!maybeOutSnap.has_value()) throw;
+                if(!maybeOutSnap.has_value())
+                {
+                    exchange_.writeFailureCount.fetch_add(1);
+                    recordFault(exchange_, ecDBServiceFaultReason::FailedWrite);
+                    continue;
+                }
+                sDBOutboundSnapshot outSnap = maybeOutSnap.value();
+                if(!writeSnapshot(outSnap))
+                {
+                    exchange_.writeFailureCount.fetch_add(1);
+                    recordFault(exchange_, ecDBServiceFaultReason::FailedWrite);
+                    continue;
+                }
             }
             
         }
-;
+
         exchange_.databaseState.store(ecDBServiceState::Stopped);
     } 
     catch (...) 
@@ -199,6 +217,7 @@ std::optional<sDBInboundSnapshot> cDBMessageService::readSnapshot() const {
     return std::nullopt;
 }
 
+// TODO: This function may need to be passed the supervisory controllers state as well
 std::optional<sSupervisoryEvent> cDBMessageService::inboundSnapshotToSupervisoryEvent(sDBInboundSnapshot& snap) const {
     std::optional<sSupervisoryEvent> event;
     if(isValidFloor(snap.requestedFloor, config_)) {
