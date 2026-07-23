@@ -10,10 +10,12 @@
 #include <mysql_connection.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
+#include <cppconn/prepared_statement.h>
 #include <thread>
 #include "supervisory/common/event.hpp"
 #include "supervisory/common/result.hpp"
 #include "supervisory/common/spsc_queue.hpp"
+#include "supervisory/control/supervisory_state_machine.hpp"
 #include "supervisory/database/database_tables.hpp"
 
 namespace project6::supervisory
@@ -24,6 +26,8 @@ struct sDBServiceConfig {
     sql::SQLString user     = "pi";
     sql::SQLString password = "ese";
     sql::SQLString database = "elevatorg1";
+    std::uint8_t   minFloor = 1;
+    std::uint8_t   maxFloor = 3;
 };
 
 /** @brief database worker lifecycle state */
@@ -50,7 +54,7 @@ struct sDBMessageExchange {
     /** @brief DATABASE-to-CONTROL events. */
     cSpscQueue<sSupervisoryEvent, 64> readEvents;
     /** @brief CONTROL-to-DATABASE messages. */
-    cSpscQueue<sSupervisoryEvent, 64> writtenMessages;
+    cSpscQueue<sSupervisoryStateSnapshot, 64> writableSnapshots;
     /** Messages read from Database. */
     std::atomic<std::uint64_t> readCount{0};
     /** Events rejected by a full queue. */
@@ -103,16 +107,39 @@ private:
     sql::Driver*            driver_;
     sql::Connection*        connection_;
     const sDBServiceConfig& config_;
+    // Prepared statments
+    const char* writeSnapshotStmtQuery_ = "\
+        INSERT INTO elevatorNetwork(\
+            currentFloor,\
+            floorRequest1,\
+            floorRequest2,\
+            floorRequest3,\
+            carRequestFloor1,\
+            carRequestFloor2,\
+            carRequestFloor3,\
+            doorsOpen\
+        ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )";
+    std::unique_ptr<sql::PreparedStatement> writeSnapshotStmt_;
     // thread data
     sDBMessageExchange& exchange_;
     std::jthread        worker_;
 
     /*** Private methods ***/
+
+    /** @brief main function for the thread (also handles thread failures with std::stop_token)*/
     void run(const std::stop_token& stopToken) const noexcept;
-    [[nodiscard]] std::optional<sDBInboundSnapshot> readSnapshot() const;
-    [[nodiscard]] std::optional<sSupervisoryEvent> inboundSnapshotToSupervisoryEvent(sDBInboundSnapshot& snap) const;
-    [[nodiscard]] sDBInboundSnapshot supervisoryEventToOutboundSnapshot(sSupervisoryEvent& snap) const;
-    [[nodiscard]] bool writeSnapshot(sDBOutboundSnapshot snap) const;
+    /** @brief read a snapshot from the database (only the gui requests table)*/
+    [[nodiscard]] 
+    std::optional<sDBInboundSnapshot> readSnapshot() const;
+    /** @brief convert inbound snapshot to supervisory event to be sent to control thread */
+    [[nodiscard]] 
+    std::optional<sSupervisoryEvent> inboundSnapshotToSupervisoryEvent(sDBInboundSnapshot& snap) const;
+    /** @brief convert supervisory event to outbound snapshot to be written to database */
+    [[nodiscard]] 
+    std::optional<sDBOutboundSnapshot> supervisoryStateToOutboundSnapshot(sSupervisoryStateSnapshot& state) const;
+    /** @brief write outbound snapshot to database */
+    [[nodiscard]] 
+    bool writeSnapshot(sDBOutboundSnapshot snap) const;
 };
 
 }

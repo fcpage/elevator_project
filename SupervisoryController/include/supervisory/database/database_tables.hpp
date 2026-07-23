@@ -12,25 +12,18 @@
 namespace project6::supervisory
 {
 
-enum class ecDBFloorValues : std::uint8_t {
-    None,
-    Floor1,
-    Floor2,
-    Floor3,
-};
-
 struct sDBInboundSnapshot {
     std::int32_t index;
     // std::time_t  date; TODO: add these (not sure which methods support this)
     // std::time_t  time;
-    ecDBFloorValues requestedFloor;
+    std::uint8_t requestedFloor;
 };
 
 struct sDBOutboundSnapshot {
     std::int32_t index;
     // std::time_t  date; TODO: add these (not sure which methods support this)
     // std::time_t  time;
-    ecDBFloorValues currentFloor;
+    std::uint8_t currentFloor;
     bool floorRequest1;
     bool floorRequest2;
     bool floorRequest3;
@@ -40,27 +33,6 @@ struct sDBOutboundSnapshot {
     bool doorsOpen;
 };
 
-
-static inline std::ostream& operator<<(std::ostream& os, const ecDBFloorValues& floor) {
-    switch(floor) {
-        case ecDBFloorValues::Floor1: {
-            os << "Floor1";
-            break;
-        }
-        case ecDBFloorValues::Floor2: {
-            os << "Floor2";
-            break;
-        }
-        case ecDBFloorValues::Floor3: {
-            os << "Floor3";
-            break;
-        }
-        case ecDBFloorValues::Moving: {
-            os << "Moving";
-            break;
-        }
-    }
-}
 
 static inline std::ostream& operator<<(std::ostream& os, const sDBInboundSnapshot& snap) {
     os  << "sDBSnapshot = {\n" 
