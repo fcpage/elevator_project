@@ -12,35 +12,76 @@
 namespace project6::supervisory
 {
 
-struct sDBSnapshot {
-    std::int32_t index;
-    std::time_t  date;
-    std::time_t  time;
-    std::int32_t nodeID;
-    std::uint8_t sender;
-    std::uint8_t receiver;
-    std::uint8_t currentFloor;
-    std::uint8_t requestFloor;
-    std::uint8_t status;
-    bool queued;
-    bool served;
+enum class ecDBFloorValues : std::uint8_t {
+    None,
+    Floor1,
+    Floor2,
+    Floor3,
 };
 
-static inline std::ostream& operator<<(std::ostream& os, const sDBSnapshot& snap) {
+struct sDBInboundSnapshot {
+    std::int32_t index;
+    // std::time_t  date; TODO: add these (not sure which methods support this)
+    // std::time_t  time;
+    ecDBFloorValues requestedFloor;
+};
+
+struct sDBOutboundSnapshot {
+    std::int32_t index;
+    // std::time_t  date; TODO: add these (not sure which methods support this)
+    // std::time_t  time;
+    ecDBFloorValues currentFloor;
+    bool floorRequest1;
+    bool floorRequest2;
+    bool floorRequest3;
+    bool carRequestFloor1;
+    bool carRequestFloor2;
+    bool carRequestFloor3;
+    bool doorsOpen;
+};
+
+
+static inline std::ostream& operator<<(std::ostream& os, const ecDBFloorValues& floor) {
+    switch(floor) {
+        case ecDBFloorValues::Floor1: {
+            os << "Floor1";
+            break;
+        }
+        case ecDBFloorValues::Floor2: {
+            os << "Floor2";
+            break;
+        }
+        case ecDBFloorValues::Floor3: {
+            os << "Floor3";
+            break;
+        }
+        case ecDBFloorValues::Moving: {
+            os << "Moving";
+            break;
+        }
+    }
+}
+
+static inline std::ostream& operator<<(std::ostream& os, const sDBInboundSnapshot& snap) {
     os  << "sDBSnapshot = {\n" 
-        << "\tindex = " << snap.index
-        << "\tdate = " << snap.date
-        << "\ttime = " << snap.time
-        << "\tnodeID = " << snap.nodeID
-        << "\tsender = " << snap.sender
-        << "\treceiver = " << snap.receiver
-        << "\tcurrentFloor = " << snap.currentFloor
-        << "\trequestFloor = " << snap.requestFloor
-        << "\tstatus = " << snap.status
-        << "\tqueued = " << snap.queued
+        << "\trequestedFloor = " << snap.requestedFloor << '\n'
+        << "\tindex = " << snap.index << '\n'
         << "};\n";
     return os;
 }
 
+static inline std::ostream& operator<<(std::ostream& os, const sDBOutboundSnapshot& snap) {
+    os  << "sDBSnapshot = {\n" 
+        << "\tcurrentFloor = " << snap.currentFloor << '\n'
+        << "\tfloorRequest1 = " << snap.floorRequest1 << '\n'
+        << "\tfloorRequest2 = " << snap.floorRequest2 << '\n'
+        << "\tfloorRequest3 = " << snap.floorRequest3 << '\n'
+        << "\tcarRequestFloor1 = " << snap.carRequestFloor1 << '\n'
+        << "\tcarRequestFloor2 = " << snap.carRequestFloor2 << '\n'
+        << "\tcarRequestFloor3 = " << snap.carRequestFloor3 << '\n'
+        << "\tdoorsOpen = " << snap.doorsOpen << '\n'
+        << "};\n";
+    return os;
+}
 
 } // namespace project6::supervisory

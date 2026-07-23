@@ -127,17 +127,14 @@ void cDBMessageService::close() {
 }
 
 void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
-    std::ofstream file("test.txt");
-    file << "Hello from database thread!" << '\n';
     try 
     {
         exchange_.databaseState.store(ecDBServiceState::Running);
 
         while(!stopToken.stop_requested()) {
-            std::optional<sDBSnapshot> snap = getDBSnapshot();
-            if(snap == std::nullopt) throw;
-            sDBSnapshot snap_value = snap.value();
-            file << snap_value << std::endl;
+            std::optional<sDBInboundSnapshot> result = readSnapshot();
+            if(result == std::nullopt) throw;
+            sDBInboundSnapshot snap = result.value();
             // TODO: Send the snapshot to main thread
         }
 
@@ -150,32 +147,47 @@ void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
     }
 }
 
-std::optional<sDBSnapshot> cDBMessageService::getDBSnapshot() const {
-    if(auto choice = query("SELECT * FROM elevatorNetwork"); choice.err()) {
+std::optional<sDBInboundSnapshot> cDBMessageService::readSnapshot() const {
+    if(auto choice = query("SELECT * FROM guiRequests"); choice.err()) {
         std::cerr << "query failed: " << operationStatusMessage(choice.status()) << '\n';
     } else {
         std::unique_ptr<sql::ResultSet>result{choice.value()};
-        // TODO: Handle null result
-        sDBSnapshot snap = {
+        sDBInboundSnapshot snap = {
             .index = result->getInt("index"),
-            // .date = result->getDate("date"), // TODO: what type should this be?
-            // .time = result->getTime("time"), // TODO: what type should this be?
-            .nodeID = result->getInt("nodeID"),
-            .sender = static_cast<uint8_t>(result->getUInt("sender")),
-            .receiver = static_cast<uint8_t>(result->getInt("reciever")),
-            .currentFloor = static_cast<uint8_t>(result->getInt("currentFloor")),
-            .requestFloor = static_cast<uint8_t>(result->getInt("requestFloor")),
-            .status = static_cast<uint8_t>(result->getInt("status")),
-            .queued = result->getBoolean("queued"),
-            .served = result->getBoolean("served"),
+            .requestedFloor = static_cast<ecDBFloorValues>(result->getInt("requestedFloor")),
         };
-        return std::optional<sDBSnapshot>{snap};
+        return std::optional<sDBInboundSnapshot>{snap};
     }
     return std::nullopt;
 }
 
-sSupervisoryEvent cDBMessageService::snapshotToSupervisoryEvent(sDBSnapshot snap) const {
-     
+std::optional<sSupervisoryEvent> cDBMessageService::inboundSnapshotToSupervisoryEvent(sDBInboundSnapshot& snap) const {
+    std::optional<sSupervisoryEvent> event;
+    switch (snap.requestedFloor) {
+        case ecDBFloorValues::Floor1: {
+            event = {
+                .type = ecEventType::DatabaseFloorRequest,
+            };
+            break;
+        }
+        case ecDBFloorValues::Floor2: {
+            break;
+        }
+        case ecDBFloorValues::Floor3: {
+            break;
+        }
+        case ecDBFloorValues::None: {
+            break;
+        }
+    }
+}
+
+sDBInboundSnapshot cDBMessageService::supervisoryEventToOutboundSnapshot(sSupervisoryEvent& snap) const {
+
+}
+
+bool cDBMessageService::writeSnapshot(sDBOutboundSnapshot snap) const {
+
 }
 
 } // project6::supervisory

@@ -109,8 +109,10 @@ private:
 
     /*** Private methods ***/
     void run(const std::stop_token& stopToken) const noexcept;
-    [[nodiscard]] std::optional<sDBSnapshot> getDBSnapshot() const;
-    [[nodiscard]] sSupervisoryEvent snapshotToSupervisoryEvent(sDBSnapshot snap) const;
+    [[nodiscard]] std::optional<sDBInboundSnapshot> readSnapshot() const;
+    [[nodiscard]] std::optional<sSupervisoryEvent> inboundSnapshotToSupervisoryEvent(sDBInboundSnapshot& snap) const;
+    [[nodiscard]] sDBInboundSnapshot supervisoryEventToOutboundSnapshot(sSupervisoryEvent& snap) const;
+    [[nodiscard]] bool writeSnapshot(sDBOutboundSnapshot snap) const;
 };
 
 }
