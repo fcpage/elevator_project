@@ -78,7 +78,7 @@ int main(const int argumentCount, char* arguments[])
     sDBMessageExchange dbExchange;
     sCanExchange canExchange;
     cCanCommsService commsService(canConfig, canExchange);
-    cSupervisoryApplication application(canExchange);
+    cSupervisoryApplication application(canExchange, dbExchange);
     cDBMessageService database(dbConfig, dbExchange);
 
     if (const ecOperationStatus status = commsService.initializeService(); status != ecOperationStatus::Ok)

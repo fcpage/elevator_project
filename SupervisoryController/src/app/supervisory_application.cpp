@@ -80,9 +80,11 @@ void logNodeHbError(const std::uint16_t sourceId, const std::uint8_t nodeMask)
 } // namespace
 
 cSupervisoryApplication::cSupervisoryApplication(
-    sCanExchange& exchange,
+    sCanExchange& canExchange,
+    sDBMessageExchange& databaseExchange,
     const ecNodeHbFailureMode nodeHbFailureMode)
-    : exchange_(exchange), nodeHbFailureMode_(nodeHbFailureMode)
+    : canExchange_(canExchange), databaseExchange_(databaseExchange), 
+    nodeHbFailureMode_(nodeHbFailureMode)
 {
 }
 
@@ -91,15 +93,28 @@ ecOperationStatus cSupervisoryApplication::runControlCycle(
 {
     checkCommsHealth(elapsedMs);
 
+    // Drain can queue
     for (std::size_t count = 0; count < kMaximumEventsPerCycle; ++count)
     {
         sSupervisoryEvent event{};
-        if (!exchange_.receivedEvents.tryPop(event))
+        if (!canExchange_.receivedEvents.tryPop(event))
         {
             break;
         }
         appStateMachine_.handleEvent(event);
         publishPendingFrame();
+    }
+
+    // Drain database queue
+    for (std::size_t count = 0; count < kMaximumEventsPerCycle; ++count)
+    {
+        sSupervisoryEvent event{};
+        if (!databaseExchange_.readEvents.tryPop(event))
+        {
+            break;
+        }
+        appStateMachine_.handleEvent(event);
+        publishSnapshot();
     }
 
     sSupervisoryEvent timerEvent{};
@@ -121,13 +136,13 @@ sSupervisoryStateSnapshot cSupervisoryApplication::snapshot() const
 sCanCommsHealthSnapshot cSupervisoryApplication::canHealth() const
 {
     return {
-        exchange_.commsState.load(),
-        exchange_.faultReason.load(),
-        exchange_.commsProgress.load(),
-        exchange_.receivedFrameCount.load(),
-        exchange_.droppedEventCount.load(),
-        exchange_.transmittedFrameCount.load(),
-        exchange_.transmitFailureCount.load(),
+        canExchange_.commsState.load(),
+        canExchange_.faultReason.load(),
+        canExchange_.commsProgress.load(),
+        canExchange_.receivedFrameCount.load(),
+        canExchange_.droppedEventCount.load(),
+        canExchange_.transmittedFrameCount.load(),
+        canExchange_.transmitFailureCount.load(),
         expectedNodeHbReplyMask_,
         receivedNodeHbReplyMask_,
         missedNodeHbReplyMask_,
@@ -138,9 +153,17 @@ void cSupervisoryApplication::publishPendingFrame()
 {
     // If we have a frame, and we cannot push that frame to the transmit queue fault.
     if (const std::optional<sCanFrame> frame = appStateMachine_.tryTakePendingCanFrame();
-        frame.has_value() && !exchange_.transmitFrames.tryPush(*frame))
+        frame.has_value() && !canExchange_.transmitFrames.tryPush(*frame))
     {
         faultComms(ecCanCommsFaultReason::OutboundQueueFull);
+    }
+}
+
+void cSupervisoryApplication::publishSnapshot() {
+    if (const std::optional<sSupervisoryStateSnapshot> snapshot = appStateMachine_.snapshot();
+        snapshot.has_value() && !databaseExchange_.writableSnapshots.tryPush(*snapshot))
+    {
+        std::cerr << "ERROR: Supervisory snapshot not writable to database." << std::endl;
     }
 }
 
@@ -154,20 +177,20 @@ void cSupervisoryApplication::checkCommsHealth(
     }
 
     // Reset stale progress counter if the progress counter has changed since last check
-    if (const std::uint64_t progress = exchange_.commsProgress.load(); progress != lastCommsProgress_)
+    if (const std::uint64_t progress = canExchange_.commsProgress.load(); progress != lastCommsProgress_)
     {
         lastCommsProgress_ = progress;
         staleCommsProgressElapsed_ = std::chrono::milliseconds{0};
     }
     // Else if it is the same value the comms are hanging, add the elapsed ms.
-    else if (exchange_.commsState.load() == ecCanCommsState::Running)
+    else if (canExchange_.commsState.load() == ecCanCommsState::Running)
     {
         staleCommsProgressElapsed_ += elapsedMs;
     }
 
     // Check for standard comm failures
-    const std::uint64_t droppedEvents = exchange_.droppedEventCount.load();
-    const std::uint64_t transmitFailures = exchange_.transmitFailureCount.load();
+    const std::uint64_t droppedEvents = canExchange_.droppedEventCount.load();
+    const std::uint64_t transmitFailures = canExchange_.transmitFailureCount.load();
     const bool didDropEvent = droppedEvents != lastDroppedEventCount_;
     const bool didTransmitFail = transmitFailures != lastTransmitFailureCount_;
 
@@ -182,9 +205,9 @@ void cSupervisoryApplication::checkCommsHealth(
     {
         faultComms(ecCanCommsFaultReason::TransmitFailed);
     }
-    else if (exchange_.commsState.load() == ecCanCommsState::Failed)
+    else if (canExchange_.commsState.load() == ecCanCommsState::Failed)
     {
-        const ecCanCommsFaultReason reason = exchange_.faultReason.load();
+        const ecCanCommsFaultReason reason = canExchange_.faultReason.load();
         faultComms(
             reason == ecCanCommsFaultReason::None
                 ? ecCanCommsFaultReason::ThreadFailed
@@ -202,7 +225,7 @@ void cSupervisoryApplication::processNodeHbCycle(
     sNodeHbMessage message{};
 
     // Pull received HB messages from the SPSC queue
-    while (exchange_.receivedNodeHbMessages.tryPop(message))
+    while (canExchange_.receivedNodeHbMessages.tryPop(message))
     {
         handleNodeHbMessage(message);
     }
@@ -281,7 +304,7 @@ void cSupervisoryApplication::publishNodeHbFrame(const ecNodeHb type)
 {
     // If we have Hb frames to transmit and they fail to push to the outbound queue fault
     if (const std::optional<sCanFrame> frame = makeNodeHbFrame(kSupervisoryControllerCanId, type);
-        frame.has_value() && !exchange_.transmitFrames.tryPush(*frame))
+        frame.has_value() && !canExchange_.transmitFrames.tryPush(*frame))
     {
         faultComms(ecCanCommsFaultReason::OutboundQueueFull);
     }
@@ -339,7 +362,7 @@ void cSupervisoryApplication::faultControl(const ecCanCommsFaultReason reason)
      *  We're using the strong variant over the weak variant to protect against spurious failures.
      *  Note: it compares the object representation (until C++20, and value representation after).
     *******************************************************************************************/
-    static_cast<void>(exchange_.faultReason.compare_exchange_strong(expected, reason));
+    static_cast<void>(canExchange_.faultReason.compare_exchange_strong(expected, reason));
     isControlFaultLatched_ = true;
 
     sSupervisoryEvent event{};
@@ -355,7 +378,7 @@ void cSupervisoryApplication::faultComms(const ecCanCommsFaultReason reason)
     }
 
     ecCanCommsFaultReason expected = ecCanCommsFaultReason::None;
-    static_cast<void>(exchange_.faultReason.compare_exchange_strong(expected, reason));
+    static_cast<void>(canExchange_.faultReason.compare_exchange_strong(expected, reason));
     isControlFaultLatched_ = true;
 
     // Try and restart with default configuration.

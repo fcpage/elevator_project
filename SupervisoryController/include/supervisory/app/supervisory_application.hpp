@@ -14,6 +14,7 @@
 #include "supervisory/can/can_comms_service.hpp"
 #include "supervisory/common/result.hpp"
 #include "supervisory/control/supervisory_state_machine.hpp"
+#include "supervisory/database/database_message_service.hpp"
 
 namespace project6::supervisory
 {
@@ -56,7 +57,8 @@ public:
      *        heartbeat verification window.
      */
     explicit cSupervisoryApplication(
-        sCanExchange& exchange,
+        sCanExchange& canExchange,
+        sDBMessageExchange& databaseExchange,
         ecNodeHbFailureMode nodeHbFailureMode = ecNodeHbFailureMode::FaultControl);
 
     /**
@@ -75,6 +77,8 @@ public:
 private:
     /** @brief Moves a generated frame to COMMS. */
     void publishPendingFrame();
+    /** @brief Moves a generated state machine snapshot to database. */
+    void publishSnapshot();
     /** @brief Detects COMMS failure or timeout. */
     void checkCommsHealth(std::chrono::milliseconds elapsedMs);
     /** @brief Drains and schedules node heartbeat messages. */
@@ -100,7 +104,9 @@ private:
     void faultComms(ecCanCommsFaultReason reason);
 
     /** Shared COMMS exchange. */
-    sCanExchange& exchange_;
+    sCanExchange& canExchange_;
+    /** Shared DATABASE exchange. */
+    sDBMessageExchange& databaseExchange_;
     /** CONTROL-owned state machine. */
     cSupervisoryStateMachineAPI appStateMachine_;
     /** Last observed COMMS worker progress counter. */

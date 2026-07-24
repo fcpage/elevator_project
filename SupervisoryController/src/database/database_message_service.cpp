@@ -7,7 +7,6 @@
 #include "supervisory/database/database_message_service.hpp"
 #include "supervisory/common/result.hpp"
 #include <iostream>
-#include <fstream>
 #include <optional>
 
 namespace project6::supervisory
