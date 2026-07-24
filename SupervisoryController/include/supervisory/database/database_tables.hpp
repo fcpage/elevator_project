@@ -13,14 +13,14 @@ namespace project6::supervisory
 {
 
 struct sDBInboundSnapshot {
-    std::int32_t index;
+    std::uint32_t index;
     // std::time_t  date; TODO: add these (not sure which methods support this)
     // std::time_t  time;
     std::uint8_t requestedFloor;
 };
 
 struct sDBOutboundSnapshot {
-    std::int32_t index;
+    std::uint32_t index;
     // std::time_t  date; TODO: add these (not sure which methods support this)
     // std::time_t  time;
     std::uint8_t currentFloor;

@@ -102,17 +102,6 @@ int main(const int argumentCount, char* arguments[])
         return 1;
     }
 
-    /* TEMP: Test query to test connection with database */
-    if(auto choice = database.query("SELECT * FROM guiRequests;"); choice.err()) {
-        std::cerr << "query failed: " << operationStatusMessage(choice.status()) << '\n';
-    } else {
-        std::unique_ptr<sql::ResultSet>result{choice.value()};
-        while (result->next()) {
-            std::cout << "index: " << result->getString("index") << std::endl;
-            std::cout << "requestedFloor: " << result->getString("requestFloor") << std::endl;
-        }
-    }
-
     std::signal(SIGINT, handleShutdownSignal);
     std::signal(SIGTERM, handleShutdownSignal);
 

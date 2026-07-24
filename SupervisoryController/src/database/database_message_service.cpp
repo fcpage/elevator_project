@@ -93,27 +93,32 @@ cDBMessageService::~cDBMessageService()
 
 [[nodiscard]] sChoice<ecOperationStatus, sql::ResultSet*> cDBMessageService::query(const char* query) const noexcept
 {
+    sql::ResultSet* result;
     // Unlikely attribute helps branch prediction for unlikely control flow
     if(connection_ == nullptr || driver_ == nullptr) [[unlikely]] {
-        std::cout << "ERROR: Uninitialized driver or connection.";
+        std::cerr << "ERROR: Uninitialized driver or connection.";
         return { ecOperationStatus::DatabaseException };
     }
     try {
         std::unique_ptr<sql::Statement>stmt{connection_->createStatement()}; 
-        return { stmt->executeQuery(query) };
+        result = stmt->executeQuery(query);
     } catch (sql::SQLException& e) {
         /*  handles these:
          * sql::MethodNotImplementedException (derived from sql::SQLException), 
          * sql::InvalidArgumentException (derived from sql::SQLException), 
          * sql::SQLException (derived from std::runtime_error)
          */
-        std::cout << "ERROR: SQLEception in " << __FUNCTION__;
-        std::cout << "from file " << __FILE__ << " on line " << __LINE__ << '\n';
-        std::cout << "ERROR: " << e.what();
-        std::cout << "(MySQL error code: " << e.getErrorCode();
-        std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
+        std::cerr << "ERROR: SQLEception in " << __FUNCTION__;
+        std::cerr << " from file " << __FILE__ << " on line " << __LINE__ << '\n';
+        std::cerr << "ERROR: " << e.what();
+        std::cerr << "(MySQL error code: " << e.getErrorCode();
+        std::cerr << ", SQLState: " << e.getSQLState() << ")" << std::endl;
+        return { ecOperationStatus::DatabaseException };
+    } catch (...) {
+        std::cerr << "ERROR: Unspecified exception" << std::endl;
         return { ecOperationStatus::DatabaseException };
     }
+    return { result };
 }
 
 void cDBMessageService::stop() {
@@ -188,7 +193,9 @@ void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
                     continue;
                 }
             }
-            
+
+            std::chrono::milliseconds delay{1000};
+            std::this_thread::sleep_for(delay);
         }
 
         exchange_.databaseState.store(ecDBServiceState::Stopped);
@@ -201,25 +208,30 @@ void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
 }
 
 std::optional<sDBInboundSnapshot> cDBMessageService::readSnapshot() const {
+    sDBInboundSnapshot snap{};
+
     if(auto choice = query("SELECT * FROM guiRequests;"); choice.err()) {
         std::cerr << "query failed: " << operationStatusMessage(choice.status()) << '\n';
     } else {
-        std::unique_ptr<sql::ResultSet>result{choice.value()};
-        /* NOTE: There is no way to ensure that the requested floor is not out-of-bounds 
-         * but we know that it *should* be TINYINT (4-bytes) */
-        sDBInboundSnapshot snap = {
-            .index = result->getInt("index"),
-            .requestedFloor = static_cast<std::uint8_t>(result->getInt("requestFloor")),
-        };
-        return std::optional<sDBInboundSnapshot>{snap};
+        try {
+            std::unique_ptr<sql::ResultSet>result{choice.value()};
+            while (result->next()) {
+                snap.index = result->getUInt("index");
+                snap.requestedFloor = result->getUInt("requestedFloor");
+            }
+        } catch (...) {
+            std::cerr << "ERROR: Invalid field from query." << std::endl;
+            return std::nullopt;
+        }
     }
-    return std::nullopt;
+
+    return std::optional<sDBInboundSnapshot>{snap};
 }
 
 // TODO: This function may need to be passed the supervisory controllers state as well
 std::optional<sSupervisoryEvent> cDBMessageService::inboundSnapshotToSupervisoryEvent(sDBInboundSnapshot& snap) const {
     std::optional<sSupervisoryEvent> event;
-    if(isValidFloor(snap.requestedFloor, config_)) {
+    if(!isValidFloor(snap.requestedFloor, config_)) {
         event = std::nullopt;
     } else {
         event = {
@@ -267,7 +279,7 @@ bool cDBMessageService::writeSnapshot(sDBOutboundSnapshot snap) const {
         writeSnapshotStmt_->setBoolean(7, snap.carRequestFloor3);
         writeSnapshotStmt_->setBoolean(8, snap.doorsOpen);
         writeSnapshotStmt_->executeUpdate();
-    } catch (sql::SQLException& e) {
+    } catch (...) {
         return false; 
     }
     return true;
