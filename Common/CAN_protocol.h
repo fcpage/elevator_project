@@ -91,6 +91,10 @@ enum CAN_NAMESPACE(Messages, uint8_t) {
     SC_POS_FLOOR_1  = CAN_FLOOR_BITS(1) | EXTENDED_MSG,
     SC_POS_FLOOR_2  = CAN_FLOOR_BITS(2) | EXTENDED_MSG,
     SC_POS_FLOOR_3  = CAN_FLOOR_BITS(3) | EXTENDED_MSG,
+
+    /* Supervisory controller commands for the car door controller. */
+    SC_DOOR_OPEN    = EXTENDED_MSG | 0b1000,
+    SC_DOOR_CLOSE   = EXTENDED_MSG | 0b1001,
 #endif
 };
 

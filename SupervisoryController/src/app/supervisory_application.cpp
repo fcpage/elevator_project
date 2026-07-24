@@ -88,6 +88,7 @@ cSupervisoryApplication::cSupervisoryApplication(
 {
 }
 
+// Main Loop
 ecOperationStatus cSupervisoryApplication::runControlCycle(
     const std::chrono::milliseconds elapsedMs)
 {
@@ -152,10 +153,19 @@ sCanCommsHealthSnapshot cSupervisoryApplication::canHealth() const
 void cSupervisoryApplication::publishPendingFrame()
 {
     // If we have a frame, and we cannot push that frame to the transmit queue fault.
-    if (const std::optional<sCanFrame> frame = appStateMachine_.tryTakePendingCanFrame();
-        frame.has_value() && !canExchange_.transmitFrames.tryPush(*frame))
+    while (true)
     {
-        faultComms(ecCanCommsFaultReason::OutboundQueueFull);
+        const std::optional<sCanFrame> frame = appStateMachine_.tryTakePendingCanFrame();
+        if (!frame.has_value())
+        {
+            return;
+        }
+
+        if (!canExchange_.transmitFrames.tryPush(*frame))
+        {
+            faultComms(ecCanCommsFaultReason::OutboundQueueFull);
+            return;
+        }
     }
 }
 

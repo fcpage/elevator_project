@@ -71,6 +71,25 @@ int main()
     require(exchange.transmitFrames.tryPop(command), "control cycle did not publish a command");
     require(command.data[0] == 0x07, "control cycle published the wrong command");
 
+    sSupervisoryEvent arrival{};
+    arrival.type = ecEventType::CanElevatorStatus;
+    arrival.reportedFloor = 3;
+    require(exchange.receivedEvents.tryPush(arrival), "arrival setup failed");
+    require(
+        application.runControlCycle(10ms) == ecOperationStatus::Ok,
+        "control cycle rejected an elevator arrival");
+    require(exchange.transmitFrames.tryPop(command), "arrival did not publish a hall-light command");
+    require(command.data[0] == 0x83, "arrival published the wrong hall-light command");
+    require(exchange.transmitFrames.tryPop(command), "arrival did not publish a door-open command");
+    require(command.data[0] == 0x88, "arrival published the wrong door-open command");
+
+    markCommsProgress(exchange);
+    require(
+        application.runControlCycle(3s) == ecOperationStatus::Ok,
+        "control cycle rejected the door dwell timeout");
+    require(exchange.transmitFrames.tryPop(command), "arrival exit did not publish a door-close command");
+    require(command.data[0] == 0x89, "arrival exit published the wrong door-close command");
+
     require(
         application.runControlCycle(249ms) == ecOperationStatus::Ok,
         "control cycle stopped while COMMS progress was stale");
