@@ -83,11 +83,11 @@ cDBMessageService::~cDBMessageService()
     // TODO: Consider adding date check
 
     // Worker thread initialization
-    worker_ = std::jthread([this](const std::stop_token stopToken){
-        run(stopToken);
-    });
-
-    if(!worker_.joinable()) return ecOperationStatus::NotInitialized;
+    // worker_ = std::jthread([this](const std::stop_token stopToken){
+    //     run(stopToken);
+    // });
+    //
+    // if(!worker_.joinable()) return ecOperationStatus::NotInitialized;
     return ecOperationStatus::Ok;
 }
 
@@ -108,7 +108,7 @@ cDBMessageService::~cDBMessageService()
          * sql::SQLException (derived from std::runtime_error)
          */
         std::cout << "ERROR: SQLEception in " << __FUNCTION__;
-        std::cout << "from file " << __FILE__ << "on line " << __LINE__ << std::endl;
+        std::cout << "from file " << __FILE__ << " on line " << __LINE__ << '\n';
         std::cout << "ERROR: " << e.what();
         std::cout << "(MySQL error code: " << e.getErrorCode();
         std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;

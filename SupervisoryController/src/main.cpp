@@ -102,15 +102,15 @@ int main(const int argumentCount, char* arguments[])
         return 1;
     }
 
-    // /* TEMP: Test query to test connection with database */
-    // if(auto choice = database.query("SELECT 'Database Connection Established' AS _message"); choice.err()) {
-    //     std::cerr << "query failed: " << operationStatusMessage(choice.status()) << '\n';
-    // } else {
-    //     std::unique_ptr<sql::ResultSet>result{choice.value()};
-    //     while (result->next()) {
-    //         std::cout << "MySQL Reply: " << result->getString("_message") << std::endl;
-    //     }
-    // }
+    /* TEMP: Test query to test connection with database */
+    if(auto choice = database.query("SELECT * FROM guiRequests;"); choice.err()) {
+        std::cerr << "query failed: " << operationStatusMessage(choice.status()) << '\n';
+    } else {
+        std::unique_ptr<sql::ResultSet>result{choice.value()};
+        while (result->next()) {
+            std::cout << "index: " << result->getString("index") << std::endl;
+        }
+    }
 
     std::signal(SIGINT, handleShutdownSignal);
     std::signal(SIGTERM, handleShutdownSignal);

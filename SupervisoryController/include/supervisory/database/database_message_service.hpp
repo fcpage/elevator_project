@@ -126,8 +126,10 @@ private:
 
     /*** Private methods ***/
 
+public:
     /** @brief main function for the thread (also handles thread failures with std::stop_token)*/
     void run(const std::stop_token& stopToken) const noexcept;
+private:
     /** @brief read a snapshot from the database (only the gui requests table)*/
     [[nodiscard]] 
     std::optional<sDBInboundSnapshot> readSnapshot() const;
