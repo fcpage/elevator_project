@@ -109,6 +109,7 @@ int main(const int argumentCount, char* arguments[])
         std::unique_ptr<sql::ResultSet>result{choice.value()};
         while (result->next()) {
             std::cout << "index: " << result->getString("index") << std::endl;
+            std::cout << "requestedFloor: " << result->getString("requestFloor") << std::endl;
         }
     }
 
