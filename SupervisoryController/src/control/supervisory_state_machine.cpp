@@ -17,16 +17,20 @@
 #include "supervisory/control/supervisory_state_machine.hpp"
 
 #include <chrono>
+#include <cstddef>
 #include <iostream>
 #include <memory>
 #include <optional>
 
 #include "supervisory/can/can_protocol.hpp"
+#include "supervisory/common/spsc_queue.hpp"
 #include "supervisory/drivers/supervisory_drivers.hpp"
 #include "supervisory/scheduler/request_scheduler.hpp"
 
 namespace project6::supervisory
 {
+
+constexpr std::size_t kPendingCanFrameQueueCapacity = 4;
 
 /**
  * @brief Mutable data shared by generated conditions and transition actions.
@@ -55,8 +59,8 @@ struct sStateMachineContext
     /** Latched when elevator status confirms the active target floor. */
     bool didElevatorReportArrival = false;
 
-    /** CAN command waiting for the application to hand to the COMMS thread. */
-    std::optional<sCanFrame> pendingCanFrame;
+    /** Ordered CAN effects waiting for the application to hand to COMMS. */
+    cSpscQueue<sCanFrame, kPendingCanFrameQueueCapacity> pendingCanFrames;
 };
 
 namespace
@@ -160,6 +164,20 @@ bool faultDetected()
     return state->snapshot.isFaulted;
 }
 
+/** Queues a CAN effect without allowing a failed encode or full queue to be ignored. */
+bool enqueuePendingCanFrame(
+    sStateMachineContext& state,
+    const std::optional<sCanFrame>& frame)
+{
+    if (!frame.has_value() || !state.pendingCanFrames.tryPush(*frame))
+    {
+        state.snapshot.isFaulted = true;
+        return false;
+    }
+
+    return true;
+}
+
 /**
  * @brief Promotes the scheduler's highest-priority request into active service.
  *
@@ -182,10 +200,10 @@ void selectNextRequest()
 }
 
 /**
- * @brief Derives travel direction and transmits the active floor command.
+ * @brief Derives travel direction and queues the active floor command.
  *
- * A CAN transmission failure is converted into the latched fault state consumed
- * by the next generated-machine update.
+ * A failed encode or local queue push is converted into the latched fault state
+ * consumed by the next generated-machine update.
  */
 void commandElevatorToTarget()
 {
@@ -211,11 +229,9 @@ void commandElevatorToTarget()
     state->movementElapsedMs = std::chrono::milliseconds{0};
     state->didElevatorReportArrival = false;
 
-    state->pendingCanFrame = makeSupervisorCommandFrame(state->activeRequest->floor, true);
-    if (!state->pendingCanFrame.has_value())
-    {
-        state->snapshot.isFaulted = true;
-    }
+    static_cast<void>(enqueuePendingCanFrame(
+        *state,
+        makeSupervisorCommandFrame(state->activeRequest->floor, true)));
 }
 
 /**
@@ -243,17 +259,29 @@ void recordArrival()
     state->doorOpenElapsedMs = std::chrono::milliseconds{0};
     state->didElevatorReportArrival = false;
 
-    const ecOperationStatus status = drivers::commandDoorOpen();
-    if (status != ecOperationStatus::Ok)
+    if (!state->activeRequest.has_value())
     {
         state->snapshot.isFaulted = true;
+        return;
     }
+
+    // Keep the hall-light clear ahead of the matching door-open command.
+    if (!enqueuePendingCanFrame(
+            *state,
+            makeSupervisorArrivalFrame(state->activeRequest->floor)))
+    {
+        return;
+    }
+
+    static_cast<void>(enqueuePendingCanFrame(
+        *state,
+        makeSupervisorDoorFrame(ecDoorCommand::Open)));
 }
 
 /**
  * @brief Completes the active request when leaving Arrived.
  *
- * Door-close failure is latched as a fault for the following machine update.
+ * A failed door-close encode or queue push is latched for the following update.
  */
 void clearServicedRequest()
 {
@@ -269,11 +297,9 @@ void clearServicedRequest()
     state->doorOpenElapsedMs = std::chrono::milliseconds{0};
     state->movementElapsedMs = std::chrono::milliseconds{0};
 
-    const ecOperationStatus status = drivers::commandDoorClose();
-    if (status != ecOperationStatus::Ok)
-    {
-        state->snapshot.isFaulted = true;
-    }
+    static_cast<void>(enqueuePendingCanFrame(
+        *state,
+        makeSupervisorDoorFrame(ecDoorCommand::Close)));
 }
 
 /** @brief Applies the supervisor's conservative stop behavior after a fault. */
@@ -785,7 +811,7 @@ namespace
      * @return A constant character pointer representing the name of the state. Returns "Unknown"
      *         if the state does not match any known value in `ecSupervisoryControlState`.
      */
-    const char* controlStateName(const ecSupervisoryControlState state)
+const char* controlStateName(const ecSupervisoryControlState state)
 {
     switch (state)
     {
@@ -809,7 +835,7 @@ namespace
     /**
      *
      */
-    const char* directionName(const ecTravelDirection direction)
+const char* directionName(const ecTravelDirection direction)
 {
     switch (direction)
     {
@@ -827,9 +853,7 @@ namespace
     /**
      *
      */
-    bool snapshotsDiffer(
-    const sSupervisoryStateSnapshot& previous,
-    const sSupervisoryStateSnapshot& current)
+bool snapshotsDiffer(const sSupervisoryStateSnapshot& previous, const sSupervisoryStateSnapshot& current)
 {
     return previous.controlState != current.controlState ||
            previous.currentFloor != current.currentFloor ||
@@ -842,28 +866,27 @@ namespace
     /**
      *
      */
-    void logStateChange(
-    const sSupervisoryStateSnapshot& previous,
-    const sSupervisoryStateSnapshot& current)
+void logStateChange(const sSupervisoryStateSnapshot& previous, const sSupervisoryStateSnapshot& current)
 {
     if (!snapshotsDiffer(previous, current))
     {
         return;
     }
 
-    std::clog << "STATE " << controlStateName(previous.controlState)
-              << " -> " << controlStateName(current.controlState)
-              << " current=" << static_cast<unsigned int>(current.currentFloor)
-              << " target=" << static_cast<unsigned int>(current.targetFloor)
-              << " direction=" << directionName(current.direction)
-              << " door_open=" << (current.isDoorOpen ? "true" : "false")
-              << " faulted=" << (current.isFaulted ? "true" : "false") << '\n';
+    std::clog << '\r'
+              << "STATE=" << controlStateName(current.controlState)
+              << " CURRENT=" << static_cast<unsigned int>(current.currentFloor)
+              << " TARGET=" << static_cast<unsigned int>(current.targetFloor)
+              << " DIRECTION=" << directionName(current.direction)
+              << " DOOR_OPEN=" << (current.isDoorOpen ? "true" : "false")
+              << " FAULTED=" << (current.isFaulted ? "true" : "false")
+              << "        " << std::flush;
 }
 
     /**
      *
      */
-    bool isMoving(const ecSupervisoryControlState state)
+bool isMoving(const ecSupervisoryControlState state)
 {
     return state == ecSupervisoryControlState::MovingUp ||
            state == ecSupervisoryControlState::MovingDown;
@@ -962,8 +985,12 @@ sSupervisoryStateSnapshot cSupervisoryStateMachineAPI::snapshot() const
 
 std::optional<sCanFrame> cSupervisoryStateMachineAPI::tryTakePendingCanFrame()
 {
-    std::optional<sCanFrame> frame = smContext_->pendingCanFrame;
-    smContext_->pendingCanFrame.reset();
+    sCanFrame frame{};
+    if (!smContext_->pendingCanFrames.tryPop(frame))
+    {
+        return std::nullopt;
+    }
+
     return frame;
 }
 

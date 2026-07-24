@@ -88,26 +88,30 @@ void CANModule::receiveCAN(LCD lcd) {
     Serial.println();
 
     // Use next line of code to repeat the floor value received every few seconds (later can transmit actual floor number based on distance measurement)
-    txdata[0] = rxdata[0];                                      // Send back the received destination floor number                     
+    if (RxID == 0x100) {
+        txdata[0] = rxdata[0];    /*ADD FILTER*/                                  // Send back the received destination floor number 
+        // Change setpoint and output new destination floor
+        lcd.lcdObj.setCursor(0, 0);                                   // Set cursor to column 0, line 0  (line 1 is second row since counting starts at 0)
+        if (rxdata[0] == FLOOR1) {
+            setpoint = FLOOR1_SP;
+            lcd.lcdObj.print("Floor 1");
+        }
+        else if (rxdata[0] == FLOOR2) {
+            setpoint = FLOOR2_SP;
+            lcd.lcdObj.print("Floor 2");
+        }
+        else if (rxdata[0] == FLOOR3) {
+            setpoint = FLOOR3_SP;
+            lcd.lcdObj.print("Floor 3");
+        }
+        else {
+            setpoint = FLOOR1_SP;
+            lcd.lcdObj.print("Floor 1");
+        }
+    }
+                        
 
-    // Change setpoint and output new destination floor
-    lcd.lcdObj.setCursor(0, 0);                                   // Set cursor to column 0, line 0  (line 1 is second row since counting starts at 0)
-    if (rxdata[0] == FLOOR1) {
-        setpoint = FLOOR1_SP;
-        lcd.lcdObj.print("Floor 1");
-    }
-    else if (rxdata[0] == FLOOR2) {
-        setpoint = FLOOR2_SP;
-        lcd.lcdObj.print("Floor 2");
-    }
-    else if (rxdata[0] == FLOOR3) {
-        setpoint = FLOOR3_SP;
-        lcd.lcdObj.print("Floor 3");
-    }
-    else {
-        setpoint = FLOOR1_SP;
-        lcd.lcdObj.print("Floor 1");
-    }
+    
 }
 
 // Set up CAN communications
