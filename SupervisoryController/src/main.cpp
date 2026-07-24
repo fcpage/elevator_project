@@ -10,12 +10,19 @@
 */
 
 #include "supervisory/app/supervisory_application.hpp"
+#include "supervisory/audio/announcement_service.hpp"
 #include "supervisory/can/can_comms_service.hpp"
+
+#ifdef SUPERVISORY_ENABLE_DEMO_MODES
+#include "supervisory/demo/demo_control.hpp"
+#endif
 
 #include <chrono>
 #include <csignal>
 #include <cstdint>
 #include <iostream>
+#include <cstdlib>
+#include <string>
 #include <thread>
 
 namespace
@@ -37,6 +44,25 @@ constexpr bool kConfigureCanInterfaceOnInitialize = true;
 #endif
 
 volatile std::sig_atomic_t keepRunning = 1;
+
+std::string environmentValue(const char* name, const char* fallback)
+{
+#ifdef _WIN32
+    char* value = nullptr;
+    std::size_t valueLength = 0;
+    if (_dupenv_s(&value, &valueLength, name) == 0 && value != nullptr)
+    {
+        const std::string result(value);
+        std::free(value);
+        return result;
+    }
+    std::free(value);
+    return fallback;
+#else
+    const char* value = std::getenv(name);
+    return value == nullptr ? fallback : value;
+#endif
+}
 
 void handleShutdownSignal(const int signalNumber)
 {
@@ -102,7 +128,25 @@ int main(const int argumentCount, char* arguments[])
         kConfigureCanInterfaceOnInitialize};
     sCanExchange canExchange;
     cCanCommsService commsService(canConfig, canExchange);
-    cSupervisoryApplication application(canExchange);
+    sAnnouncementExchange announcementExchange;
+    const std::string audioDirectory =
+        environmentValue("SUPERVISORY_AUDIO_DIR", "audio");
+    const std::string audioDevice =
+        environmentValue("SUPERVISORY_AUDIO_DEVICE", "Headphones");
+    const sAnnouncementServiceConfig announcementConfig{
+        true,
+        audioDirectory.c_str(),
+        audioDevice.c_str(),
+        1.0F};
+    cAnnouncementService announcementService(announcementConfig, announcementExchange);
+    cSupervisoryApplication application(canExchange, ecNodeHbFailureMode::FaultControl, &announcementService);
+
+#ifdef SUPERVISORY_ENABLE_DEMO_MODES
+    const std::string demoControlPath =
+        environmentValue("SUPERVISORY_DEMO_CONTROL_FILE", "demo_control.txt");
+    cDemoControl demoControl({
+        demoControlPath.c_str()});
+#endif
 
     if (const ecOperationStatus status = commsService.initializeService(); status != ecOperationStatus::Ok)
     {
@@ -116,6 +160,11 @@ int main(const int argumentCount, char* arguments[])
         std::cerr << "supervisory_controller: COMMS start failed: "
                   << operationStatusMessage(status) << '\n';
         return 1;
+    }
+
+    if (!announcementService.start())
+    {
+        std::cerr << "supervisory_controller: announcement service start failed\n";
     }
 
     std::signal(SIGINT, handleShutdownSignal);
@@ -135,6 +184,12 @@ int main(const int argumentCount, char* arguments[])
             iterationStart - previousIteration);
         previousIteration = iterationStart;
         nextIteration += kLoopPeriodMs;
+
+#ifdef SUPERVISORY_ENABLE_DEMO_MODES
+        // Temporary Phase 2 substitute for the unfinished GUI/database path.
+        // The adapter emits the same normalized events a future DB worker must use.
+        demoControl.poll(application);
+#endif
 
         if (const ecOperationStatus runStatus = application.runControlCycle(elapsedMs);
             runStatus != ecOperationStatus::Ok)
@@ -158,6 +213,7 @@ int main(const int argumentCount, char* arguments[])
     }
 
     commsService.stop();
+    announcementService.stop();
     std::clog << "SHUTDOWN reason=signal\n";
     return 0;
 }

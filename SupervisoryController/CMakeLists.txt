@@ -20,6 +20,25 @@ option(
     OFF
 )
 
+option(
+    SUPERVISORY_ENABLE_DEMO_MODES
+    "Read demo_control.txt as a temporary database integration seam."
+    OFF
+)
+
+option(
+    SUPERVISORY_ENABLE_MINIAUDIO
+    "Enable real miniaudio/ALSA playback; otherwise log demo announcements."
+    OFF
+)
+
+set(
+    SUPERVISORY_MINIAUDIO_INCLUDE_DIR
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    CACHE PATH
+    "Directory containing miniaudio.h when real audio is enabled."
+)
+
 find_package(Threads REQUIRED)
 
 set(SUPERVISORY_COMMON_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../Common")
@@ -31,6 +50,8 @@ add_library(project6_supervisory
     src/can/socket_can_adapter.cpp
     src/control/supervisory_state_machine.cpp
     src/drivers/supervisory_drivers.cpp
+    src/audio/announcement_service.cpp
+    src/demo/demo_control.cpp
     src/http/http_server.cpp
     src/scheduler/request_scheduler.cpp
 )
@@ -40,6 +61,21 @@ target_include_directories(project6_supervisory
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         "${SUPERVISORY_COMMON_DIR}"
 )
+
+if(SUPERVISORY_ENABLE_MINIAUDIO)
+    if(NOT EXISTS "${SUPERVISORY_MINIAUDIO_INCLUDE_DIR}/miniaudio.h")
+        message(FATAL_ERROR
+            "SUPERVISORY_ENABLE_MINIAUDIO requires miniaudio.h in "
+            "SUPERVISORY_MINIAUDIO_INCLUDE_DIR. Set it to the directory "
+            "containing miniaudio.h.")
+    endif()
+    target_include_directories(project6_supervisory PRIVATE ${SUPERVISORY_MINIAUDIO_INCLUDE_DIR})
+    target_compile_definitions(project6_supervisory PRIVATE SUPERVISORY_ENABLE_MINIAUDIO=1)
+endif()
+
+if(SUPERVISORY_ENABLE_DEMO_MODES)
+    target_compile_definitions(project6_supervisory PRIVATE SUPERVISORY_ENABLE_DEMO_MODES=1)
+endif()
 
 target_link_libraries(project6_supervisory
     PUBLIC
@@ -155,6 +191,7 @@ target_link_libraries(supervisory_can_comms_service_tests
 add_executable(supervisory_control_loop_tests
     tests/control_loop_tests.cpp
     src/app/supervisory_application.cpp
+    src/audio/announcement_service.cpp
     src/can/can_comms_service.cpp
     src/can/can_protocol.cpp
     src/can/socket_can_adapter.cpp
@@ -171,6 +208,24 @@ target_include_directories(supervisory_control_loop_tests
 target_link_libraries(supervisory_control_loop_tests
     PRIVATE
         Threads::Threads
+)
+
+add_executable(supervisory_modes_audio_tests
+    tests/modes_audio_tests.cpp
+    src/app/supervisory_application.cpp
+    src/audio/announcement_service.cpp
+    src/can/can_comms_service.cpp
+    src/control/supervisory_state_machine.cpp
+    src/drivers/supervisory_drivers.cpp
+    src/can/can_protocol.cpp
+    src/can/socket_can_adapter.cpp
+    src/scheduler/request_scheduler.cpp
+)
+
+target_include_directories(supervisory_modes_audio_tests
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        "${SUPERVISORY_COMMON_DIR}"
 )
 
 add_test(
@@ -201,6 +256,11 @@ add_test(
 add_test(
     NAME supervisory_control_loop_tests
     COMMAND supervisory_control_loop_tests
+)
+
+add_test(
+    NAME supervisory_modes_audio_tests
+    COMMAND supervisory_modes_audio_tests
 )
 
 set(ESEPP_EXECUTABLE

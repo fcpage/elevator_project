@@ -12,7 +12,9 @@
 #include <cstdint>
 
 #include "supervisory/can/can_comms_service.hpp"
+#include "supervisory/audio/announcement_service.hpp"
 #include "supervisory/common/result.hpp"
+#include "supervisory/common/spsc_queue.hpp"
 #include "supervisory/control/supervisory_state_machine.hpp"
 
 namespace project6::supervisory
@@ -57,7 +59,19 @@ public:
      */
     explicit cSupervisoryApplication(
         sCanExchange& exchange,
-        ecNodeHbFailureMode nodeHbFailureMode = ecNodeHbFailureMode::FaultControl);
+        ecNodeHbFailureMode nodeHbFailureMode = ecNodeHbFailureMode::FaultControl,
+        cAnnouncementService* announcementService = nullptr);
+
+    /**
+     * Queues an adapter event for the next control cycle.
+     *
+     * The Phase 2 demo file uses this seam while the database branch is WIP.
+     * The future database service should emit the same normalized events.
+     */
+    [[nodiscard]] bool enqueueAdapterEvent(const sSupervisoryEvent& event);
+
+    /** Sets the demo/runtime Sabbath interval without changing the FSM API. */
+    void setSabbathStopDuration(std::chrono::milliseconds duration);
 
     /**
      * @brief Applies bounded queued input, advances time, and publishes output.
@@ -75,6 +89,8 @@ public:
 private:
     /** @brief Moves a generated frame to COMMS. */
     void publishPendingFrame();
+    void processControlEvent(const sSupervisoryEvent& event);
+    void publishArrivalAnnouncement(const sSupervisoryStateSnapshot& before);
     /** @brief Detects COMMS failure or timeout. */
     void checkCommsHealth(std::chrono::milliseconds elapsedMs);
     /** @brief Drains and schedules node heartbeat messages. */
@@ -101,6 +117,10 @@ private:
 
     /** Shared COMMS exchange. */
     sCanExchange& exchange_;
+    /** Optional output side service; control remains valid without audio. */
+    cAnnouncementService* announcementService_ = nullptr;
+    /** Adapter events share the same bounded control-cycle path as CAN events. */
+    cSpscQueue<sSupervisoryEvent, 16> adapterEvents_;
     /** CONTROL-owned state machine. */
     cSupervisoryStateMachineAPI appStateMachine_;
     /** Last observed COMMS worker progress counter. */

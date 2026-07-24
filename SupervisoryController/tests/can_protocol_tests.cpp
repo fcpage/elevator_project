@@ -56,7 +56,7 @@ void require(const bool condition, const char* message)
 int main()
 {
     using project6::supervisory::sCanFrame;
-    using project6::supervisory::CanMessageType;
+    using project6::supervisory::ecCanMessageType;
     using project6::supervisory::decodeNodeHbFrame;
     using project6::supervisory::decodeCanFrame;
     using project6::supervisory::ecDoorCommand;
@@ -144,7 +144,7 @@ int main()
     const auto decodedStandard = decodeCanFrame(standardFrame);
     require(decodedStandard.has_value(), "standard shared-protocol frame stopped decoding");
     require(
-        decodedStandard->type == CanMessageType::FloorModuleRequest,
+        decodedStandard->type == ecCanMessageType::FloorModuleRequest,
         "standard shared-protocol frame decoded to the wrong type");
 
     const auto nodeHbOk = makeNodeHbFrame(

@@ -15,6 +15,12 @@
 namespace project6::supervisory
 {
 
+// Prefer bit masks for atomic nature prevent bugs using ints.
+/** Global mode bit: only authorized maintenance requests may be dispatched. */
+inline constexpr std::uint8_t kModeMaintenance = 1u << 0;
+/** Global mode bit: the SA generates an automatic floor cycle. */
+inline constexpr std::uint8_t kModeSabbath = 1u << 1;
+
 /**
  * @brief Identifies the source or purpose of an event entering the supervisor.
  */
@@ -29,11 +35,17 @@ enum class ecEventType
     /** In-car floor request received over CAN. */
     CanCarRequest,
 
+    /** Authorized maintenance request supplied by the local demo/database adapter. */
+    MaintenanceFloorRequest,
+
     /** Elevator position/status report received over CAN. */
     CanElevatorStatus,
 
     /** Elapsed monotonic time supplied by the application loop. */
     TimerTick,
+
+    /** Global mode bits supplied by the database adapter or Phase 2 demo adapter. */
+    ModeUpdate,
 
     /** Fault indication that latches the machine into its safe state. */
     Fault
@@ -72,6 +84,9 @@ struct sSupervisoryEvent
 
     /** Elapsed duration carried by TimerTick events. */
     std::chrono::milliseconds timestampMs{0};
+
+    /** Global maintenance/Sabbath mode bits. */
+    std::uint8_t modeBits = 0;
 };
 
 } // namespace project6::supervisory

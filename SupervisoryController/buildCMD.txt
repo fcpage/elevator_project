@@ -1,85 +1,34 @@
-ryan@ryans-ubuntu-pi:~$ sudo modprobe can_raw
-ryan@ryans-ubuntu-pi:~$ sudo modprobe peak_usb
-ryan@ryans-ubuntu-pi:~$ ip link show
+Raspberry Pi build and run commands
+====================================
 
-Build commands
-==============
-
-Script builds
--------------
-
-Dry test with virtual CAN and auto-arrival:
+First time only:
 chmod +x scripts/*.sh
+
+Normal modes:
+./scripts/run_rpi.sh --test
+./scripts/run_rpi.sh --hardware can0 125000
+./scripts/run_rpi.sh --production can0 125000
+
+Phase 2 feature demos:
+./scripts/run_rpi.sh --sabbath
+./scripts/run_rpi.sh --maintenance
+
+The run script builds the matching configuration automatically when it is
+missing. To build without running:
 ./scripts/build_rpi.sh --test
-./scripts/run_rpi.sh --test
-
-Physical CAN demo with auto-arrival:
-chmod +x scripts/*.sh
 ./scripts/build_rpi.sh --hardware can0 125000
-./scripts/run_rpi.sh --hardware can0 125000
-
-Physical CAN production build:
-chmod +x scripts/*.sh
 ./scripts/build_rpi.sh --production can0 125000
-./scripts/run_rpi.sh --production can0 125000
+./scripts/build_rpi.sh --sabbath
+./scripts/build_rpi.sh --maintenance
 
-Run an existing build
----------------------
+Feature modes can also use real CAN:
+./scripts/run_rpi.sh --hardware can0 125000 --sabbath
+./scripts/run_rpi.sh --production can0 125000 --maintenance
 
-Virtual CAN test:
-./scripts/run_rpi.sh --test
+Sabbath uses a 10-second stop timer. Maintenance starts with a demo request
+to floor 2. Edit the matching build-rpi/*/demo_control.txt before running if
+you need a different demo value.
 
-Physical CAN demo:
-./scripts/run_rpi.sh --hardware can0 125000
-
-Physical CAN production:
-./scripts/run_rpi.sh --production can0 125000
-
-Each run writes a timestamped supervisory-YYYYMMDD-HHMMSS.log file.
-Mode-specific binaries are stored under build-rpi/test, build-rpi/hardware,
-and build-rpi/production.
-
-CAN setup only
---------------
-
-Virtual CAN:
-./scripts/initialize_can.sh --virtual vcan0
-
-Physical CAN:
-./scripts/initialize_can.sh can0 125000
-
-Traditional CMake builds
-------------------------
-
-Dry test with virtual CAN and auto-arrival:
-sudo modprobe vcan
-sudo ip link add vcan0 type vcan
-sudo ip link set vcan0 up
-cmake -S rpi -B build-rpi/test -DSUPERVISORY_ENABLE_AUTO_ARRIVAL=ON -DSUPERVISORY_USE_VIRTUAL_CAN=ON
-cmake --build build-rpi/test
-./build-rpi/test/supervisory_controller vcan0
-
-Physical CAN demo with auto-arrival:
-sudo modprobe can
-sudo modprobe can_raw
-sudo modprobe peak_usb
-sudo ip link set can0 down
-sudo ip link set can0 type can bitrate 125000 restart-ms 100
-sudo ip link set can0 up
-cmake -S rpi -B build-rpi/hardware -DSUPERVISORY_ENABLE_AUTO_ARRIVAL=ON
-cmake --build build-rpi/hardware
-./build-rpi/hardware/supervisory_controller can0
-
-Physical CAN production build:
-cmake -S rpi -B build-rpi/production -DSUPERVISORY_ENABLE_AUTO_ARRIVAL=OFF
-cmake --build build-rpi/production
-./build-rpi/production/supervisory_controller can0
-
-Virtual CAN frame injection
----------------------------
-
-Observe CAN traffic:
-candump vcan0
-
-Simulate a floor-2 button press:
-cansend vcan0 202#01
+Audio files belong in audio/floor1.wav, audio/floor2.wav, and audio/floor3.wav.
+miniaudio.h is included in include/, so deployment does not depend on the
+developer's Downloads folder. Logs are written beside this file.

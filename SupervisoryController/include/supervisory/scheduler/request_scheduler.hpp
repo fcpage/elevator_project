@@ -20,8 +20,10 @@ namespace project6::supervisory
 /**
  * @brief Source category for a pending elevator request.
  */
-enum class RequestSource
+enum class ecRequestSource
 {
+    Maintenance,
+    Sabbath,
     CarModule,
     FloorModule,
     WebInterface
@@ -36,7 +38,7 @@ struct sElevatorRequest
     std::uint8_t floor = 1;
 
     /** Origin category used by the scheduler's fixed priority policy. */
-    RequestSource source = RequestSource::FloorModule;
+    ecRequestSource source = ecRequestSource::FloorModule;
 };
 
 /**
@@ -57,20 +59,46 @@ public:
      */
     void enqueueEvent(const sSupervisoryEvent& event);
 
+    /** Adds one internally generated Sabbath floor request. */
+    void enqueueSabbathRequest(std::uint8_t floor);
+
     /**
      * @brief Removes the next request according to the fixed source priority.
-     * 1. Car Requests
-     * 2. Local Network Requests
-     * 3. Web Requests
+     *
+     * 1. Maintenance Mode
+     * 2. Sabbath Mode
+     * 3. Car Requests
+     * 4. Local Network Requests
+     * 5. Web Requests
      *
      * @return The selected request, or std::nullopt when all queues are empty.
      */
     std::optional<sElevatorRequest> tryTakeNextRequest();
 
+    /**
+     * @brief Removes the next request allowed by the active global mode.
+     * Maintenance and Sabbath modes intentionally gate normal queues.
+     *
+     * @return Elevator request on success or std nullopt when all queues are empty.
+     */
+    std::optional<sElevatorRequest> tryTakeNextAllowedRequest(std::uint8_t modeBits);
+
     /** @return True when any source queue contains a request. */
     bool hasPendingRequest() const;
 
+    /** @return True when a request from the specified queue is pending. */
+    bool hasPendingRequest(ecRequestSource source) const;
+
+    /** Removes stale requests belonging to a mode that has just been disabled. */
+    void clear(ecRequestSource source);
+
 private:
+    /** FIFO maintenance requests; active only while maintenance mode is set. */
+    std::deque<sElevatorRequest> maintenanceRequests_;
+
+    /** FIFO automatic Sabbath requests; higher priority than normal service. */
+    std::deque<sElevatorRequest> sabbathRequests_;
+
     /** FIFO in-car requests; highest scheduler priority. */
     std::deque<sElevatorRequest> carRequests_;
 

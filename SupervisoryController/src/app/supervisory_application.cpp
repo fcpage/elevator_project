@@ -19,8 +19,11 @@ namespace
 
 constexpr std::size_t kMaximumEventsPerCycle = 16;
 constexpr std::chrono::milliseconds kCommsProgressTimeout{250};
-constexpr std::chrono::seconds kNodeHbInterval{4};
-constexpr std::chrono::seconds kNodeHbReplyWindow{3};
+// Keep these values aligned with the rev3 FSM design and control-loop tests:
+// a supervisory request is sent every 3 seconds and nodes have 1 second to
+// complete the reply window. This was already a dev-branch mismatch.
+constexpr std::chrono::seconds kNodeHbInterval{3};
+constexpr std::chrono::seconds kNodeHbReplyWindow{1};
 
 std::optional<std::uint8_t> nodeHbMaskFromSourceId(const std::uint16_t sourceId)
 {
@@ -81,9 +84,21 @@ void logNodeHbError(const std::uint16_t sourceId, const std::uint8_t nodeMask)
 
 cSupervisoryApplication::cSupervisoryApplication(
     sCanExchange& exchange,
-    const ecNodeHbFailureMode nodeHbFailureMode)
-    : exchange_(exchange), nodeHbFailureMode_(nodeHbFailureMode)
+    const ecNodeHbFailureMode nodeHbFailureMode,
+    cAnnouncementService* announcementService)
+    : exchange_(exchange), announcementService_(announcementService), nodeHbFailureMode_(nodeHbFailureMode)
 {
+}
+
+bool cSupervisoryApplication::enqueueAdapterEvent(const sSupervisoryEvent& event)
+{
+    return adapterEvents_.tryPush(event);
+}
+
+void cSupervisoryApplication::setSabbathStopDuration(
+    const std::chrono::milliseconds duration)
+{
+    appStateMachine_.setSabbathStopDuration(duration);
 }
 
 // Main Loop
@@ -95,23 +110,50 @@ ecOperationStatus cSupervisoryApplication::runControlCycle(
     for (std::size_t count = 0; count < kMaximumEventsPerCycle; ++count)
     {
         sSupervisoryEvent event{};
+        if (adapterEvents_.tryPop(event))
+        {
+            processControlEvent(event);
+            continue;
+        }
         if (!exchange_.receivedEvents.tryPop(event))
         {
             break;
         }
-        appStateMachine_.handleEvent(event);
-        publishPendingFrame();
+        processControlEvent(event);
     }
 
     sSupervisoryEvent timerEvent{};
     timerEvent.type = ecEventType::TimerTick;
     timerEvent.timestampMs = elapsedMs;
-    appStateMachine_.handleEvent(timerEvent);
-    publishPendingFrame();
+    processControlEvent(timerEvent);
 
     processNodeHbCycle(elapsedMs);
 
     return ecOperationStatus::Ok;
+}
+
+void cSupervisoryApplication::processControlEvent(const sSupervisoryEvent& event)
+{
+    const sSupervisoryStateSnapshot before = appStateMachine_.snapshot();
+    appStateMachine_.handleEvent(event);
+    publishPendingFrame();
+    publishArrivalAnnouncement(before);
+}
+
+void cSupervisoryApplication::publishArrivalAnnouncement(
+    const sSupervisoryStateSnapshot& before)
+{
+    if (announcementService_ == nullptr)
+    {
+        return;
+    }
+
+    const sSupervisoryStateSnapshot after = appStateMachine_.snapshot();
+    if (before.controlState != ecSupervisoryControlState::Arrived &&
+        after.controlState == ecSupervisoryControlState::Arrived)
+    {
+        static_cast<void>(announcementService_->submit(after.currentFloor));
+    }
 }
 
 sSupervisoryStateSnapshot cSupervisoryApplication::snapshot() const
@@ -353,7 +395,7 @@ void cSupervisoryApplication::faultControl(const ecCanCommsFaultReason reason)
 
     sSupervisoryEvent event{};
     event.type = ecEventType::Fault;
-    appStateMachine_.handleEvent(event);
+    processControlEvent(event);
 }
 
 void cSupervisoryApplication::faultComms(const ecCanCommsFaultReason reason)
@@ -388,7 +430,7 @@ void cSupervisoryApplication::faultComms(const ecCanCommsFaultReason reason)
 
     sSupervisoryEvent event{};
     event.type = ecEventType::Fault;
-    appStateMachine_.handleEvent(event);
+    processControlEvent(event);
 }
 
 }

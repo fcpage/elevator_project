@@ -19,6 +19,7 @@
 #include <chrono>
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <memory>
 #include <optional>
 
@@ -43,6 +44,18 @@ struct sStateMachineContext
 {
     /** Queues normalized requests until the machine enters Dispatching. */
     cRequestScheduler scheduler;
+
+    /** Latest mode bits received from the database/demo adapter. */
+    std::uint8_t modeBits = 0;
+
+    /** Time since the last Sabbath arrival or mode activation. */
+    std::chrono::milliseconds sabbathElapsedMs{0};
+
+    /** Configurable interval between automatically generated Sabbath stops. */
+    std::chrono::milliseconds sabbathStopDurationMs{10000};
+
+    /** Next floor in the fixed Phase 2 Sabbath cycle: 1, 2, 3, 2. */
+    std::size_t sabbathSequenceIndex = 0;
 
     /** Request currently being dispatched, moved toward, or completed. */
     std::optional<sElevatorRequest> activeRequest;
@@ -69,6 +82,7 @@ namespace
 /** Door dwell time before the Arrived state releases the serviced request. */
 constexpr std::chrono::milliseconds kDoorOpenDurationMs{3000};
 constexpr std::chrono::seconds kTravelTimeoutS{10};
+constexpr std::uint8_t kSabbathSequence[] = {1, 2, 3, 2};
 #ifdef SUPERVISORY_ENABLE_AUTO_ARRIVAL
 constexpr std::chrono::seconds kSimulatedTravelDuration{3};
 #endif
@@ -95,7 +109,24 @@ bool hasPendingRequest()
         return false;
     }
 
-    return state->activeRequest.has_value() || state->scheduler.hasPendingRequest();
+    if (state->activeRequest.has_value())
+    {
+        return true;
+    }
+
+    if ((state->modeBits & kModeMaintenance) != 0)
+    {
+        return state->scheduler.hasPendingRequest(ecRequestSource::Maintenance);
+    }
+
+    if ((state->modeBits & kModeSabbath) != 0)
+    {
+        return state->scheduler.hasPendingRequest(ecRequestSource::Sabbath);
+    }
+
+    return state->scheduler.hasPendingRequest(ecRequestSource::CarModule) ||
+           state->scheduler.hasPendingRequest(ecRequestSource::FloorModule) ||
+           state->scheduler.hasPendingRequest(ecRequestSource::WebInterface);
 }
 
 bool targetIsCurrentFloor()
@@ -192,7 +223,7 @@ void selectNextRequest()
         return;
     }
 
-    state->activeRequest = state->scheduler.tryTakeNextRequest();
+    state->activeRequest = state->scheduler.tryTakeNextAllowedRequest(state->modeBits);
     if (state->activeRequest.has_value())
     {
         state->snapshot.targetFloor = state->activeRequest->floor;
@@ -914,11 +945,60 @@ void cSupervisoryStateMachineAPI::handleEvent(const sSupervisoryEvent& event)
     sStateMachineContext& state = *smContext_;
     const sSupervisoryStateSnapshot previousSnapshot = state.snapshot;
 
+    if (event.type == ecEventType::ModeUpdate)
+    {
+        const std::uint8_t previousModeBits = state.modeBits;
+        state.modeBits = event.modeBits & static_cast<std::uint8_t>(kModeMaintenance | kModeSabbath);
+
+        // Mode queues contain generated/privileged work. Do not dispatch stale
+        // mode-specific jobs after the GUI/database clears the corresponding bit.
+        if ((previousModeBits & kModeMaintenance) != 0 &&
+            (state.modeBits & kModeMaintenance) == 0)
+        {
+            state.scheduler.clear(ecRequestSource::Maintenance);
+        }
+        if ((previousModeBits & kModeSabbath) != 0 &&
+            (state.modeBits & kModeSabbath) == 0)
+        {
+            state.scheduler.clear(ecRequestSource::Sabbath);
+        }
+
+        if ((state.modeBits & kModeSabbath) != 0 &&
+            (previousModeBits & kModeSabbath) == 0)
+        {
+            // Start the automatic cycle immediately on the next control tick.
+            state.sabbathSequenceIndex = 0;
+            state.sabbathElapsedMs = state.sabbathStopDurationMs;
+        }
+        else if ((state.modeBits & kModeSabbath) == 0)
+        {
+            state.sabbathElapsedMs = std::chrono::milliseconds{0};
+        }
+    }
+
     if (event.type == ecEventType::HttpFloorRequest ||
         event.type == ecEventType::CanFloorRequest ||
-        event.type == ecEventType::CanCarRequest)
+        event.type == ecEventType::CanCarRequest ||
+        event.type == ecEventType::MaintenanceFloorRequest)
     {
         state.scheduler.enqueueEvent(event);
+    }
+
+    if (event.type == ecEventType::TimerTick &&
+        (state.modeBits & kModeSabbath) != 0 &&
+        (state.modeBits & kModeMaintenance) == 0)
+    {
+        state.sabbathElapsedMs += event.timestampMs;
+        if (state.sabbathElapsedMs >= state.sabbathStopDurationMs &&
+            !state.activeRequest.has_value() &&
+            !state.scheduler.hasPendingRequest(ecRequestSource::Sabbath))
+        {
+            state.scheduler.enqueueSabbathRequest(
+                kSabbathSequence[state.sabbathSequenceIndex]);
+            state.sabbathSequenceIndex =
+                (state.sabbathSequenceIndex + 1) % std::size(kSabbathSequence);
+            state.sabbathElapsedMs = std::chrono::milliseconds{0};
+        }
     }
 
     if (event.reportedFloor.has_value())
@@ -974,7 +1054,17 @@ void cSupervisoryStateMachineAPI::handleEvent(const sSupervisoryEvent& event)
 
     smMachine_->update();
     refreshSnapshotState();
+    state.snapshot.modeBits = state.modeBits;
     logStateChange(previousSnapshot, state.snapshot);
+}
+
+void cSupervisoryStateMachineAPI::setSabbathStopDuration(
+    const std::chrono::milliseconds duration)
+{
+    if (duration.count() > 0)
+    {
+        smContext_->sabbathStopDurationMs = duration;
+    }
 }
 
 sSupervisoryStateSnapshot cSupervisoryStateMachineAPI::snapshot() const

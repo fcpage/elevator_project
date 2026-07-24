@@ -1,0 +1,4 @@
+# Automatically selected by scripts/build_rpi.sh --sabbath.
+# The GUI/database integration will eventually write these values instead.
+mode_bits=2
+sabbath_stop_ms=10000
