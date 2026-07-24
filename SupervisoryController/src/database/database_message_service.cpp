@@ -83,11 +83,11 @@ cDBMessageService::~cDBMessageService()
     // TODO: Consider adding date check
 
     // Worker thread initialization
-    // worker_ = std::jthread([this](const std::stop_token stopToken){
-    //     run(stopToken);
-    // });
-    //
-    // if(!worker_.joinable()) return ecOperationStatus::NotInitialized;
+    worker_ = std::jthread([this](const std::stop_token stopToken){
+        run(stopToken);
+    });
+
+    if(!worker_.joinable()) return ecOperationStatus::NotInitialized;
     return ecOperationStatus::Ok;
 }
 
@@ -201,7 +201,7 @@ void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
 }
 
 std::optional<sDBInboundSnapshot> cDBMessageService::readSnapshot() const {
-    if(auto choice = query("SELECT * FROM guiRequests"); choice.err()) {
+    if(auto choice = query("SELECT * FROM guiRequests;"); choice.err()) {
         std::cerr << "query failed: " << operationStatusMessage(choice.status()) << '\n';
     } else {
         std::unique_ptr<sql::ResultSet>result{choice.value()};
@@ -209,7 +209,7 @@ std::optional<sDBInboundSnapshot> cDBMessageService::readSnapshot() const {
          * but we know that it *should* be TINYINT (4-bytes) */
         sDBInboundSnapshot snap = {
             .index = result->getInt("index"),
-            .requestedFloor = static_cast<std::uint8_t>(result->getInt("requestedFloor")),
+            .requestedFloor = static_cast<std::uint8_t>(result->getInt("requestFloor")),
         };
         return std::optional<sDBInboundSnapshot>{snap};
     }
