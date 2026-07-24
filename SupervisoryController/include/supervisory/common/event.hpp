@@ -20,8 +20,9 @@ namespace project6::supervisory
  */
 enum class ecEventType
 {
+
     /** Floor request received from the local web interface. */
-    HttpFloorRequest,
+    HttpFloorRequest [[deprecated("use DatabaseFloorRequest")]],
 
     /** Landing request received from a floor controller over CAN. */
     CanFloorRequest,
@@ -36,7 +37,10 @@ enum class ecEventType
     TimerTick,
 
     /** Fault indication that latches the machine into its safe state. */
-    Fault
+    Fault,
+
+    /** Floor request received from the local web interface. */
+    DatabaseFloorRequest,
 };
 
 /**
