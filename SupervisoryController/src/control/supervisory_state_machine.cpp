@@ -916,6 +916,7 @@ void cSupervisoryStateMachineAPI::handleEvent(const sSupervisoryEvent& event)
     const sSupervisoryStateSnapshot previousSnapshot = state.snapshot;
 
     if (event.type == ecEventType::HttpFloorRequest ||
+        event.type == ecEventType::DatabaseFloorRequest ||
         event.type == ecEventType::CanFloorRequest ||
         event.type == ecEventType::CanCarRequest)
     {

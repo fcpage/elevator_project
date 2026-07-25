@@ -36,7 +36,7 @@ struct sDBOutboundSnapshot {
 
 static inline std::ostream& operator<<(std::ostream& os, const sDBInboundSnapshot& snap) {
     os  << "sDBSnapshot = {\n" 
-        << "\trequestedFloor = " << snap.requestedFloor << '\n'
+        << "\trequestedFloor = " << unsigned(snap.requestedFloor) << '\n'
         << "\tindex = " << snap.index << '\n'
         << "};\n";
     return os;
@@ -44,7 +44,7 @@ static inline std::ostream& operator<<(std::ostream& os, const sDBInboundSnapsho
 
 static inline std::ostream& operator<<(std::ostream& os, const sDBOutboundSnapshot& snap) {
     os  << "sDBSnapshot = {\n" 
-        << "\tcurrentFloor = " << snap.currentFloor << '\n'
+        << "\tcurrentFloor = " << unsigned(snap.currentFloor) << '\n'
         << "\tfloorRequest1 = " << snap.floorRequest1 << '\n'
         << "\tfloorRequest2 = " << snap.floorRequest2 << '\n'
         << "\tfloorRequest3 = " << snap.floorRequest3 << '\n'

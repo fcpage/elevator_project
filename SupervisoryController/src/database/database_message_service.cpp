@@ -156,6 +156,7 @@ void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
                 continue;
             }
             sDBInboundSnapshot snap = maybeInSnap.value();
+            std::clog << snap << '\n';
             std::optional<sSupervisoryEvent> maybeEvent = inboundSnapshotToSupervisoryEvent(snap);
             if(!maybeEvent.has_value())
             {
