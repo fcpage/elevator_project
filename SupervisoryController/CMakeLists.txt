@@ -26,6 +26,14 @@ option(
     OFF
 )
 
+# Simulator integration: selects the localhost CAN bridge for the normal SA
+# entry point. It does not create a simulator-specific executable.
+option(
+    SUPERVISORY_BUILD_SIMULATOR
+    "Build supervisory_controller with the localhost simulator CAN transport."
+    OFF
+)
+
 option(
     SUPERVISORY_ENABLE_MINIAUDIO
     "Enable real miniaudio/ALSA playback; otherwise log demo announcements."
@@ -54,6 +62,7 @@ add_library(project6_supervisory
     src/demo/demo_control.cpp
     src/http/http_server.cpp
     src/scheduler/request_scheduler.cpp
+    src/sim/simulator_can_service.cpp
 )
 
 target_include_directories(project6_supervisory
@@ -82,6 +91,11 @@ target_link_libraries(project6_supervisory
         Threads::Threads
 )
 
+if(WIN32)
+    # simulator_can_service uses the native localhost socket API on Windows.
+    target_link_libraries(project6_supervisory PUBLIC ws2_32)
+endif()
+
 if(SUPERVISORY_ENABLE_AUTO_ARRIVAL)
     target_compile_definitions(project6_supervisory
         PRIVATE
@@ -103,6 +117,12 @@ target_link_libraries(supervisory_controller
     PRIVATE
         project6_supervisory
 )
+
+if(SUPERVISORY_BUILD_SIMULATOR)
+    # Used only by the normal supervisory_controller target in simulator runs.
+    target_compile_definitions(supervisory_controller
+        PRIVATE SUPERVISORY_USE_SIMULATOR_CAN=1)
+endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/sim/simulator_supervisor_main.cpp")
     add_executable(supervisory_simulator_adapter

@@ -11,7 +11,9 @@
 
 #include "supervisory/app/supervisory_application.hpp"
 #include "supervisory/audio/announcement_service.hpp"
-#include "supervisory/can/can_comms_service.hpp"
+// Selects the production CAN service normally and the simulator bridge only
+// when SUPERVISORY_BUILD_SIMULATOR is enabled by the simulator launcher.
+#include "supervisory/can/runtime_can_service.hpp"
 
 #ifdef SUPERVISORY_ENABLE_DEMO_MODES
 #include "supervisory/demo/demo_control.hpp"
@@ -127,7 +129,9 @@ int main(const int argumentCount, char* arguments[])
         kDefaultCanRestartMs,
         kConfigureCanInterfaceOnInitialize};
     sCanExchange canExchange;
-    cCanCommsService commsService(canConfig, canExchange);
+    // Keep the normal application entry point; only the transport is selected
+    // at build time for a simulator run.
+    cRuntimeCanService commsService(canConfig, canExchange);
     sAnnouncementExchange announcementExchange;
     const std::string audioDirectory =
         environmentValue("SUPERVISORY_AUDIO_DIR", "audio");
