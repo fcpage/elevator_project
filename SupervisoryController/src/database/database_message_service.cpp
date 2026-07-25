@@ -159,8 +159,6 @@ void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
             std::optional<sSupervisoryEvent> maybeEvent = inboundSnapshotToSupervisoryEvent(snap);
             if(!maybeEvent.has_value())
             {
-                exchange_.droppedEventCount.fetch_add(1);
-                recordFault(exchange_, ecDBServiceFaultReason::FailedRead);
                 continue;
             }
             sSupervisoryEvent event = maybeEvent.value();

@@ -124,7 +124,9 @@ private:
         WHERE `index` = (\
             SELECT MAX(`index`)\
             FROM elevatorNetwork\
-        );";
+        );\
+        UPDATE guiRequests\
+        SET requestedFloor = 0;";
     // const char* writeSnapshotStmtQuery_ = "\
     //     INSERT INTO elevatorNetwork(\
     //         date,\
