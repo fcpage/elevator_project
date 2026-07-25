@@ -114,6 +114,7 @@ private:
             date = CURRENT_DATE(),\
             time = CURRENT_TIME(),\
             currentFloor = ?,\
+            requestedFloor = 0,\
             floorRequest1 = ?,\
             floorRequest2 = ?,\
             floorRequest3 = ?,\
@@ -121,12 +122,6 @@ private:
             carRequestFloor2 = ?,\
             carRequestFloor3 = ?,\
             doorsOpen = ?\
-        WHERE `index` = (\
-            SELECT MAX(`index`)\
-            FROM elevatorNetwork\
-        );\
-        UPDATE guiRequests\
-        SET requestedFloor = 0\
         WHERE `index` = (\
             SELECT MAX(`index`)\
             FROM elevatorNetwork\

@@ -208,7 +208,7 @@ void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
 std::optional<sDBInboundSnapshot> cDBMessageService::readSnapshot() const {
     sDBInboundSnapshot snap{};
 
-    if(auto choice = query("SELECT * FROM guiRequests;"); choice.err()) {
+    if(auto choice = query("SELECT * FROM elevatorNetwork;"); choice.err()) {
         std::cerr << "query failed: " << operationStatusMessage(choice.status()) << '\n';
     } else {
         try {
