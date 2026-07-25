@@ -110,6 +110,8 @@ private:
     // Prepared statments
     const char* writeSnapshotStmtQuery_ = "\
         INSERT INTO elevatorNetwork(\
+            date,\
+            time,\
             currentFloor,\
             floorRequest1,\
             floorRequest2,\
@@ -118,7 +120,7 @@ private:
             carRequestFloor2,\
             carRequestFloor3,\
             doorsOpen\
-        ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )";
+        ) VALUES ( CURRENT_DATE(), CURRENT_TIME(), ?, ?, ?, ?, ?, ?, ?, ? )";
     std::unique_ptr<sql::PreparedStatement> writeSnapshotStmt_;
     // thread data
     sDBMessageExchange& exchange_;
