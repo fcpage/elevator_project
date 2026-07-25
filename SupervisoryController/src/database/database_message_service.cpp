@@ -279,6 +279,18 @@ bool cDBMessageService::writeSnapshot(sDBOutboundSnapshot snap) const {
         writeSnapshotStmt_->setBoolean(7, snap.carRequestFloor3);
         writeSnapshotStmt_->setBoolean(8, snap.doorsOpen);
         writeSnapshotStmt_->executeUpdate();
+    } catch (sql::SQLException& e) {
+        /*  handles these:
+         * sql::MethodNotImplementedException (derived from sql::SQLException), 
+         * sql::InvalidArgumentException (derived from sql::SQLException), 
+         * sql::SQLException (derived from std::runtime_error)
+         */
+        std::cerr << "ERROR: SQLEception in " << __FUNCTION__;
+        std::cerr << " from file " << __FILE__ << " on line " << __LINE__ << '\n';
+        std::cerr << "ERROR: " << e.what();
+        std::cerr << "(MySQL error code: " << e.getErrorCode();
+        std::cerr << ", SQLState: " << e.getSQLState() << ")" << std::endl;
+        return false;
     } catch (...) {
         std::cerr << "Error writing snapshot" << std::endl;
         return false; 
