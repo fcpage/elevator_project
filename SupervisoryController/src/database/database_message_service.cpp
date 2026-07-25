@@ -270,7 +270,7 @@ cDBMessageService::supervisoryStateToOutboundSnapshot(sSupervisoryStateSnapshot&
 
 bool cDBMessageService::writeSnapshot(sDBOutboundSnapshot snap) const {
     try {
-        writeSnapshotStmt_->setInt(1, snap.currentFloor);
+        writeSnapshotStmt_->setUInt(1, snap.currentFloor);
         writeSnapshotStmt_->setBoolean(2, snap.floorRequest1);
         writeSnapshotStmt_->setBoolean(3, snap.floorRequest2);
         writeSnapshotStmt_->setBoolean(4, snap.floorRequest3);
