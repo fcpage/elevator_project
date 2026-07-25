@@ -109,18 +109,35 @@ private:
     const sDBServiceConfig& config_;
     // Prepared statments
     const char* writeSnapshotStmtQuery_ = "\
-        INSERT INTO elevatorNetwork(\
-            date,\
-            time,\
-            currentFloor,\
-            floorRequest1,\
-            floorRequest2,\
-            floorRequest3,\
-            carRequestFloor1,\
-            carRequestFloor2,\
-            carRequestFloor3,\
-            doorsOpen\
-        ) VALUES ( CURRENT_DATE(), CURRENT_TIME(), ?, ?, ?, ?, ?, ?, ?, ? )";
+        UPDATE elevatorNetwork\
+        SET\
+            date = CURRENT_DATE(),\
+            time = CURRENT_TIME(),\
+            currentFloor = ?,\
+            floorRequest1 = ?,\
+            floorRequest2 = ?,\
+            floorRequest3 = ?,\
+            carRequestFloor1 = ?,\
+            carRequestFloor2 = ?,\
+            carRequestFloor3 = ?,\
+            doorsOpen = ?\
+        WHERE `index` = (\
+            SELECT MAX(`index`)\
+            FROM elevatorNetwork\
+        );";
+    // const char* writeSnapshotStmtQuery_ = "\
+    //     INSERT INTO elevatorNetwork(\
+    //         date,\
+    //         time,\
+    //         currentFloor,\
+    //         floorRequest1,\
+    //         floorRequest2,\
+    //         floorRequest3,\
+    //         carRequestFloor1,\
+    //         carRequestFloor2,\
+    //         carRequestFloor3,\
+    //         doorsOpen\
+    //     ) VALUES ( CURRENT_DATE(), CURRENT_TIME(), ?, ?, ?, ?, ?, ?, ?, ? )";
     std::unique_ptr<sql::PreparedStatement> writeSnapshotStmt_;
     // thread data
     sDBMessageExchange& exchange_;
