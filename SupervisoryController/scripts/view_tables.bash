@@ -14,6 +14,7 @@ WHERE \`index\` = (
     FROM elevatorNetwork
 ); 
 EOF
+)
 
   if [ -n "$changes" ]; then
     echo "$changes"
