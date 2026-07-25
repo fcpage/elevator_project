@@ -280,6 +280,7 @@ bool cDBMessageService::writeSnapshot(sDBOutboundSnapshot snap) const {
         writeSnapshotStmt_->setBoolean(8, snap.doorsOpen);
         writeSnapshotStmt_->executeUpdate();
     } catch (...) {
+        std::cerr << "Error writing snapshot" << std::endl;
         return false; 
     }
     return true;
