@@ -6,7 +6,7 @@ CREATE TABLE elevatorNetwork(
 `index` INT NOT NULL,	/*database access index*/
 `date` DATE NOT NULL,	/*snapshot package time*/
 `time` TIME NOT NULL,	/*snapshot package date*/
-`currentFloor` BIT(2) NOT NULL,	/*the elevator's current position*/
+`currentFloor` TINYINT UNSIGNED NOT NULL,	/*the elevator's current position*/
 `floorRequest1` BOOL NOT NULL,	/*active request at floor 1?*/
 `floorRequest2` BOOL NOT NULL,	/*active request at floor 2?*/
 `floorRequest3` BOOL NOT NULL,	/*active request at floor 3?*/
@@ -27,7 +27,7 @@ CREATE TABLE guiRequests(	/*table to send gui requests to the hardware system*/
 `index` INT NOT NULL,	/*database access index*/
 `date` DATE NOT NULL,	/*snapshot package time*/
 `time` TIME NOT NULL,	/*snapshot package date*/
-`requestFloor` TINYINT NOT NULL,	/*gui floor request*/
+`requestFloor` TINYINT UNSIGNED NOT NULL,	/*gui floor request*/
 `remote` INT NOT NULL	/*optional remote maintenance options (enum: 0 = off, 1 = maintainance, 2 = override, 3 = sabbath)*/	
 ) ENGINE = InnoDb;
 
