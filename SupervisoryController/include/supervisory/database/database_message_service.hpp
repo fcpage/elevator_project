@@ -142,4 +142,52 @@ private:
     bool writeSnapshot(sDBOutboundSnapshot snap) const;
 };
 
+/*** Extras ***/
+static inline std::ostream& operator<<(std::ostream& os, const ecDBServiceFaultReason& reason) {
+    using namespace project6::supervisory;
+    switch (reason) {
+        case ecDBServiceFaultReason::DatabaseProgressTimeout: 
+        {
+            os << "DatabaseProgressTimeout";
+            break;
+        }
+        case ecDBServiceFaultReason::FailedRead: 
+        {
+            os << "FailedRead";
+            break;
+        }
+        case ecDBServiceFaultReason::FailedWrite: 
+        {
+            os << "FailedWrite";
+            break;
+        }
+        case ecDBServiceFaultReason::InboundQueueFull: 
+        {
+            os << "InboundQueueFull";
+            break;
+        }
+        case ecDBServiceFaultReason::InitializationFailed: 
+        {
+            os << "InitializationFailed";
+            break;
+        }
+        case ecDBServiceFaultReason::OutboundQueueFull: 
+        {
+            os << "OutboundQueueFull";
+            break;
+        }
+        case ecDBServiceFaultReason::ThreadFailure: 
+        {
+            os << "ThreadFailure";
+            break;
+        }
+        case ecDBServiceFaultReason::None: 
+        {
+            os << "None";
+            break;
+        }
+    }
+    return os;
+}
+
 }

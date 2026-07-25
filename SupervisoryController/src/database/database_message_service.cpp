@@ -37,20 +37,20 @@ cDBMessageService::cDBMessageService(const sDBServiceConfig& config, sDBMessageE
 
 cDBMessageService::~cDBMessageService() 
 {
-    this->stop();
-    this->close();
+    stop();
+    close();
     delete connection_; // Connect allocates memory
     connection_ = nullptr;
 }
 
 [[nodiscard]] ecOperationStatus cDBMessageService::start() noexcept
 {
-    if(connection_ != nullptr && !connection_->isClosed()) {
-        // connection_->setSchema(config_.database);
-        return ecOperationStatus::InvalidArgument;
-    }
+    // If it is already running then stop before restarting
     if(worker_.joinable()) {
-        return ecOperationStatus::InvalidArgument;
+        stop();
+    }
+    if(connection_ != nullptr && !connection_->isClosed()) {
+        close();
     }
 
     // Database initialization

@@ -19,6 +19,7 @@ namespace
 
 constexpr std::size_t kMaximumEventsPerCycle = 16;
 constexpr std::chrono::milliseconds kCommsProgressTimeout{250};
+constexpr std::chrono::milliseconds kDatabaseProgressTimeout{250};
 constexpr std::chrono::seconds kNodeHbInterval{4};
 constexpr std::chrono::seconds kNodeHbReplyWindow{3};
 
@@ -93,6 +94,7 @@ ecOperationStatus cSupervisoryApplication::runControlCycle(
     const std::chrono::milliseconds elapsedMs)
 {
     checkCommsHealth(elapsedMs);
+    checkDatabaseHealth(elapsedMs);
 
     // Drain can queue
     for (std::size_t count = 0; count < kMaximumEventsPerCycle; ++count)
@@ -173,7 +175,7 @@ void cSupervisoryApplication::publishSnapshot() {
     if (const std::optional<sSupervisoryStateSnapshot> snapshot = appStateMachine_.snapshot();
         snapshot.has_value() && !databaseExchange_.writableSnapshots.tryPush(*snapshot))
     {
-        std::cerr << "ERROR: Supervisory snapshot not writable to database." << std::endl;
+        faultDatabase(ecDBServiceFaultReason::OutboundQueueFull);
     }
 }
 
@@ -201,11 +203,11 @@ void cSupervisoryApplication::checkCommsHealth(
     // Check for standard comm failures
     const std::uint64_t droppedEvents = canExchange_.droppedEventCount.load();
     const std::uint64_t transmitFailures = canExchange_.transmitFailureCount.load();
-    const bool didDropEvent = droppedEvents != lastDroppedEventCount_;
-    const bool didTransmitFail = transmitFailures != lastTransmitFailureCount_;
+    const bool didDropEvent = droppedEvents != lastCommsDroppedEventCount_;
+    const bool didTransmitFail = transmitFailures != lastCommsTransmitFailureCount_;
 
-    lastDroppedEventCount_ = droppedEvents;
-    lastTransmitFailureCount_ = transmitFailures;
+    lastCommsDroppedEventCount_ = droppedEvents;
+    lastCommsTransmitFailureCount_ = transmitFailures;
 
     if (didDropEvent)
     {
@@ -229,6 +231,51 @@ void cSupervisoryApplication::checkCommsHealth(
     }
 }
 
+void cSupervisoryApplication::checkDatabaseHealth(
+    const std::chrono::milliseconds elapsedMs)
+{
+    // Duplicate event. Return.
+    if (isControlFaultLatched_)
+    {
+        return;
+    }
+
+    // Else if it is the same value the comms are hanging, add the elapsed ms.
+    else if (databaseExchange_.databaseState.load() == ecDBServiceState::Running)
+    {
+        staleDatabaseProgressElapsed_ += elapsedMs;
+    }
+
+    // Check for standard comm failures
+    const std::uint64_t droppedEvents = databaseExchange_.droppedEventCount.load();
+    const std::uint64_t writeFailures = databaseExchange_.writeFailureCount.load();
+    const bool didDropEvent = droppedEvents != lastDatabaseDroppedEventCount_;
+    const bool didTransmitFail = writeFailures != lastDatabaseWriteFailureCount_;
+
+    lastCommsDroppedEventCount_ = droppedEvents;
+    lastCommsTransmitFailureCount_ = writeFailures;
+
+    if (didDropEvent)
+    {
+        faultDatabase(ecDBServiceFaultReason::InboundQueueFull);
+    }
+    else if (didTransmitFail)
+    {
+        faultDatabase(ecDBServiceFaultReason::FailedWrite);
+    }
+    else if (databaseExchange_.databaseState.load() == ecDBServiceState::Failed)
+    {
+        const ecDBServiceFaultReason reason = databaseExchange_.faultReason.load();
+        faultDatabase(
+            reason == ecDBServiceFaultReason::None
+                ? ecDBServiceFaultReason::ThreadFailure
+                : reason);
+    }
+    else if (staleDatabaseProgressElapsed_ >= kDatabaseProgressTimeout)
+    {
+        faultDatabase(ecDBServiceFaultReason::DatabaseProgressTimeout);
+    }
+}
 void cSupervisoryApplication::processNodeHbCycle(
     const std::chrono::milliseconds elapsedMs)
 {
@@ -407,6 +454,37 @@ void cSupervisoryApplication::faultComms(const ecCanCommsFaultReason reason)
     }
     else {
         std::clog << "supervisory_controller: Recovery successful. COMMS restarted." << std::endl;
+        return;
+    }
+
+    sSupervisoryEvent event{};
+    event.type = ecEventType::Fault;
+    appStateMachine_.handleEvent(event);
+}
+
+void cSupervisoryApplication::faultDatabase(const ecDBServiceFaultReason reason)
+{
+    if (isControlFaultLatched_)
+    {
+        return;
+    }
+
+    ecDBServiceFaultReason expected = ecDBServiceFaultReason::None;
+    static_cast<void>(databaseExchange_.faultReason.compare_exchange_strong(expected, reason));
+    isControlFaultLatched_ = true;
+    
+    std::cerr << "supervisory_controller: Database service faulted (Reason: " << reason << ")\n";
+    // Try and restart with default configuration.
+    const sDBServiceConfig databaseConfig;
+    sDBMessageExchange databaseExchange;
+    cDBMessageService databaseService(databaseConfig, databaseExchange);
+
+    if (const ecOperationStatus status = databaseService.start(); status != ecOperationStatus::Ok)
+    {
+        std::cerr << "supervisory_controller: Database service restart failed." << std::endl;
+    }
+    else {
+        std::clog << "supervisory_controller: Recovery successful. Database service restarted." << std::endl;
         return;
     }
 
