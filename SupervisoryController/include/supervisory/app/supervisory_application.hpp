@@ -123,6 +123,8 @@ private:
     std::chrono::milliseconds staleCommsProgressElapsed_{0};
     /** Time without DATABASE worker progress. */
     std::chrono::milliseconds staleDatabaseProgressElapsed_{0};
+    /** Last aggregate DATABASE worker progress count. */
+    std::uint64_t lastDatabaseProgress_{0};
     /** Last observed dropped-event count. */
     std::uint64_t lastDatabaseDroppedEventCount_ = 0;
     /** Last observed transmit-failure count. */

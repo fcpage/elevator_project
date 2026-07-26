@@ -38,6 +38,18 @@ option(
     ON
 )
 
+option(
+    SUPERVISORY_ENABLE_SIM_DIAGNOSTICS
+    "Enable best-effort localhost simulator diagnostics."
+    OFF
+)
+
+option(
+    SUPERVISORY_ENABLE_SIM_TESTPOINTS
+    "Enable optional, non-blocking simulator testpoint calls."
+    OFF
+)
+
 if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/src/main.cpp")
     set(SUPERVISORY_ROOT "${CMAKE_CURRENT_LIST_DIR}")
 elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../src/main.cpp")
@@ -67,6 +79,11 @@ add_executable(supervisory_controller
     "${SUPERVISORY_ROOT}/src/scheduler/request_scheduler.cpp"
     "${SUPERVISORY_ROOT}/src/database/database_message_service.cpp"
 )
+
+if(SUPERVISORY_ENABLE_SIM_DIAGNOSTICS OR SUPERVISORY_ENABLE_SIM_TESTPOINTS)
+    target_sources(supervisory_controller PRIVATE
+        "${SUPERVISORY_ROOT}/src/sim/simulator_diagnostics.cpp")
+endif()
 
 target_include_directories(supervisory_controller
     PRIVATE
@@ -110,4 +127,14 @@ if(SUPERVISORY_CAN_INTERFACE_PRECONFIGURED)
     target_compile_definitions(supervisory_controller PRIVATE
         SUPERVISORY_CAN_INTERFACE_PRECONFIGURED=1
     )
+endif()
+
+if(SUPERVISORY_ENABLE_SIM_DIAGNOSTICS)
+    target_compile_definitions(supervisory_controller PRIVATE
+        SUPERVISORY_ENABLE_SIM_DIAGNOSTICS=1)
+endif()
+
+if(SUPERVISORY_ENABLE_SIM_TESTPOINTS)
+    target_compile_definitions(supervisory_controller PRIVATE
+        SUPERVISORY_ENABLE_SIM_TESTPOINTS=1)
 endif()

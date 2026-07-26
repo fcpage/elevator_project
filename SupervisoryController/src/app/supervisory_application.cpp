@@ -240,7 +240,13 @@ void cSupervisoryApplication::checkDatabaseHealth(
         return;
     }
 
-    // Else if it is the same value the comms are hanging, add the elapsed ms.
+    const std::uint64_t databaseProgress =
+        databaseExchange_.readCount.load() + databaseExchange_.writeCount.load();
+    if (databaseProgress != lastDatabaseProgress_)
+    {
+        lastDatabaseProgress_ = databaseProgress;
+        staleDatabaseProgressElapsed_ = std::chrono::milliseconds{0};
+    }
     else if (databaseExchange_.databaseState.load() == ecDBServiceState::Running)
     {
         staleDatabaseProgressElapsed_ += elapsedMs;
@@ -252,8 +258,8 @@ void cSupervisoryApplication::checkDatabaseHealth(
     const bool didDropEvent = droppedEvents != lastDatabaseDroppedEventCount_;
     const bool didTransmitFail = writeFailures != lastDatabaseWriteFailureCount_;
 
-    lastCommsDroppedEventCount_ = droppedEvents;
-    lastCommsTransmitFailureCount_ = writeFailures;
+    lastDatabaseDroppedEventCount_ = droppedEvents;
+    lastDatabaseWriteFailureCount_ = writeFailures;
 
     if (didDropEvent)
     {

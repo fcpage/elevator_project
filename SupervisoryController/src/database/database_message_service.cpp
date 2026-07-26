@@ -6,8 +6,12 @@
 
 #include "supervisory/database/database_message_service.hpp"
 #include "supervisory/common/result.hpp"
+#include "project6_sim/testpoints.hpp"
+
+#include <chrono>
 #include <iostream>
 #include <optional>
+#include <string>
 
 namespace project6::supervisory
 {
@@ -140,42 +144,51 @@ void cDBMessageService::close() {
     }
 }
 
-void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
+void cDBMessageService::run(const std::stop_token& stopToken) noexcept {
     try 
     {
         exchange_.databaseState.store(ecDBServiceState::Running);
+#ifdef SUPERVISORY_ENABLE_SIM_TESTPOINTS
+        PROJECT6_SIM_TESTPOINT("database.worker.started", "database worker entered its polling loop");
+#endif
 
         while(!stopToken.stop_requested()) 
         {
             /*** Read ***/
             std::optional<sDBInboundSnapshot> maybeInSnap = readSnapshot();
-            if(!maybeInSnap.has_value()) 
+            exchange_.readCount.fetch_add(1);
+            if (maybeInSnap.has_value())
             {
-                exchange_.droppedEventCount.fetch_add(1);
-                recordFault(exchange_, ecDBServiceFaultReason::FailedRead);
-                continue;
-            }
-            sDBInboundSnapshot snap = maybeInSnap.value();
-            std::optional<sSupervisoryEvent> maybeEvent = inboundSnapshotToSupervisoryEvent(snap);
-            if(!maybeEvent.has_value())
-            {
-                continue;
-            }
-            sSupervisoryEvent event = maybeEvent.value();
-            if(!exchange_.readEvents.tryPush(event)) 
-            {
-                exchange_.droppedEventCount.fetch_add(1);         
-                recordFault(exchange_, ecDBServiceFaultReason::InboundQueueFull);
-            } else {
-                exchange_.readCount.fetch_add(1);
+                sDBInboundSnapshot snap = *maybeInSnap;
+                const std::optional<sSupervisoryEvent> maybeEvent = inboundSnapshotToSupervisoryEvent(snap);
+                if (maybeEvent.has_value())
+                {
+#ifdef SUPERVISORY_ENABLE_SIM_TESTPOINTS
+                    PROJECT6_SIM_TESTPOINT("database.gui_request.decoded", "new guiRequests row decoded");
+#endif
+                    if (!exchange_.readEvents.tryPush(*maybeEvent))
+                    {
+                        exchange_.droppedEventCount.fetch_add(1);
+                        recordFault(exchange_, ecDBServiceFaultReason::InboundQueueFull);
+#ifdef SUPERVISORY_ENABLE_SIM_TESTPOINTS
+                        PROJECT6_SIM_TESTPOINT("database.event.dropped", "DATABASE-to-CONTROL queue was full");
+#endif
+                    }
+                    else
+                    {
+#ifdef SUPERVISORY_ENABLE_SIM_TESTPOINTS
+                        PROJECT6_SIM_TESTPOINT("database.event.enqueued", "GUI request queued for CONTROL");
+#endif
+                    }
+                }
             }
 
             /*** Write ***/
             sSupervisoryStateSnapshot state;
-            if(!exchange_.writableSnapshots.tryPop(state)) {
-                exchange_.writeFailureCount.fetch_add(1);
-                recordFault(exchange_, ecDBServiceFaultReason::OutboundQueueFull);
-            } else {
+            if (exchange_.writableSnapshots.tryPop(state)) {
+#ifdef SUPERVISORY_ENABLE_SIM_TESTPOINTS
+                PROJECT6_SIM_TESTPOINT("database.snapshot.dequeued", "CONTROL snapshot dequeued for database write");
+#endif
                 std::optional<sDBOutboundSnapshot> maybeOutSnap = supervisoryStateToOutboundSnapshot(state);
                 if(!maybeOutSnap.has_value())
                 {
@@ -190,9 +203,13 @@ void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
                     recordFault(exchange_, ecDBServiceFaultReason::FailedWrite);
                     continue;
                 }
+                exchange_.writeCount.fetch_add(1);
+#ifdef SUPERVISORY_ENABLE_SIM_TESTPOINTS
+                PROJECT6_SIM_TESTPOINT("database.snapshot.written", "elevatorNetwork row inserted");
+#endif
             }
 
-            std::chrono::milliseconds delay{1000};
+            std::chrono::milliseconds delay{100};
             std::this_thread::sleep_for(delay);
         }
 
@@ -205,25 +222,38 @@ void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
     }
 }
 
-std::optional<sDBInboundSnapshot> cDBMessageService::readSnapshot() const {
+std::optional<sDBInboundSnapshot> cDBMessageService::readSnapshot() {
     sDBInboundSnapshot snap{};
 
-    if(auto choice = query("SELECT * FROM elevatorNetwork;"); choice.err()) {
+    const std::string readQuery =
+        "SELECT `index`, `requestFloor` FROM `guiRequests` WHERE `index` > " +
+        std::to_string(lastReadIndex_) + " ORDER BY `index` ASC LIMIT 1";
+    if(auto choice = query(readQuery.c_str()); choice.err()) {
         std::cerr << "query failed: " << operationStatusMessage(choice.status()) << '\n';
+        recordFault(exchange_, ecDBServiceFaultReason::FailedRead);
+        exchange_.databaseState.store(ecDBServiceState::Failed);
+#ifdef SUPERVISORY_ENABLE_SIM_TESTPOINTS
+        PROJECT6_SIM_TESTPOINT("database.read.failed", "guiRequests query failed");
+#endif
     } else {
         try {
             std::unique_ptr<sql::ResultSet>result{choice.value()};
-            while (result->next()) {
+            if (result->next()) {
                 snap.index = result->getUInt("index");
-                snap.requestedFloor = result->getUInt("requestedFloor");
+                snap.requestedFloor = static_cast<std::uint8_t>(result->getUInt("requestFloor"));
+                lastReadIndex_ = snap.index;
+                return snap;
             }
         } catch (...) {
             std::cerr << "ERROR: Invalid field from query." << std::endl;
-            return std::nullopt;
+            recordFault(exchange_, ecDBServiceFaultReason::FailedRead);
+            exchange_.databaseState.store(ecDBServiceState::Failed);
+#ifdef SUPERVISORY_ENABLE_SIM_TESTPOINTS
+            PROJECT6_SIM_TESTPOINT("database.read.failed", "guiRequests row could not be decoded");
+#endif
         }
     }
-
-    return std::optional<sDBInboundSnapshot>{snap};
+    return std::nullopt;
 }
 
 // TODO: This function may need to be passed the supervisory controllers state as well

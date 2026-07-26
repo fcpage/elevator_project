@@ -10,11 +10,15 @@
 */
 
 #include "supervisory/app/supervisory_application.hpp"
-#include "supervisory/can/can_comms_service.hpp"
+#include "supervisory/can/runtime_can_service.hpp"
 #include "supervisory/database/database_message_service.hpp"
+#ifdef SUPERVISORY_ENABLE_SIM_DIAGNOSTICS
+#include "supervisory/sim/simulator_diagnostics.hpp"
+#endif
 
 #include <chrono>
 #include <csignal>
+#include <cstdlib>
 #include <cstdint>
 #include <iostream>
 #include <thread>
@@ -38,6 +42,40 @@ constexpr bool kConfigureCanInterfaceOnInitialize = true;
 #endif
 
 volatile std::sig_atomic_t keepRunning = 1;
+
+#ifdef SUPERVISORY_ENABLE_SIM_DIAGNOSTICS
+void applySimulatorDatabaseEnvironment(project6::supervisory::sDBServiceConfig& config)
+{
+    if (const char* value = std::getenv("ELEVATOR_DB_URL"); value != nullptr && value[0] != '\0')
+    {
+        config.url = value;
+    }
+    if (const char* value = std::getenv("ELEVATOR_DB_USER"); value != nullptr && value[0] != '\0')
+    {
+        config.user = value;
+    }
+    if (const char* value = std::getenv("ELEVATOR_DB_PASSWORD"); value != nullptr)
+    {
+        config.password = value;
+    }
+    if (const char* value = std::getenv("ELEVATOR_DB_SCHEMA"); value != nullptr && value[0] != '\0')
+    {
+        config.database = value;
+    }
+}
+
+bool snapshotsDiffer(
+    const project6::supervisory::sSupervisoryStateSnapshot& left,
+    const project6::supervisory::sSupervisoryStateSnapshot& right)
+{
+    return left.controlState != right.controlState ||
+           left.currentFloor != right.currentFloor ||
+           left.targetFloor != right.targetFloor ||
+           left.direction != right.direction ||
+           left.isDoorOpen != right.isDoorOpen ||
+           left.isFaulted != right.isFaulted;
+}
+#endif
 
 void handleShutdownSignal(const int signalNumber)
 {
@@ -74,12 +112,20 @@ int main(const int argumentCount, char* arguments[])
         kDefaultCanBitrateBitsPerSecond,
         kDefaultCanRestartMs,
         kConfigureCanInterfaceOnInitialize};
-    const sDBServiceConfig dbConfig{};
+    sDBServiceConfig dbConfig{};
+#ifdef SUPERVISORY_ENABLE_SIM_DIAGNOSTICS
+    applySimulatorDatabaseEnvironment(dbConfig);
+#endif
+
     sDBMessageExchange dbExchange;
     sCanExchange canExchange;
-    cCanCommsService commsService(canConfig, canExchange);
+    cRuntimeCanService commsService(canConfig, canExchange);
     cSupervisoryApplication application(canExchange, dbExchange);
     cDBMessageService database(dbConfig, dbExchange);
+#ifdef SUPERVISORY_ENABLE_SIM_DIAGNOSTICS
+    cSimulatorDiagnosticsPublisher diagnostics;
+    diagnostics.start();
+#endif
 
     if (const ecOperationStatus status = commsService.initializeService(); status != ecOperationStatus::Ok)
     {
@@ -94,6 +140,9 @@ int main(const int argumentCount, char* arguments[])
                   << operationStatusMessage(status) << '\n';
         return 1;
     }
+#ifdef SUPERVISORY_ENABLE_SIM_TESTPOINTS
+    SUPERVISORY_TESTPOINT("service.can.started", "CAN worker is running");
+#endif
 
     if (const ecOperationStatus status = database.start(); status != ecOperationStatus::Ok)
     {
@@ -101,6 +150,9 @@ int main(const int argumentCount, char* arguments[])
                   << operationStatusMessage(status) << '\n';
         return 1;
     }
+#ifdef SUPERVISORY_ENABLE_SIM_TESTPOINTS
+    SUPERVISORY_TESTPOINT("service.database.started", "database worker is running");
+#endif
 
     std::signal(SIGINT, handleShutdownSignal);
     std::signal(SIGTERM, handleShutdownSignal);
@@ -108,9 +160,20 @@ int main(const int argumentCount, char* arguments[])
     constexpr std::chrono::milliseconds kLoopPeriodMs{10}; 
     auto previousIteration = std::chrono::steady_clock::now();
     auto nextIteration = previousIteration;
+#ifdef SUPERVISORY_ENABLE_SIM_DIAGNOSTICS
+    std::uint64_t loopSequence = 0;
+    std::chrono::milliseconds diagnosticElapsed{100};
+    sSupervisoryStateSnapshot lastDiagnosticSnapshot = application.snapshot();
+#endif
 
-    std::clog << "START interface=" << canConfig.interfaceName
-              << " bitrate=" << canConfig.bitrateBitsPerSecond << '\n';
+    std::clog << "START transport="
+#ifdef SUPERVISORY_USE_SIMULATOR_CAN
+              << "simulator-loopback"
+#else
+              << "socketcan interface=" << canConfig.interfaceName
+              << " bitrate=" << canConfig.bitrateBitsPerSecond
+#endif
+              << '\n';
 
     while (keepRunning != 0)
     {
@@ -128,20 +191,45 @@ int main(const int argumentCount, char* arguments[])
             return 1;
         }
 
-        if (const auto iterationEnd = std::chrono::steady_clock::now(); iterationEnd < nextIteration)
+        const auto iterationEnd = std::chrono::steady_clock::now();
+        [[maybe_unused]] std::chrono::milliseconds overrunMs{0};
+        if (iterationEnd < nextIteration)
         {
             std::this_thread::sleep_until(nextIteration);
         }
         else
         {
-            const auto overrunMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+            overrunMs = std::chrono::duration_cast<std::chrono::milliseconds>(
                 iterationEnd - nextIteration);
+#ifndef SUPERVISORY_ENABLE_SIM_DIAGNOSTICS
             std::clog << "LOOP_OVERRUN elapsed_ms=" << overrunMs.count() << '\n';
+#endif
             nextIteration = iterationEnd;
         }
+
+#ifdef SUPERVISORY_ENABLE_SIM_DIAGNOSTICS
+        ++loopSequence;
+        diagnosticElapsed += elapsedMs;
+        const sSupervisoryStateSnapshot currentSnapshot = application.snapshot();
+        if (diagnosticElapsed >= std::chrono::milliseconds{100} ||
+            snapshotsDiffer(currentSnapshot, lastDiagnosticSnapshot))
+        {
+            static_cast<void>(diagnostics.tryPublish(makeSimulatorDiagnosticRecord(
+                loopSequence,
+                static_cast<std::uint64_t>(elapsedMs.count()),
+                static_cast<std::uint64_t>(overrunMs.count()),
+                application,
+                dbExchange)));
+            diagnosticElapsed = std::chrono::milliseconds{0};
+            lastDiagnosticSnapshot = currentSnapshot;
+        }
+#endif
     }
 
     commsService.stop();
+#ifdef SUPERVISORY_ENABLE_SIM_DIAGNOSTICS
+    diagnostics.stop();
+#endif
     std::clog << "SHUTDOWN reason=signal\n";
     return 0;
 }

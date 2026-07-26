@@ -51,10 +51,11 @@ int main()
     using namespace project6::supervisory;
 
     sCanExchange exchange;
+    sDBMessageExchange databaseExchange;
     exchange.commsState.store(ecCanCommsState::Running);
     exchange.commsProgress.store(1);
 
-    cSupervisoryApplication application(exchange);
+    cSupervisoryApplication application(exchange, databaseExchange);
 
     sSupervisoryEvent request{};
     request.type = ecEventType::CanFloorRequest;
@@ -108,13 +109,14 @@ int main()
         "operator health did not identify the frozen COMMS thread");
 
     sCanExchange heartbeatExchange;
-    heartbeatExchange.commsState.store(ecCanCommsState::Running);
+    sDBMessageExchange heartbeatDatabaseExchange;
+    heartbeatExchange.commsState.store(ecCanCommsState::Stopped);
     heartbeatExchange.commsProgress.store(1);
-    cSupervisoryApplication heartbeatApplication(heartbeatExchange);
+    cSupervisoryApplication heartbeatApplication(heartbeatExchange, heartbeatDatabaseExchange);
 
     markCommsProgress(heartbeatExchange);
     require(
-        heartbeatApplication.runControlCycle(2999ms) == ecOperationStatus::Ok,
+        heartbeatApplication.runControlCycle(3999ms) == ecOperationStatus::Ok,
         "node heartbeat warmup cycle failed");
     require(
         !heartbeatExchange.transmitFrames.tryPop(command),
@@ -152,12 +154,13 @@ int main()
     require(command.data[0] == 0x84, "node heartbeat reply used the wrong payload");
 
     sCanExchange allReplyExchange;
-    allReplyExchange.commsState.store(ecCanCommsState::Running);
+    sDBMessageExchange allReplyDatabaseExchange;
+    allReplyExchange.commsState.store(ecCanCommsState::Stopped);
     allReplyExchange.commsProgress.store(1);
-    cSupervisoryApplication allReplyApplication(allReplyExchange);
+    cSupervisoryApplication allReplyApplication(allReplyExchange, allReplyDatabaseExchange);
 
     markCommsProgress(allReplyExchange);
-    require(allReplyApplication.runControlCycle(3s) == ecOperationStatus::Ok,
+    require(allReplyApplication.runControlCycle(4s) == ecOperationStatus::Ok,
         "node heartbeat request setup cycle failed");
     require(allReplyExchange.transmitFrames.tryPop(command), "node heartbeat request setup missing");
 
@@ -188,12 +191,13 @@ int main()
         "complete node heartbeat reply set faulted the state machine");
 
     sCanExchange missedReplyExchange;
-    missedReplyExchange.commsState.store(ecCanCommsState::Running);
+    sDBMessageExchange missedReplyDatabaseExchange;
+    missedReplyExchange.commsState.store(ecCanCommsState::Stopped);
     missedReplyExchange.commsProgress.store(1);
-    cSupervisoryApplication missedReplyApplication(missedReplyExchange);
+    cSupervisoryApplication missedReplyApplication(missedReplyExchange, missedReplyDatabaseExchange);
 
     markCommsProgress(missedReplyExchange);
-    require(missedReplyApplication.runControlCycle(3s) == ecOperationStatus::Ok,
+    require(missedReplyApplication.runControlCycle(4s) == ecOperationStatus::Ok,
         "missed heartbeat request setup cycle failed");
     require(missedReplyExchange.transmitFrames.tryPop(command), "missed heartbeat request missing");
     require(missedReplyExchange.receivedNodeHbMessages.tryPush(
@@ -201,7 +205,7 @@ int main()
         "partial heartbeat reply setup failed");
 
     markCommsProgress(missedReplyExchange);
-    require(missedReplyApplication.runControlCycle(999ms) == ecOperationStatus::Ok,
+    require(missedReplyApplication.runControlCycle(2999ms) == ecOperationStatus::Ok,
         "node heartbeat verification window closed early");
     require(
         missedReplyApplication.snapshot().controlState != ecSupervisoryControlState::Faulted,
@@ -222,9 +226,10 @@ int main()
         "missed node heartbeat mask did not identify missing nodes");
 
     sCanExchange nodeErrorExchange;
-    nodeErrorExchange.commsState.store(ecCanCommsState::Running);
+    sDBMessageExchange nodeErrorDatabaseExchange;
+    nodeErrorExchange.commsState.store(ecCanCommsState::Stopped);
     nodeErrorExchange.commsProgress.store(1);
-    cSupervisoryApplication nodeErrorApplication(nodeErrorExchange);
+    cSupervisoryApplication nodeErrorApplication(nodeErrorExchange, nodeErrorDatabaseExchange);
 
     require(nodeErrorExchange.receivedNodeHbMessages.tryPush(
         sNodeHbMessage{ecNodeHb::Error, kFloorTwoControllerCanId, 0x87}),
@@ -243,16 +248,18 @@ int main()
         "node heartbeat error did not identify the source node");
 
     sCanExchange logOnlyExchange;
-    logOnlyExchange.commsState.store(ecCanCommsState::Running);
+    sDBMessageExchange logOnlyDatabaseExchange;
+    logOnlyExchange.commsState.store(ecCanCommsState::Stopped);
     logOnlyExchange.commsProgress.store(1);
-    cSupervisoryApplication logOnlyApplication(logOnlyExchange, ecNodeHbFailureMode::LogOnly);
+    cSupervisoryApplication logOnlyApplication(
+        logOnlyExchange, logOnlyDatabaseExchange, ecNodeHbFailureMode::LogOnly);
 
     markCommsProgress(logOnlyExchange);
-    require(logOnlyApplication.runControlCycle(3s) == ecOperationStatus::Ok,
+    require(logOnlyApplication.runControlCycle(4s) == ecOperationStatus::Ok,
         "log-only heartbeat request setup failed");
     require(logOnlyExchange.transmitFrames.tryPop(command), "log-only heartbeat request missing");
     markCommsProgress(logOnlyExchange);
-    require(logOnlyApplication.runControlCycle(1000ms) == ecOperationStatus::Ok,
+    require(logOnlyApplication.runControlCycle(3s) == ecOperationStatus::Ok,
         "log-only heartbeat timeout cycle failed");
     require(
         logOnlyApplication.snapshot().controlState != ecSupervisoryControlState::Faulted,

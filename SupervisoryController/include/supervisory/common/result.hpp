@@ -36,11 +36,11 @@ struct sChoice {
         return fail_; 
     };
     constexpr S status() { 
-        assert(fail);
+        assert(fail_);
         return status_; 
     };
     constexpr V value() { 
-        assert(!fail);
+        assert(!fail_);
         return value_;
     };
     sChoice(S s) : fail_(true), status_(s) {}

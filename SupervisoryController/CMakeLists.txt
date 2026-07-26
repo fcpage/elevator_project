@@ -20,9 +20,49 @@ option(
     OFF
 )
 
+# Builds the normal SA executable with the localhost simulator CAN transport.
+option(
+    SUPERVISORY_BUILD_SIMULATOR
+    "Build supervisory_controller with the localhost simulator CAN transport."
+    OFF
+)
+
+option(
+    SUPERVISORY_ENABLE_SIM_DIAGNOSTICS
+    "Enable best-effort localhost simulator diagnostics."
+    OFF
+)
+
+option(
+    SUPERVISORY_ENABLE_SIM_TESTPOINTS
+    "Enable optional, non-blocking simulator testpoint calls."
+    OFF
+)
+
 find_package(Threads REQUIRED)
 
 set(SUPERVISORY_COMMON_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../Common")
+
+set(MYSQLCPPCONN_HINTS)
+if(WIN32)
+    file(GLOB MYSQLCPPCONN_HINTS LIST_DIRECTORIES true
+        "$ENV{ProgramFiles}/MySQL/MySQL Connector C++ *"
+        "$ENV{ProgramFiles}/MySQL/Connector C++ *"
+    )
+endif()
+
+find_path(MYSQLCPPCONN_INCLUDE_DIR mysql_driver.h
+    HINTS ${MYSQLCPPCONN_HINTS}
+    PATH_SUFFIXES include/jdbc jdbc mysql-cppconn/jdbc mysql-cppconn-8/jdbc)
+find_library(MYSQLCPPCONN_LIBRARY NAMES mysqlcppconn mysqlcppconn8
+    HINTS ${MYSQLCPPCONN_HINTS}
+    PATH_SUFFIXES lib64/vs14 lib64 lib/vs14 lib)
+
+if(NOT MYSQLCPPCONN_INCLUDE_DIR OR NOT MYSQLCPPCONN_LIBRARY)
+    message(FATAL_ERROR
+        "MySQL Connector/C++ was not found. Install it or set "
+        "MYSQLCPPCONN_INCLUDE_DIR and MYSQLCPPCONN_LIBRARY.")
+endif()
 
 add_library(project6_supervisory
     src/app/supervisory_application.cpp
@@ -30,21 +70,34 @@ add_library(project6_supervisory
     src/can/can_protocol.cpp
     src/can/socket_can_adapter.cpp
     src/control/supervisory_state_machine.cpp
+    src/database/database_message_service.cpp
     src/drivers/supervisory_drivers.cpp
     src/http/http_server.cpp
     src/scheduler/request_scheduler.cpp
+    src/sim/simulator_can_service.cpp
 )
+
+if(SUPERVISORY_ENABLE_SIM_DIAGNOSTICS OR SUPERVISORY_ENABLE_SIM_TESTPOINTS)
+    target_sources(project6_supervisory PRIVATE src/sim/simulator_diagnostics.cpp)
+endif()
 
 target_include_directories(project6_supervisory
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         "${SUPERVISORY_COMMON_DIR}"
+        "${MYSQLCPPCONN_INCLUDE_DIR}"
 )
 
 target_link_libraries(project6_supervisory
     PUBLIC
         Threads::Threads
+        "${MYSQLCPPCONN_LIBRARY}"
 )
+
+if(WIN32)
+    # Required by the localhost simulator CAN bridge on Windows.
+    target_link_libraries(project6_supervisory PUBLIC ws2_32)
+endif()
 
 if(SUPERVISORY_ENABLE_AUTO_ARRIVAL)
     target_compile_definitions(project6_supervisory
@@ -67,6 +120,24 @@ target_link_libraries(supervisory_controller
     PRIVATE
         project6_supervisory
 )
+
+if(SUPERVISORY_BUILD_SIMULATOR)
+    # This affects only simulator builds of the normal executable.
+    target_compile_definitions(supervisory_controller
+        PRIVATE SUPERVISORY_USE_SIMULATOR_CAN=1)
+endif()
+
+if(SUPERVISORY_ENABLE_SIM_DIAGNOSTICS)
+    target_compile_definitions(supervisory_controller
+        PRIVATE SUPERVISORY_ENABLE_SIM_DIAGNOSTICS=1)
+endif()
+
+if(SUPERVISORY_ENABLE_SIM_TESTPOINTS)
+    target_compile_definitions(project6_supervisory
+        PRIVATE SUPERVISORY_ENABLE_SIM_TESTPOINTS=1)
+    target_compile_definitions(supervisory_controller
+        PRIVATE SUPERVISORY_ENABLE_SIM_TESTPOINTS=1)
+endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/sim/simulator_supervisor_main.cpp")
     add_executable(supervisory_simulator_adapter
@@ -159,6 +230,7 @@ add_executable(supervisory_control_loop_tests
     src/can/can_protocol.cpp
     src/can/socket_can_adapter.cpp
     src/control/supervisory_state_machine.cpp
+    src/database/database_message_service.cpp
     src/scheduler/request_scheduler.cpp
 )
 
@@ -166,11 +238,13 @@ target_include_directories(supervisory_control_loop_tests
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         "${SUPERVISORY_COMMON_DIR}"
+        "${MYSQLCPPCONN_INCLUDE_DIR}"
 )
 
 target_link_libraries(supervisory_control_loop_tests
     PRIVATE
         Threads::Threads
+        "${MYSQLCPPCONN_LIBRARY}"
 )
 
 add_test(
@@ -202,6 +276,14 @@ add_test(
     NAME supervisory_control_loop_tests
     COMMAND supervisory_control_loop_tests
 )
+
+if(WIN32)
+    # mysqlcppconn.lib is under lib64/vs14 while its runtime DLL is in lib64.
+    get_filename_component(MYSQLCPPCONN_LIBRARY_DIR "${MYSQLCPPCONN_LIBRARY}" DIRECTORY)
+    get_filename_component(MYSQLCPPCONN_RUNTIME_DIR "${MYSQLCPPCONN_LIBRARY_DIR}/.." ABSOLUTE)
+    set_tests_properties(supervisory_control_loop_tests PROPERTIES
+        ENVIRONMENT "PATH=${MYSQLCPPCONN_RUNTIME_DIR};$ENV{PATH}")
+endif()
 
 set(ESEPP_EXECUTABLE
     "${CMAKE_CURRENT_SOURCE_DIR}/ESE_Preprocessor/executable/esepp.exe"

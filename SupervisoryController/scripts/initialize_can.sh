@@ -81,18 +81,29 @@ interface_exists()
     ip link show dev "${interface_name}" >/dev/null 2>&1
 }
 
+interface_is_up()
+{
+    local interface_name="$1"
+
+    ip -o link show dev "${interface_name}" 2>/dev/null | grep -q '<[^>]*UP[^>]*>'
+}
+
 setup_virtual_can()
 {
     local interface_name="$1"
 
     validate_interface_name "${interface_name}"
     require_command ip
-    require_command modprobe
+    if interface_exists "${interface_name}" && interface_is_up "${interface_name}"; then
+        echo "initialize_can.sh: virtual CAN already ready on ${interface_name}"
+        ip -details -statistics link show "${interface_name}"
+        return 0
+    fi
+
     require_privilege_tool
-
-    run_privileged modprobe vcan
-
     if ! interface_exists "${interface_name}"; then
+        require_command modprobe
+        run_privileged modprobe vcan
         run_privileged ip link add dev "${interface_name}" type vcan
     fi
 
