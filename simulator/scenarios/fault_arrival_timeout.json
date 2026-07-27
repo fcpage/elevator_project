@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "name": "fault_arrival_timeout",
+  "description": "Delays one elevator arrival beyond the supervisory application's ten-second travel timeout.",
+  "repeat": false,
+  "steps": [
+    {"action": "delay_arrival", "delay_ms": 11000},
+    {"action": "floor_call", "floor": 3},
+    {"action": "wait_for_can", "id": "0x100", "data_byte": "0x07", "timeout_ms": 10000},
+    {"action": "wait", "ms": 13000}
+  ]
+}

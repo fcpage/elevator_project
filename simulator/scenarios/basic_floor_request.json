@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "name": "basic_floor_request",
+  "description": "Floor 3 calls the elevator and the simulated car reaches floor 3.",
+  "repeat": false,
+  "journeys": [
+    [
+      {"action": "floor_call", "floor": 3},
+      {"action": "wait_for_can", "id": "0x100", "data_byte": "0x07", "timeout_ms": 10000},
+      {"action": "wait_for_can", "id": "0x101", "data_byte": 3, "timeout_ms": 10000}
+    ]
+  ]
+}

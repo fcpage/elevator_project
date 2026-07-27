@@ -13,17 +13,11 @@ sudo mysql -u root -p -P 3306 #give root access to all databases
 wait_fn #let that sink in
 echo "password: ese"	#you probably should change at least one of your passwords...
 wait_fn #HOLD IT RIGHT THERE!
-sudo mysql -u phpmyadmin -p -P 3306 #give phpmyadmin access to all databases
-echo "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('ese')" | mysql -u root #setting password for the root in mysql
+sudo mysql -u phpmyadmin -pese -P 3306 #give phpmyadmin access to all databases
+#echo "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('ese')" | mysql -u root #setting password for the root in mysql
 
 #creating ese user so we aren't in root all the time
-mysql -u root -p << POM 
-	USE mysql;
-	CREATE USER 'ese'@'%' IDENTIFIED BY 'ese';
-	GRANT ALL PRIVILEGES ON *.* TO 'ese'@'%' WITH GRANT OPTION;
-	FLUSH PRIVILEGES;
-	quit;
-POM
+sudo mysql -u root -pese < ./sql/user_init.sql
 
 #multi-line input sequence... the commands are pretty self-evident
 sudo service mysql restart #restart mysql so that the changes can take effect

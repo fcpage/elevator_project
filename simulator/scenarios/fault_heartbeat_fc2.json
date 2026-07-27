@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "name": "fault_heartbeat_fc2",
+  "description": "Suppresses the floor-2 controller reply for exactly one supervisory heartbeat cycle.",
+  "repeat": false,
+  "steps": [
+    {"action": "suppress_heartbeat", "node_id": "0x202", "cycles": 1},
+    {"action": "wait", "ms": 9000}
+  ]
+}

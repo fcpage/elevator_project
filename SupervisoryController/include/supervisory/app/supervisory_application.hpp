@@ -14,6 +14,7 @@
 #include "supervisory/can/can_comms_service.hpp"
 #include "supervisory/common/result.hpp"
 #include "supervisory/control/supervisory_state_machine.hpp"
+#include "supervisory/database/database_message_service.hpp"
 
 namespace project6::supervisory
 {
@@ -56,7 +57,8 @@ public:
      *        heartbeat verification window.
      */
     explicit cSupervisoryApplication(
-        sCanExchange& exchange,
+        sCanExchange& canExchange,
+        sDBMessageExchange& databaseExchange,
         ecNodeHbFailureMode nodeHbFailureMode = ecNodeHbFailureMode::FaultControl);
 
     /**
@@ -75,8 +77,12 @@ public:
 private:
     /** @brief Moves a generated frame to COMMS. */
     void publishPendingFrame();
+    /** @brief Moves a generated state machine snapshot to database. */
+    void publishSnapshot();
     /** @brief Detects COMMS failure or timeout. */
     void checkCommsHealth(std::chrono::milliseconds elapsedMs);
+    /** @brief Detects COMMS failure or timeout. */
+    void checkDatabaseHealth(std::chrono::milliseconds elapsedMs);
     /** @brief Drains and schedules node heartbeat messages. */
     void processNodeHbCycle(std::chrono::milliseconds elapsedMs);
     /** @brief Applies one decoded node heartbeat message. */
@@ -98,19 +104,29 @@ private:
     void faultControl(ecCanCommsFaultReason reason);
     /** @brief Latches a COMMS fault into CONTROL. */
     void faultComms(ecCanCommsFaultReason reason);
+    /** @brief Latches a Database fault into CONTROL. */
+    void faultDatabase(ecDBServiceFaultReason reason);
 
     /** Shared COMMS exchange. */
-    sCanExchange& exchange_;
+    sCanExchange& canExchange_;
+    /** Shared DATABASE exchange. */
+    sDBMessageExchange& databaseExchange_;
     /** CONTROL-owned state machine. */
     cSupervisoryStateMachineAPI appStateMachine_;
     /** Last observed COMMS worker progress counter. */
     std::uint64_t lastCommsProgress_ = 0;
     /** Last observed dropped-event count. */
-    std::uint64_t lastDroppedEventCount_ = 0;
+    std::uint64_t lastCommsDroppedEventCount_ = 0;
     /** Last observed transmit-failure count. */
-    std::uint64_t lastTransmitFailureCount_ = 0;
+    std::uint64_t lastCommsTransmitFailureCount_ = 0;
     /** Time without COMMS worker progress. */
     std::chrono::milliseconds staleCommsProgressElapsed_{0};
+    /** Time without DATABASE worker progress. */
+    std::chrono::milliseconds staleDatabaseProgressElapsed_{0};
+    /** Last observed dropped-event count. */
+    std::uint64_t lastDatabaseDroppedEventCount_ = 0;
+    /** Last observed transmit-failure count. */
+    std::uint64_t lastDatabaseWriteFailureCount_ = 0;
     /** Time accumulated toward the next outbound node heartbeat request. */
     std::chrono::milliseconds nodeHbIntervalElapsed_{0};
     /** Time accumulated while waiting for node heartbeat replies. */
