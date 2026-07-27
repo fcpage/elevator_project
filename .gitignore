@@ -9,8 +9,7 @@ SupervisoryController/out/
 SupervisoryController/.vs/
 FloorController/build/
 SupervisoryController/.idea/
-
-**/__pycache__/**
+__pycache__
 
 latex
 html
