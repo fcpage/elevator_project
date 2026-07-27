@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "name": "agreed-v1",
+  "schema_name": "elevatorg1",
+  "sql_file": "agreed_v1.sql",
+  "tables": {
+    "gui_requests": {
+      "name": "guiRequests",
+      "index_column": "index",
+      "columns": ["index", "date", "time", "requestFloor", "remote"],
+      "reset": true,
+      "observe": true
+    },
+    "elevator_network": {
+      "name": "elevatorNetwork",
+      "index_column": "index",
+      "columns": ["index", "date", "time", "currentFloor", "floorRequest1", "floorRequest2", "floorRequest3", "carRequestFloor1", "carRequestFloor2", "carRequestFloor3", "doorsOpen"],
+      "reset": true,
+      "observe": true
+    }
+  },
+  "gui_request": {
+    "table": "gui_requests",
+    "fields": [
+      {"column": "date", "source": "date"},
+      {"column": "time", "source": "time"},
+      {"column": "requestFloor", "source": "floor"},
+      {"column": "remote", "source": "remote"}
+    ]
+  },
+  "outbound_table": "elevator_network"
+}
