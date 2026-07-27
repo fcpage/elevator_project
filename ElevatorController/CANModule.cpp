@@ -1,4 +1,4 @@
-/*!
+/*! vim: set filetype=arduino : (its a vim thing you wouldn't understand)
  * @file CANModule.cpp
  * @brief Michael Galle's Elevator Controller API
  * @copyright Michael Galle

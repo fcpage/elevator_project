@@ -11,6 +11,7 @@
 
 #include "supervisory/app/supervisory_application.hpp"
 #include "supervisory/can/can_comms_service.hpp"
+#include "supervisory/database/database_message_service.hpp"
 
 #include <chrono>
 #include <csignal>
@@ -44,33 +45,6 @@ void handleShutdownSignal(const int signalNumber)
     keepRunning = 0;
 }
 
-const char* operationStatusMessage(const project6::supervisory::ecOperationStatus status)
-{
-    using project6::supervisory::ecOperationStatus;
-
-    switch (status)
-    {
-        case ecOperationStatus::Ok:
-            return "operation completed successfully";
-        case ecOperationStatus::NotInitialized:
-            return "a required module was not initialized";
-        case ecOperationStatus::InvalidArgument:
-            return "invalid runtime configuration";
-        case ecOperationStatus::WouldBlock:
-            return "operation would block";
-        case ecOperationStatus::InsufficientPrivileges:
-            return "permission denied while configuring CAN; run as root or grant CAP_NET_ADMIN";
-        case ecOperationStatus::HardwareUnavailable:
-            return "required hardware or SocketCAN interface is unavailable";
-        case ecOperationStatus::NetworkUnavailable:
-            return "required network service is unavailable";
-        case ecOperationStatus::NotImplemented:
-            return "requested operation is not implemented";
-    }
-
-    return "unknown operation status";
-}
-
 } // namespace
 
 /**
@@ -100,9 +74,12 @@ int main(const int argumentCount, char* arguments[])
         kDefaultCanBitrateBitsPerSecond,
         kDefaultCanRestartMs,
         kConfigureCanInterfaceOnInitialize};
+    const sDBServiceConfig dbConfig{};
+    sDBMessageExchange dbExchange;
     sCanExchange canExchange;
     cCanCommsService commsService(canConfig, canExchange);
     cSupervisoryApplication application(canExchange);
+    cDBMessageService database(dbConfig, dbExchange);
 
     if (const ecOperationStatus status = commsService.initializeService(); status != ecOperationStatus::Ok)
     {
@@ -117,6 +94,23 @@ int main(const int argumentCount, char* arguments[])
                   << operationStatusMessage(status) << '\n';
         return 1;
     }
+
+    if (const ecOperationStatus status = database.start(); status != ecOperationStatus::Ok)
+    {
+        std::cerr << "supervisory_controller: database service start failed: "
+                  << operationStatusMessage(status) << '\n';
+        return 1;
+    }
+
+    // /* TEMP: Test query to test connection with database */
+    // if(auto choice = database.query("SELECT 'Database Connection Established' AS _message"); choice.err()) {
+    //     std::cerr << "query failed: " << operationStatusMessage(choice.status()) << '\n';
+    // } else {
+    //     std::unique_ptr<sql::ResultSet>result{choice.value()};
+    //     while (result->next()) {
+    //         std::cout << "MySQL Reply: " << result->getString("_message") << std::endl;
+    //     }
+    // }
 
     std::signal(SIGINT, handleShutdownSignal);
     std::signal(SIGTERM, handleShutdownSignal);
