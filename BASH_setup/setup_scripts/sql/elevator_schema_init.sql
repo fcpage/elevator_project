@@ -22,11 +22,6 @@ ALTER TABLE elevatorNetwork
     ADD INDEX(`index`),		/*the index is indexed by index*/
     MODIFY `index` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY;	/*make index the primary key, and auto increment it*/
 
-CREATE TRIGGER supervisorStateChange AFTER INSERT ON elevatorNetwork
-    FOR EACH ROW SELECT index FROM elevatorNetwork INTO OUTFILE
-    '/var/www/html/project_vi_website/general/resources/requests/database/toGUI.csv'
-    FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n';
-
 /*The multi-row table for requesting floors*/
 CREATE TABLE guiRequests(	/*table to send gui requests to the hardware system*/
 `index` INT NOT NULL,	/*database access index*/
@@ -42,18 +37,14 @@ ALTER TABLE guiRequests
     ADD INDEX(`index`),		/*the index is indexed by index*/
     MODIFY `index` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY;	/*make index the primary key, and auto increment it*/
 
-CREATE TRIGGER guiRequest AFTER INSERT ON guiRequests
-    FOR EACH ROW SELECT index FROM guiRequests INTO OUTFILE
-    '/var/www/html/project_vi_website/general/resources/requests/database/toSupervisor.csv'
-    FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n';
-
 CREATE TABLE accessAttempts(
     `index` INT NOT NULL,	/*access attempt index*/
     `date` DATE NOT NULL,	/*access date*/
     `time` TIME NOT NULL,	/*snapshot package time*/
-    `user` VARCHAR NOT NULL,
-    `authorization` VARCHAR NOT NULL,
-    `authentication` VARCHAR NOT NULL
+    `user` CHAR(32) NOT NULL,
+    `authorization` CHAR(32) NOT NULL,
+    `authentication` CHAR(32) NOT NULL,
+    `accepted` BOOL NOT NULL
 ) ENGINE = InnoDb;
 
 /*Set the table indexing, unique key, and auto incrementing of the primary key*/
@@ -64,25 +55,25 @@ ALTER TABLE accessAttempts
 
 CREATE TABLE loginRegistry(
     `index` INT NOT NULL,
-    `username` VARCHAR NOT NULL,
-    `password` VARCHAR NOT NULL,
-    `authorization` VARCHAR NOT NULL,
-    `accepted` BOOL NOT NULL
+    `username` CHAR(32) NOT NULL,
+    `password` CHAR(8) NOT NULL,
+    `authorization` CHAR(5) NOT NULL
 ) ENGINE = InnoDb;
 
 /*Set the table indexing, unique key, and auto incrementing of the primary key*/
 ALTER TABLE loginRegistry
-    ADD UNIQUE KEY(`time`),	/*time is a unique key*/
+    ADD UNIQUE KEY(`username`),	/*time is a unique key*/
     ADD INDEX(`index`),		/*the index is indexed by index*/
     MODIFY `index` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY;	/*make index the primary key, and auto increment it*/
+    
 
-INSERT INTO loginRegistry VALUES (1, nigel_sinclair, 12345678, dev);
-INSERT INTO loginRegistry VALUES (2, ryan_pratt, 12345678, dev);
-INSERT INTO loginRegistry VALUES (3, fergus_page, 12345678, dev);
-INSERT INTO loginRegistry VALUES (4, safat_khan, 12345678, prof);
-INSERT INTO loginRegistry VALUES (5, hassan_zaytoon, 12345678, prof);
-INSERT INTO loginRegistry VALUES (6, elevator, 12345678, run);
-INSERT INTO loginRegistry VALUES (7, maintenance, 12345678, admin);
+INSERT INTO loginRegistry VALUES (nigel_sinclair, 12345678, dev);
+INSERT INTO loginRegistry VALUES (ryan_pratt, 12345678, dev);
+INSERT INTO loginRegistry VALUES (fergus_page, 12345678, dev);
+INSERT INTO loginRegistry VALUES (safat_khan, 12345678, prof);
+INSERT INTO loginRegistry VALUES (hassan_zaytoon, 12345678, prof);
+INSERT INTO loginRegistry VALUES (elevator, 12345678, run);
+INSERT INTO loginRegistry VALUES (maintenance, 12345678, admin);
 
 DESC elevatorNetwork;
 DESC guiRequests;
