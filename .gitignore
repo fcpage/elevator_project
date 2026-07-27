@@ -10,6 +10,8 @@ SupervisoryController/.vs/
 FloorController/build/
 SupervisoryController/.idea/
 
+**/__pycache__/**
+
 latex
 html
 
