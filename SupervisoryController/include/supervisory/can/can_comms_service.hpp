@@ -72,6 +72,21 @@ struct sCanCommsHealthSnapshot
     bool isNodeHbReplyWindowOpen = false;
 };
 
+/** Direction of a raw CAN frame captured by the COMMS worker. */
+enum class ecCanLogDirection : std::uint8_t
+{
+    Received,
+    Transmitted
+};
+
+/** Temporary persistence record for one CAN frame. */
+struct sCanLogRecord
+{
+    std::uint64_t timestampMs = 0;
+    ecCanLogDirection direction = ecCanLogDirection::Received;
+    sCanFrame frame{};
+};
+
 /** @brief Lock-free data exchange between COMMS and CONTROL. */
 struct sCanExchange
 {
@@ -79,6 +94,8 @@ struct sCanExchange
     cSpscQueue<sSupervisoryEvent, 64> receivedEvents;
     /** COMMS-to-CONTROL node heartbeat messages. */
     cSpscQueue<sNodeHbMessage, 32> receivedNodeHbMessages;
+    /** Raw CAN records for temporary CONTROL-owned persistence. */
+    cSpscQueue<sCanLogRecord, 256> canLogRecords;
     /** CONTROL-to-COMMS frames. */
     cSpscQueue<sCanFrame, 16> transmitFrames;
 

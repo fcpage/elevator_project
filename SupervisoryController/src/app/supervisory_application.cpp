@@ -8,6 +8,7 @@
 #include "supervisory/app/supervisory_application.hpp"
 
 #include <cstddef>
+#include <iomanip>
 #include <iostream>
 #include <optional>
 
@@ -105,6 +106,7 @@ void cSupervisoryApplication::setSabbathStopDuration(
 ecOperationStatus cSupervisoryApplication::runControlCycle(
     const std::chrono::milliseconds elapsedMs)
 {
+    writeCanLogRecords();
     checkCommsHealth(elapsedMs);
 
     for (std::size_t count = 0; count < kMaximumEventsPerCycle; ++count)
@@ -130,6 +132,35 @@ ecOperationStatus cSupervisoryApplication::runControlCycle(
     processNodeHbCycle(elapsedMs);
 
     return ecOperationStatus::Ok;
+}
+
+void cSupervisoryApplication::writeCanLogRecords()
+{
+    // Temporary database seam: replace this file append with an INSERT/batch
+    // writer for the database CAN-log table here, while keeping this queue as
+    // the COMMS-to-CONTROL handoff.
+    if (!canLogFile_.is_open())
+    {
+        return;
+    }
+
+    sCanLogRecord record{};
+    while (exchange_.canLogRecords.tryPop(record))
+    {
+        canLogFile_ << "timestamp_ms=" << record.timestampMs
+                    << " direction="
+                    << (record.direction == ecCanLogDirection::Received ? "rx" : "tx")
+                    << " id=0x" << std::hex << record.frame.id << std::dec
+                    << " dlc=" << static_cast<unsigned int>(record.frame.dataLength)
+                    << " data=";
+        for (std::uint8_t index = 0; index < record.frame.dataLength; ++index)
+        {
+            canLogFile_ << std::hex << std::setw(2) << std::setfill('0')
+                        << static_cast<unsigned int>(record.frame.data[index]);
+        }
+        canLogFile_ << std::setfill(' ') << std::dec << '\n';
+    }
+    canLogFile_.flush();
 }
 
 void cSupervisoryApplication::processControlEvent(const sSupervisoryEvent& event)

@@ -10,6 +10,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <fstream>
 
 #include "supervisory/can/can_comms_service.hpp"
 #include "supervisory/audio/announcement_service.hpp"
@@ -90,6 +91,8 @@ private:
     /** @brief Moves a generated frame to COMMS. */
     void publishPendingFrame();
     void processControlEvent(const sSupervisoryEvent& event);
+    /** Writes queued raw CAN records until the database CAN-log table exists. */
+    void writeCanLogRecords();
     void publishArrivalAnnouncement(const sSupervisoryStateSnapshot& before);
     /** @brief Detects COMMS failure or timeout. */
     void checkCommsHealth(std::chrono::milliseconds elapsedMs);
@@ -121,6 +124,8 @@ private:
     cAnnouncementService* announcementService_ = nullptr;
     /** Adapter events share the same bounded control-cycle path as CAN events. */
     cSpscQueue<sSupervisoryEvent, 16> adapterEvents_;
+    /** Temporary CONTROL-owned CAN log output. */
+    std::ofstream canLogFile_{"can_log.txt", std::ios::app};
     /** CONTROL-owned state machine. */
     cSupervisoryStateMachineAPI appStateMachine_;
     /** Last observed COMMS worker progress counter. */
