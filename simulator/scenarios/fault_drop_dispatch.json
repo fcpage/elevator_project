@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "name": "fault_drop_dispatch",
+  "description": "Drops the next supervisor dispatch frame before it reaches the simulated plant.",
+  "repeat": false,
+  "steps": [
+    {"action": "drop_next_frame", "direction": "sa_to_sim", "id": "0x100", "data_byte": "0x07"},
+    {"action": "floor_call", "floor": 3},
+    {"action": "wait", "ms": 12000}
+  ]
+}

@@ -1,0 +1,10 @@
+// PLACE THE INCLUDE in any worker/control source file where ordering is hard
+// to see. The macro does nothing in a non-simulator build and does not evaluate
+// its arguments there.
+#include "project6_sim/testpoints.hpp"
+
+// PLACE AT A MEANINGFUL BOUNDARY, not in every loop iteration. This emits a
+// bounded best-effort breadcrumb; it never blocks CONTROL or the worker.
+PROJECT6_SIM_TESTPOINT(
+    "database.row.claimed",
+    "guiRequests row accepted by database worker");

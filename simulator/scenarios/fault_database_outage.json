@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "name": "fault_database_outage",
+  "description": "Stops the simulator-owned MariaDB for two seconds and then restarts it.",
+  "repeat": false,
+  "steps": [
+    {"action": "wait", "ms": 3000},
+    {"action": "database_outage", "duration_ms": 2000},
+    {"action": "wait", "ms": 5000}
+  ]
+}
