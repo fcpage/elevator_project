@@ -9,7 +9,7 @@ wait_fn()
     sleep 0.5	                            #a moment's hesitation
 }
 
-sudo mysql -u root -pese -P 3306 #give root access to all databases
+sudo mysql -u root -p -P 3306 #give root access to all databases
 wait_fn #let that sink in
 echo "password: ese"	#you probably should change at least one of your passwords...
 wait_fn #HOLD IT RIGHT THERE!

@@ -140,7 +140,7 @@ void cDBMessageService::close() {
     }
 }
 
-void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
+void cDBMessageService::run(const std::stop_token& stopToken) noexcept {
     try 
     {
         exchange_.databaseState.store(ecDBServiceState::Running);
@@ -205,23 +205,34 @@ void cDBMessageService::run(const std::stop_token& stopToken) const noexcept {
     }
 }
 
-std::optional<sDBInboundSnapshot> cDBMessageService::readSnapshot() const {
-    sDBInboundSnapshot snap{};
+std::optional<sDBInboundSnapshot> cDBMessageService::readSnapshot() 
+{
+    std::uint32_t index = 0;
+    std::uint8_t requestedFloor = 0;
 
-    if(auto choice = query("SELECT * FROM elevatorNetwork;"); choice.err()) {
+    if(auto choice = query("SELECT * FROM guiRequests;"); choice.err()) {
         std::cerr << "query failed: " << operationStatusMessage(choice.status()) << '\n';
     } else {
         try {
             std::unique_ptr<sql::ResultSet>result{choice.value()};
             while (result->next()) {
-                snap.index = result->getUInt("index");
-                snap.requestedFloor = result->getUInt("requestedFloor");
+                index = result->getUInt("index");
+                requestedFloor = result->getUInt("requestedFloor");
             }
         } catch (...) {
             std::cerr << "ERROR: Invalid field from query." << std::endl;
             return std::nullopt;
         }
     }
+
+    // If the index hasn't changed its a stale request
+    bool staleRequest = (index == guiRequestsLastIndex_);
+    guiRequestsLastIndex_ = index;
+
+    sDBInboundSnapshot snap = {
+        .index          = index,
+        .requestedFloor = staleRequest ? static_cast<std::uint8_t>(0) : requestedFloor,
+    };
 
     return std::optional<sDBInboundSnapshot>{snap};
 }
