@@ -72,6 +72,7 @@ else()
     )
 endif()
 
+# find_package(PulseAudio REQUIRED)
 find_package(Threads REQUIRED)
 
 add_executable(supervisory_controller
@@ -124,6 +125,7 @@ target_compile_options(supervisory_controller PRIVATE
 
 target_link_libraries(supervisory_controller PRIVATE
     Threads::Threads
+    pulse
     atomic
 )
 

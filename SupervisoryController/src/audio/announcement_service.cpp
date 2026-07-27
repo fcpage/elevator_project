@@ -13,6 +13,9 @@
 
 #ifdef SUPERVISORY_ENABLE_MINIAUDIO
 #define MINIAUDIO_IMPLEMENTATION
+#define MA_ENABLE_PULSEAUDIO
+#define MA_ENABLE_ONLY_SPECIFIC_BACKENDS
+#define MA_NO_RUNTIME_LINKING
 #include "miniaudio.h"
 #endif
 
@@ -183,7 +186,7 @@ bool cAnnouncementService::initializeAudio()
 #ifndef SUPERVISORY_ENABLE_MINIAUDIO
     return true;
 #else
-    const ma_backend backends[] = {ma_backend_alsa};
+    const ma_backend backends[] = {ma_backend_pulseaudio};
     if (ma_context_init(backends, 1, nullptr, &implementation_->context) != MA_SUCCESS)
     {
         return false;

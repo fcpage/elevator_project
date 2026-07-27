@@ -47,6 +47,7 @@ set(
     "Directory containing miniaudio.h when real audio is enabled."
 )
 
+find_package(PulseAudio REQUIRED)
 find_package(Threads REQUIRED)
 
 set(SUPERVISORY_COMMON_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../Common")
@@ -88,7 +89,10 @@ endif()
 
 target_link_libraries(project6_supervisory
     PUBLIC
+        ${CMAKE_DL_LIBS}
         Threads::Threads
+        PulseAudio::PulseAudio
+        m
 )
 
 if(WIN32)

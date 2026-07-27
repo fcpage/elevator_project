@@ -12,6 +12,7 @@
 
 #include "supervisory/common/spsc_queue.hpp"
 
+
 namespace project6::supervisory
 {
 
