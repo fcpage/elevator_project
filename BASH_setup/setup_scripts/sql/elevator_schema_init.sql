@@ -22,6 +22,11 @@ ALTER TABLE elevatorNetwork
     ADD INDEX(`index`),		/*the index is indexed by index*/
     MODIFY `index` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY;	/*make index the primary key, and auto increment it*/
 
+CREATE TRIGGER supervisorStateChange AFTER INSERT ON elevatorNetwork
+    FOR EACH ROW SELECT index FROM elevatorNetwork INTO OUTFILE
+    '/var/www/html/project_vi_website/general/resources/requests/database/toGUI.csv'
+    FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n';
+
 /*The multi-row table for requesting floors*/
 CREATE TABLE guiRequests(	/*table to send gui requests to the hardware system*/
 `index` INT NOT NULL,	/*database access index*/
@@ -36,6 +41,11 @@ ALTER TABLE guiRequests
     ADD UNIQUE KEY(`time`),	/*time is a unique key*/
     ADD INDEX(`index`),		/*the index is indexed by index*/
     MODIFY `index` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY;	/*make index the primary key, and auto increment it*/
+
+CREATE TRIGGER guiRequest AFTER INSERT ON guiRequests
+    FOR EACH ROW SELECT index FROM guiRequests INTO OUTFILE
+    '/var/www/html/project_vi_website/general/resources/requests/database/toSupervisor.csv'
+    FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n';
 
 CREATE TABLE accessAttempts(
     `index` INT NOT NULL,	/*access attempt index*/
