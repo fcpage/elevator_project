@@ -107,6 +107,7 @@ private:
     sql::Driver*            driver_;
     sql::Connection*        connection_;
     const sDBServiceConfig& config_;
+    std::size_t guiRequestsLastIndex_ = 0;
     // Prepared statments
     const char* writeSnapshotStmtQuery_ = "\
         UPDATE elevatorNetwork\
@@ -114,7 +115,6 @@ private:
             date = CURRENT_DATE(),\
             time = CURRENT_TIME(),\
             currentFloor = ?,\
-            requestedFloor = 0,\
             floorRequest1 = ?,\
             floorRequest2 = ?,\
             floorRequest3 = ?,\
@@ -126,19 +126,6 @@ private:
             SELECT MAX(`index`)\
             FROM elevatorNetwork\
         );";
-    // const char* writeSnapshotStmtQuery_ = "\
-    //     INSERT INTO elevatorNetwork(\
-    //         date,\
-    //         time,\
-    //         currentFloor,\
-    //         floorRequest1,\
-    //         floorRequest2,\
-    //         floorRequest3,\
-    //         carRequestFloor1,\
-    //         carRequestFloor2,\
-    //         carRequestFloor3,\
-    //         doorsOpen\
-    //     ) VALUES ( CURRENT_DATE(), CURRENT_TIME(), ?, ?, ?, ?, ?, ?, ?, ? )";
     std::unique_ptr<sql::PreparedStatement> writeSnapshotStmt_;
     // thread data
     sDBMessageExchange& exchange_;
@@ -147,10 +134,10 @@ private:
     /*** Private methods ***/
 
     /** @brief main function for the thread (also handles thread failures with std::stop_token)*/
-    void run(const std::stop_token& stopToken) const noexcept;
+    void run(const std::stop_token& stopToken) noexcept;
     /** @brief read a snapshot from the database (only the gui requests table)*/
     [[nodiscard]] 
-    std::optional<sDBInboundSnapshot> readSnapshot() const;
+    std::optional<sDBInboundSnapshot> readSnapshot();
     /** @brief convert inbound snapshot to supervisory event to be sent to control thread */
     [[nodiscard]] 
     std::optional<sSupervisoryEvent> inboundSnapshotToSupervisoryEvent(sDBInboundSnapshot& snap) const;

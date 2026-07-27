@@ -2,4 +2,4 @@ USE mysql;
 CREATE USER 'pi'@'%' IDENTIFIED BY 'ese';
 GRANT ALL PRIVILEGES ON *.* TO 'pi'@'%' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
-quit;
+-- quit;

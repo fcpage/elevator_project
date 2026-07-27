@@ -19,7 +19,7 @@ done
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 project_root="$(cd -- "${script_dir}/.." >/dev/null && pwd)"
-sa_root="${project_root}/elevator_project/SupervisoryController"
+sa_root="${project_root}/SupervisoryController"
 state_root="${XDG_STATE_HOME:-${HOME}/.local/state}/project6-elevator-simulator"
 session_path="${state_root}/runtime/active-session.json"
 venv_python="${state_root}/venv/bin/python"

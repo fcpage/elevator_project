@@ -27,7 +27,7 @@ CREATE TABLE guiRequests(	/*table to send gui requests to the hardware system*/
 `index` INT NOT NULL,	/*database access index*/
 `date` DATE NOT NULL,	/*snapshot package time*/
 `time` TIME NOT NULL,	/*snapshot package date*/
-`requestFloor` TINYINT UNSIGNED NOT NULL,	/*gui floor request*/
+`requestedFloor` TINYINT UNSIGNED NOT NULL,	/*gui floor request*/
 `remote` INT NOT NULL	/*optional remote maintenance options (enum: 0 = off, 1 = maintainance, 2 = override, 3 = sabbath)*/	
 ) ENGINE = InnoDb;
 
