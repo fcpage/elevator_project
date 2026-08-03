@@ -41,10 +41,9 @@ CREATE TABLE accessAttempts(
     `index` INT NOT NULL,	/*access attempt index*/
     `date` DATE NOT NULL,	/*access date*/
     `time` TIME NOT NULL,	/*snapshot package time*/
-    `user` CHAR(32) NOT NULL,
+    `username` CHAR(32) NOT NULL,
     `authorization` CHAR(32) NOT NULL,
-    `authentication` CHAR(32) NOT NULL,
-    `accepted` BOOL NOT NULL
+    `authentication` CHAR(32) NOT NULL
 ) ENGINE = InnoDb;
 
 /*Set the table indexing, unique key, and auto incrementing of the primary key*/
