@@ -2,13 +2,13 @@
 ******************************************************************************** 
 * @file     : usermain.c
 * @brief    : User main file (avoids overwritting auto-generated code)
-* By        : Nigel Sinclair
+* By        : Nigel Sinclair & Ryan Pratt
 ******************************************************************************** 
 */
 
 // PSA: ONLY EVER INCLUDE THIS YOU WILL REGRET INCLUDING OTHER HAL HEADERS
+#include "RxQueue.h"
 #include "stm32f3xx_hal.h" 
-#include "stm32f3xx_hal_gpio.h"
 
 enum FloorButtons {
     NO_BUTTON_PRESSED	= 0,
@@ -36,21 +36,6 @@ static volatile u8 BUTTON = NO_BUTTON_PRESSED;		// Initial value is that no BUTT
 #ifndef NODE_ID
 #define NODE_ID NODE_ID_CC
 #endif
-
-enum {
-    CAN_RX_QUEUE_CAPACITY = 8,
-    CAN_RX_QUEUE_STORAGE_SIZE = CAN_RX_QUEUE_CAPACITY + 1,
-};
-
-typedef struct {
-    CAN_RxHeaderTypeDef header;
-    u8                  data[CAN_PAYLOAD_LENGTH];
-} CanRxFrame;
-
-static CanRxFrame RxQueue[CAN_RX_QUEUE_STORAGE_SIZE];
-static volatile u8 RxQueueHead;
-static volatile u8 RxQueueTail;
-static volatile u32 DroppedRxFrameCount;
 
 typedef struct { 
     GPIO_TypeDef* led_port; 
@@ -88,26 +73,6 @@ static const FloorData event_lookup[] = {
 
 
 static const FloorData* floor = &event_lookup[NO_BUTTON_PRESSED];
-
-static u8 advanceRxQueueIndex(const u8 index)
-{
-    return (u8)((index + 1U) % CAN_RX_QUEUE_STORAGE_SIZE);
-}
-
-static u8 tryTakeRxFrame(CanRxFrame* frame)
-{
-    const u8 tail = RxQueueTail;
-    if (tail == RxQueueHead)
-    {
-        return 0U;
-    }
-
-    __DMB();
-    *frame = RxQueue[tail];
-    __DMB();
-    RxQueueTail = advanceRxQueueIndex(tail);
-    return 1U;
-}
 
 static void handleRxFrame(const CanRxFrame* frame)
 {
@@ -148,9 +113,10 @@ static void handleRxFrame(const CanRxFrame* frame)
 
 void user_main(void) {
     CanRxFrame frame;
+    RxQueue* rxQueue;
 
     /*** Receive ***/
-    while (tryTakeRxFrame(&frame) != 0U)
+    while (tryTakeRxFrame(rxQueue, &frame))
     {
         handleRxFrame(&frame);
     }
@@ -265,7 +231,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	// Set the BUTTON Flag to indicate which button was pressed
 	switch(GPIO_Pin)  {
-        case B1_Pin:           BUTTON = BLUE_BUTTON_PRESSED; break;
+        case B1_Pin:     BUTTON = BLUE_BUTTON_PRESSED; break;
         case PB1_IN_Pin: BUTTON = FL1_BUTTON_PRESSED; break;
         case PB2_IN_Pin: BUTTON = FL2_BUTTON_PRESSED; break;
         case PB3_IN_Pin: BUTTON = FL3_BUTTON_PRESSED; break;
