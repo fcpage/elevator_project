@@ -1,6 +1,35 @@
 # elevator_project
 
-## Floor Controller SW
+## Supervisory Controller SW
+
+### Intro
+
+The supervisory controller is responsible for the following: 
+- Control flow logic for the elevator (FSM)
+- Serving the web GUI
+- Instructing the other CAN node controllers to perform specific functions according to the FSM
+- Hosting the database
+- Updating the database from the physical elevator state
+- Responding to GUI requests
+
+### Building
+
+The following commands will build the SC on the RPI (from supervisory controller dir).
+
+```sh
+./scripts/build_rpi.sh --prodcution can0 125000
+./scripts/run_rpi.sh --prodcution can0 125000
+```
+
+## Floor/Car Controller SW
+
+### Intro
+
+The Floor/Car controller(s) are responsible for the following: 
+- Handling physical requests via the physical elevator buttons
+- Sending CAN requests upon button press
+- Responding to heartbeat requests from the SC
+- "Opening doors" (simulated) upon arrival notification from SC
 
 ### Building
 
