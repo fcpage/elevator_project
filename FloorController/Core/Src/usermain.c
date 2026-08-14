@@ -7,8 +7,10 @@
 */
 
 // PSA: ONLY EVER INCLUDE THIS YOU WILL REGRET INCLUDING OTHER HAL HEADERS
-#include "RxQueue.h"
 #include "stm32f3xx_hal.h" 
+
+#define RX_QUEUE_CAPACITY 8
+#include "RxQueue.h"
 
 enum FloorButtons {
     NO_BUTTON_PRESSED	= 0,
@@ -116,7 +118,7 @@ void user_main(void) {
     RxQueue* rxQueue;
 
     /*** Receive ***/
-    while (tryTakeRxFrame(rxQueue, &frame))
+    while (rxQueueTryPop(rxQueue, &frame))
     {
         handleRxFrame(&frame);
     }

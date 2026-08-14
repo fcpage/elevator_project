@@ -21,8 +21,25 @@ typedef struct {
 typedef struct RxQueue RxQueue;
 
 void initRxQueue(RxQueue* queue);
-u8 advanceRxQueueIndex(const u8 index);
-bool tryPush(RxQueue* q, CanRxFrame* frame);
-bool tryPop(RxQueue* q, CanRxFrame* frame);
+bool rxQueueTryPush(RxQueue* queue, CanRxFrame frame);
+bool rxQueueTryPop(RxQueue* queue, CanRxFrame* frameOut);
+u8   rxQueueGetCapacity(RxQueue* queue);
+
+/*** RxQueue Internal data initialization ***/
+
+#if defined(__RX_QUEUE_C)
+
+extern CanRxFrame* __rxQueueDataPtr;
+extern const u8 __rxQueueCapacity;
+
+#elif defined(RX_QUEUE_CAPACITY)
+
+static CanRxFrame __rxQueueData[RX_QUEUE_CAPACITY] = {0};
+const u8 __rxQueueCapacity = RX_QUEUE_CAPACITY;
+CanRxFrame* __rxQueueDataPtr = __rxQueueData;
+
+#else
+#error "Rx Queue Capacity must be predefined"
+#endif 
 
 #endif

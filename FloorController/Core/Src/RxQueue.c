@@ -6,50 +6,79 @@
 ******************************************************************************** 
 */
 
+#include <assert.h>
+#define __RX_QUEUE_C
 #include "RxQueue.h"
 
-enum {
-    CAN_RX_QUEUE_CAPACITY = 8,
-    CAN_RX_QUEUE_STORAGE_SIZE = CAN_RX_QUEUE_CAPACITY + 1,
-};
+#define RX_QUEUE_ASSERT_INIT \
+    do { \
+        assert(queue != 0); \
+        assert(queue->capacity != 0); \
+        assert(queue->storageSize != 0); \
+        assert(queue->data != NULL); \
+    } while(0);
 
 struct RxQueue {
-    const u8 capacity;
-    const u8 storageSize;
+    u8 capacity;
+    u8 storageSize;
     CanRxFrame* data __attribute__((counted_by(storageSize)));
     volatile u8 head;
     volatile u8 tail;
     volatile u32 droppedFrameCount;
 };
 
-void initRxQueue(RxQueue* queue, u8 capacity) {
+static u8 advanceRxQueueIndex(RxQueue* queue, const u8 index)
+{
+    RX_QUEUE_ASSERT_INIT;
+
+    return (u8)((index + 1U) % queue->storageSize);
+}
+
+void initRxQueue(RxQueue* queue) {
     *queue = (RxQueue){
-        .capacity = capacity,
-        .storageSize = capacity + 1,
-        .data = NULL,
+        .capacity = __rxQueueCapacity,
+        .storageSize = __rxQueueCapacity + 1,
+        .data = __rxQueueDataPtr,
         .droppedFrameCount = 0,
         .head = 0,
         .tail = 0,
     };
 }
 
-u8 advanceRxQueueIndex(const u8 index)
+bool rxQueueTryPush(RxQueue* queue, CanRxFrame frame)
 {
-    return (u8)((index + 1U) % CAN_RX_QUEUE_STORAGE_SIZE);
-}
-
-bool tryPop(RxQueue* q, CanRxFrame* frame)
-{
-    const u8 tail = q->tail;
-    if (tail == q->head)
+    const u8 tail = queue->tail;
+    if (tail == queue->head)
     {
-        return 0U;
+        return false;
     }
 
     __DMB();
-    *frame = q->data[tail];
+    *frame = queue->data[tail];
     __DMB();
-    q->tail = advanceRxQueueIndex(tail);
-    return 1U;
+    queue->tail = advanceRxQueueIndex(queue, tail);
+    return true;
+}
+
+bool rxQueueTryPop(RxQueue* queue, CanRxFrame* frame)
+{
+    const u8 tail = queue->tail;
+    if (tail == queue->head)
+    {
+        return false;
+    }
+
+    __DMB();
+    *frame = queue->data[tail];
+    __DMB();
+    queue->tail = advanceRxQueueIndex(queue, tail);
+    return true;
+}
+
+u8 rxQueueGetSize(RxQueue* queue)
+{
+    RX_QUEUE_ASSERT_INIT;
+
+    return queue->capacity;
 }
 
