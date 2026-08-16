@@ -1,0 +1,39 @@
+# WSL/Linux quick reference
+# Full instructions and troubleshooting: simulator/MANUAL.md
+
+# Run once per boot before a Linux SocketCAN session.
+sudo modprobe vcan
+sudo ip link add dev vcan0 type vcan 2>/dev/null || true
+sudo ip link set up vcan0
+ip link show vcan0
+
+# From the repository root, one-time simulator setup.
+./simulator/setup.sh
+
+# Terminal 1: full harness (CAN plant + isolated simulator MariaDB).
+./simulator/run.sh
+
+# Or, Terminal 1: physical plant only (no MariaDB or diagnostics).
+./simulator/run.sh --plant-only
+
+# Terminal 2: build and launch the branch's normal supervisory_controller.
+./simulator/run-sa.sh
+
+# Useful optional flags.
+./simulator/run.sh --verbose
+./simulator/run-sa.sh --verbose-build
+
+
+# Simulator for WSL:
+cd /mnt/c/Project_6
+./simulator/setup.sh
+./simulator/run.sh
+
+# Application for WSL:
+cd /mnt/c/Project_6
+./simulator/run-sa.sh
+
+# Powershell but kill any old process after making changes to sim to prevent
+# stale instances claiming resources.
+Get-Process supervisory_simulator_adapter -ErrorAction SilentlyContinue |
+    Stop-Process -Force

@@ -45,6 +45,7 @@ void cRequestScheduler::enqueueEvent(const sSupervisoryEvent& event)
             break;
         }
 
+        case ecEventType::DatabaseFloorRequest: [[fallthrough]];
         case ecEventType::HttpFloorRequest:
         {
             request.source = ecRequestSource::WebInterface;

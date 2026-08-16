@@ -259,7 +259,6 @@ std::optional<sSupervisoryEvent> toSupervisoryEvent(const sDecodedCanMessage& me
             {
                 return std::nullopt;
             }
-
             event.type = ecEventType::CanElevatorStatus;
             event.reportedFloor = message.floor;
             event.reportedDirection = ecTravelDirection::None;

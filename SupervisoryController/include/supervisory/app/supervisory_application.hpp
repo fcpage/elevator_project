@@ -17,6 +17,7 @@
 #include "supervisory/common/result.hpp"
 #include "supervisory/common/spsc_queue.hpp"
 #include "supervisory/control/supervisory_state_machine.hpp"
+#include "supervisory/database/database_message_service.hpp"
 
 namespace project6::supervisory
 {
@@ -60,14 +61,15 @@ public:
      */
     explicit cSupervisoryApplication(
         sCanExchange& exchange,
+        sDBMessageExchange& databaseExchange,
         ecNodeHbFailureMode nodeHbFailureMode = ecNodeHbFailureMode::FaultControl,
         cAnnouncementService* announcementService = nullptr);
 
     /**
      * Queues an adapter event for the next control cycle.
      *
-     * The Phase 2 demo file uses this seam while the database branch is WIP.
-     * The future database service should emit the same normalized events.
+     * Test adapters use this seam; production mode updates arrive through the
+     * database exchange.
      */
     [[nodiscard]] bool enqueueAdapterEvent(const sSupervisoryEvent& event);
 
@@ -91,11 +93,13 @@ private:
     /** @brief Moves a generated frame to COMMS. */
     void publishPendingFrame();
     void processControlEvent(const sSupervisoryEvent& event);
-    /** Writes queued raw CAN records until the database CAN-log table exists. */
-    void writeCanLogRecords();
     void publishArrivalAnnouncement(const sSupervisoryStateSnapshot& before);
+    /** @brief Moves a generated state machine snapshot to database. */
+    void publishSnapshot();
     /** @brief Detects COMMS failure or timeout. */
     void checkCommsHealth(std::chrono::milliseconds elapsedMs);
+    /** @brief Detects COMMS failure or timeout. */
+    void checkDatabaseHealth(std::chrono::milliseconds elapsedMs);
     /** @brief Drains and schedules node heartbeat messages. */
     void processNodeHbCycle(std::chrono::milliseconds elapsedMs);
     /** @brief Applies one decoded node heartbeat message. */
@@ -117,25 +121,33 @@ private:
     void faultControl(ecCanCommsFaultReason reason);
     /** @brief Latches a COMMS fault into CONTROL. */
     void faultComms(ecCanCommsFaultReason reason);
+    /** @brief Latches a Database fault into CONTROL. */
+    void faultDatabase(ecDBServiceFaultReason reason);
 
     /** Shared COMMS exchange. */
-    sCanExchange& exchange_;
+    sCanExchange& canExchange_;
     /** Optional output side service; control remains valid without audio. */
     cAnnouncementService* announcementService_ = nullptr;
     /** Adapter events share the same bounded control-cycle path as CAN events. */
     cSpscQueue<sSupervisoryEvent, 16> adapterEvents_;
-    /** Temporary CONTROL-owned CAN log output. */
-    std::ofstream canLogFile_{"can_log.txt", std::ios::app};
+    /** Shared DATABASE exchange. */
+    sDBMessageExchange& databaseExchange_;
     /** CONTROL-owned state machine. */
     cSupervisoryStateMachineAPI appStateMachine_;
     /** Last observed COMMS worker progress counter. */
     std::uint64_t lastCommsProgress_ = 0;
     /** Last observed dropped-event count. */
-    std::uint64_t lastDroppedEventCount_ = 0;
+    std::uint64_t lastCommsDroppedEventCount_ = 0;
     /** Last observed transmit-failure count. */
-    std::uint64_t lastTransmitFailureCount_ = 0;
+    std::uint64_t lastCommsTransmitFailureCount_ = 0;
     /** Time without COMMS worker progress. */
     std::chrono::milliseconds staleCommsProgressElapsed_{0};
+    /** Time without DATABASE worker progress. */
+    std::chrono::milliseconds staleDatabaseProgressElapsed_{0};
+    /** Last observed dropped-event count. */
+    std::uint64_t lastDatabaseDroppedEventCount_ = 0;
+    /** Last observed transmit-failure count. */
+    std::uint64_t lastDatabaseWriteFailureCount_ = 0;
     /** Time accumulated toward the next outbound node heartbeat request. */
     std::chrono::milliseconds nodeHbIntervalElapsed_{0};
     /** Time accumulated while waiting for node heartbeat replies. */

@@ -14,10 +14,7 @@
 // Selects the production CAN service normally and the simulator bridge only
 // when SUPERVISORY_BUILD_SIMULATOR is enabled by the simulator launcher.
 #include "supervisory/can/runtime_can_service.hpp"
-
-#ifdef SUPERVISORY_ENABLE_DEMO_MODES
-#include "supervisory/demo/demo_control.hpp"
-#endif
+#include "supervisory/database/database_message_service.hpp"
 
 #include <chrono>
 #include <csignal>
@@ -72,33 +69,6 @@ void handleShutdownSignal(const int signalNumber)
     keepRunning = 0;
 }
 
-const char* operationStatusMessage(const project6::supervisory::ecOperationStatus status)
-{
-    using project6::supervisory::ecOperationStatus;
-
-    switch (status)
-    {
-        case ecOperationStatus::Ok:
-            return "operation completed successfully";
-        case ecOperationStatus::NotInitialized:
-            return "a required module was not initialized";
-        case ecOperationStatus::InvalidArgument:
-            return "invalid runtime configuration";
-        case ecOperationStatus::WouldBlock:
-            return "operation would block";
-        case ecOperationStatus::InsufficientPrivileges:
-            return "permission denied while configuring CAN; run as root or grant CAP_NET_ADMIN";
-        case ecOperationStatus::HardwareUnavailable:
-            return "required hardware or SocketCAN interface is unavailable";
-        case ecOperationStatus::NetworkUnavailable:
-            return "required network service is unavailable";
-        case ecOperationStatus::NotImplemented:
-            return "requested operation is not implemented";
-    }
-
-    return "unknown operation status";
-}
-
 } // namespace
 
 /**
@@ -128,6 +98,8 @@ int main(const int argumentCount, char* arguments[])
         kDefaultCanBitrateBitsPerSecond,
         kDefaultCanRestartMs,
         kConfigureCanInterfaceOnInitialize};
+    const sDBServiceConfig dbConfig{};
+    sDBMessageExchange dbExchange;
     sCanExchange canExchange;
     // Keep the normal application entry point; only the transport is selected
     // at build time for a simulator run.
@@ -143,14 +115,12 @@ int main(const int argumentCount, char* arguments[])
         audioDevice.c_str(),
         1.0F};
     cAnnouncementService announcementService(announcementConfig, announcementExchange);
-    cSupervisoryApplication application(canExchange, ecNodeHbFailureMode::FaultControl, &announcementService);
-
-#ifdef SUPERVISORY_ENABLE_DEMO_MODES
-    const std::string demoControlPath =
-        environmentValue("SUPERVISORY_DEMO_CONTROL_FILE", "demo_control.txt");
-    cDemoControl demoControl({
-        demoControlPath.c_str()});
-#endif
+    cSupervisoryApplication application(
+        canExchange,
+        dbExchange,
+        ecNodeHbFailureMode::FaultControl,
+        &announcementService);
+    cDBMessageService database(dbConfig, dbExchange);
 
     if (const ecOperationStatus status = commsService.initializeService(); status != ecOperationStatus::Ok)
     {
@@ -170,6 +140,13 @@ int main(const int argumentCount, char* arguments[])
     {
         std::cerr << "supervisory_controller: announcement service start failed\n";
     }
+    if (const ecOperationStatus status = database.start(); status != ecOperationStatus::Ok)
+    {
+        std::cerr << "supervisory_controller: database service start failed: "
+                  << operationStatusMessage(status) << '\n';
+        announcementService.stop();
+        return 1;
+    }
 
     std::signal(SIGINT, handleShutdownSignal);
     std::signal(SIGTERM, handleShutdownSignal);
@@ -188,12 +165,6 @@ int main(const int argumentCount, char* arguments[])
             iterationStart - previousIteration);
         previousIteration = iterationStart;
         nextIteration += kLoopPeriodMs;
-
-#ifdef SUPERVISORY_ENABLE_DEMO_MODES
-        // Temporary Phase 2 substitute for the unfinished GUI/database path.
-        // The adapter emits the same normalized events a future DB worker must use.
-        demoControl.poll(application);
-#endif
 
         if (const ecOperationStatus runStatus = application.runControlCycle(elapsedMs);
             runStatus != ecOperationStatus::Ok)
@@ -217,6 +188,7 @@ int main(const int argumentCount, char* arguments[])
     }
 
     commsService.stop();
+    database.stop();
     announcementService.stop();
     std::clog << "SHUTDOWN reason=signal\n";
     return 0;

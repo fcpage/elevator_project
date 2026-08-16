@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "name": "healthy_loop",
+  "description": "Continuously alternates a GUI pickup and a physical hall call; every rider selects floor 1 in the car.",
+  "repeat": true,
+  "journeys": [
+    [
+      {"action": "gui_request", "floor": 3, "remote": 0},
+      {"action": "wait_for_can", "id": "0x100", "data_byte": "0x07", "timeout_ms": 10000},
+      {"action": "wait_for_can", "id": "0x100", "data_byte": "0x88", "timeout_ms": 10000},
+      {"action": "car_request", "floor": 1},
+      {"action": "wait_for_can", "id": "0x100", "data_byte": "0x05", "timeout_ms": 10000},
+      {"action": "wait_for_can", "id": "0x100", "data_byte": "0x88", "timeout_ms": 10000},
+      {"action": "wait_for_can", "id": "0x100", "data_byte": "0x89", "timeout_ms": 5000}
+    ],
+    [
+      {"action": "floor_call", "floor": 3},
+      {"action": "wait_for_can", "id": "0x100", "data_byte": "0x07", "timeout_ms": 10000},
+      {"action": "wait_for_can", "id": "0x100", "data_byte": "0x88", "timeout_ms": 10000},
+      {"action": "car_request", "floor": 1},
+      {"action": "wait_for_can", "id": "0x100", "data_byte": "0x05", "timeout_ms": 10000},
+      {"action": "wait_for_can", "id": "0x100", "data_byte": "0x88", "timeout_ms": 10000},
+      {"action": "wait_for_can", "id": "0x100", "data_byte": "0x89", "timeout_ms": 5000}
+    ]
+  ]
+}

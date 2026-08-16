@@ -1,0 +1,18 @@
+// PLACE THIS in the branch's existing main.cpp, near database configuration.
+// Compile/use it only when SUPERVISORY_ENABLE_SIM_DIAGNOSTICS is defined.
+// It lets run-sa provide the simulator-owned database endpoint without changing
+// production defaults or probing another database.
+#ifdef SUPERVISORY_ENABLE_SIM_DIAGNOSTICS
+void applySimulatorDatabaseEnvironment(sDBServiceConfig& config)
+{
+    if (const char* value = std::getenv("ELEVATOR_DB_URL"); value && value[0]) config.url = value;
+    if (const char* value = std::getenv("ELEVATOR_DB_USER"); value && value[0]) config.user = value;
+    if (const char* value = std::getenv("ELEVATOR_DB_PASSWORD"); value) config.password = value;
+    if (const char* value = std::getenv("ELEVATOR_DB_SCHEMA"); value && value[0]) config.database = value;
+}
+#endif
+
+// PLACE THIS immediately after the branch creates sDBServiceConfig dbConfig{}.
+#ifdef SUPERVISORY_ENABLE_SIM_DIAGNOSTICS
+applySimulatorDatabaseEnvironment(dbConfig);
+#endif

@@ -101,6 +101,47 @@ void testStateMachineModes()
         "Sabbath mode did not generate an automatic request");
 }
 
+void testSabbathTemporarilyServicesNormalRequests()
+{
+    constexpr ecEventType normalSources[] = {
+        ecEventType::CanCarRequest,
+        ecEventType::CanFloorRequest,
+        ecEventType::HttpFloorRequest,
+    };
+
+    for (const ecEventType source : normalSources)
+    {
+        cSupervisoryStateMachineAPI machine;
+        machine.setSabbathStopDuration(std::chrono::milliseconds{1000});
+        machine.handleEvent(mode(kModeSabbath));
+        machine.handleEvent(request(source, 3));
+        machine.handleEvent(tick(std::chrono::milliseconds{1}));
+
+        require(
+            machine.snapshot().targetFloor == 3 &&
+            machine.snapshot().controlState == ecSupervisoryControlState::MovingUp,
+            "Sabbath mode did not dispatch a normal request");
+        require(
+            machine.snapshot().modeBits == kModeSabbath,
+            "normal request cleared the configured Sabbath mode");
+
+        sSupervisoryEvent arrival{};
+        arrival.type = ecEventType::CanElevatorStatus;
+        arrival.reportedFloor = 3;
+        machine.handleEvent(arrival);
+        machine.handleEvent(tick(std::chrono::milliseconds{3000}));
+
+        require(
+            machine.snapshot().controlState == ecSupervisoryControlState::Idle,
+            "normal request did not complete before Sabbath resumed");
+
+        machine.handleEvent(tick(std::chrono::milliseconds{1000}));
+        require(
+            machine.snapshot().controlState != ecSupervisoryControlState::Idle,
+            "Sabbath mode did not resume after the normal request");
+    }
+}
+
 void testAnnouncementServiceDemoSink()
 {
     sAnnouncementExchange exchange;
@@ -120,6 +161,7 @@ void testAnnouncementServiceDemoSink()
 void testArrivalTriggersOneAnnouncement()
 {
     sCanExchange canExchange;
+    sDBMessageExchange databaseExchange;
     sAnnouncementExchange audioExchange;
     const sAnnouncementServiceConfig config{true, "audio", "Headphones", 1.0F};
     cAnnouncementService service(config, audioExchange);
@@ -127,6 +169,7 @@ void testArrivalTriggersOneAnnouncement()
 
     cSupervisoryApplication application(
         canExchange,
+        databaseExchange,
         ecNodeHbFailureMode::FaultControl,
         &service);
 
@@ -161,6 +204,7 @@ int main()
 {
     testSchedulerPriorityAndGates();
     testStateMachineModes();
+    testSabbathTemporarilyServicesNormalRequests();
     testAnnouncementServiceDemoSink();
     testArrivalTriggersOneAnnouncement();
     std::cout << "MODES_AUDIO_TESTS_PASSED\n";

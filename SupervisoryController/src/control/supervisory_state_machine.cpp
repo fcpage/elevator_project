@@ -57,6 +57,13 @@ struct sStateMachineContext
     /** Next floor in the fixed Phase 2 Sabbath cycle: 1, 2, 3, 2. */
     std::size_t sabbathSequenceIndex = 0;
 
+    /**
+     * Temporarily bypasses Sabbath-only scheduling to service a normal request.
+     * The configured Sabbath mode bit remains set so automatic service resumes
+     * as soon as the normal queues are drained.
+     */
+    bool sabbathSuspendedForNormalRequest = false;
+
     /** Request currently being dispatched, moved toward, or completed. */
     std::optional<sElevatorRequest> activeRequest;
 
@@ -101,6 +108,21 @@ sStateMachineContext* context()
     return activeContext;
 }
 
+bool hasPendingNormalRequest(const sStateMachineContext& state)
+{
+    return state.scheduler.hasPendingRequest(ecRequestSource::CarModule) ||
+           state.scheduler.hasPendingRequest(ecRequestSource::FloorModule) ||
+           state.scheduler.hasPendingRequest(ecRequestSource::WebInterface);
+}
+
+bool isNormalFloorRequest(const ecEventType type)
+{
+    return type == ecEventType::CanCarRequest ||
+           type == ecEventType::CanFloorRequest ||
+           type == ecEventType::HttpFloorRequest ||
+           type == ecEventType::DatabaseFloorRequest;
+}
+
 bool hasPendingRequest()
 {
     sStateMachineContext* state = context();
@@ -121,6 +143,10 @@ bool hasPendingRequest()
 
     if ((state->modeBits & kModeSabbath) != 0)
     {
+        if (state->sabbathSuspendedForNormalRequest)
+        {
+            return hasPendingNormalRequest(*state);
+        }
         return state->scheduler.hasPendingRequest(ecRequestSource::Sabbath);
     }
 
@@ -223,7 +249,12 @@ void selectNextRequest()
         return;
     }
 
-    state->activeRequest = state->scheduler.tryTakeNextAllowedRequest(state->modeBits);
+    std::uint8_t schedulingModeBits = state->modeBits;
+    if (state->sabbathSuspendedForNormalRequest)
+    {
+        schedulingModeBits &= static_cast<std::uint8_t>(~kModeSabbath);
+    }
+    state->activeRequest = state->scheduler.tryTakeNextAllowedRequest(schedulingModeBits);
     if (state->activeRequest.has_value())
     {
         state->snapshot.targetFloor = state->activeRequest->floor;
@@ -323,6 +354,10 @@ void clearServicedRequest()
     }
 
     state->activeRequest.reset();
+    if (state->sabbathSuspendedForNormalRequest && !hasPendingNormalRequest(*state))
+    {
+        state->sabbathSuspendedForNormalRequest = false;
+    }
     state->snapshot.direction = ecTravelDirection::None;
     state->snapshot.isDoorOpen = false;
     state->doorOpenElapsedMs = std::chrono::milliseconds{0};
@@ -961,6 +996,7 @@ void cSupervisoryStateMachineAPI::handleEvent(const sSupervisoryEvent& event)
             (state.modeBits & kModeSabbath) == 0)
         {
             state.scheduler.clear(ecRequestSource::Sabbath);
+            state.sabbathSuspendedForNormalRequest = false;
         }
 
         if ((state.modeBits & kModeSabbath) != 0 &&
@@ -977,16 +1013,29 @@ void cSupervisoryStateMachineAPI::handleEvent(const sSupervisoryEvent& event)
     }
 
     if (event.type == ecEventType::HttpFloorRequest ||
+        event.type == ecEventType::DatabaseFloorRequest ||
         event.type == ecEventType::CanFloorRequest ||
         event.type == ecEventType::CanCarRequest ||
         event.type == ecEventType::MaintenanceFloorRequest)
     {
         state.scheduler.enqueueEvent(event);
+
+        // A passenger request temporarily takes the controller out of
+        // Sabbath-only scheduling.  Keep the Sabbath bit set so this is a
+        // service interruption, not a mode change; it resumes after normal
+        // car, floor, and web queues are drained.
+        if (isNormalFloorRequest(event.type) &&
+            (state.modeBits & kModeSabbath) != 0 &&
+            (state.modeBits & kModeMaintenance) == 0)
+        {
+            state.sabbathSuspendedForNormalRequest = true;
+        }
     }
 
     if (event.type == ecEventType::TimerTick &&
         (state.modeBits & kModeSabbath) != 0 &&
-        (state.modeBits & kModeMaintenance) == 0)
+        (state.modeBits & kModeMaintenance) == 0 &&
+        !state.sabbathSuspendedForNormalRequest)
     {
         state.sabbathElapsedMs += event.timestampMs;
         if (state.sabbathElapsedMs >= state.sabbathStopDurationMs &&

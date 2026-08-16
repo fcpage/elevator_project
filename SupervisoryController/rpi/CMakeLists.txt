@@ -86,7 +86,7 @@ add_executable(supervisory_controller
     "${SUPERVISORY_ROOT}/src/http/http_server.cpp"
     "${SUPERVISORY_ROOT}/src/scheduler/request_scheduler.cpp"
     "${SUPERVISORY_ROOT}/src/audio/announcement_service.cpp"
-    "${SUPERVISORY_ROOT}/src/demo/demo_control.cpp"
+    "${SUPERVISORY_ROOT}/src/database/database_message_service.cpp"
 )
 
 target_include_directories(supervisory_controller
@@ -127,6 +127,8 @@ target_link_libraries(supervisory_controller PRIVATE
     Threads::Threads
     pulse
     atomic
+    resolv
+    mysqlcppconn
 )
 
 set(SUPERVISORY_AUDIO_DIR "${SUPERVISORY_ROOT}/audio")

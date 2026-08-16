@@ -60,6 +60,7 @@ add_library(project6_supervisory
     src/control/supervisory_state_machine.cpp
     src/drivers/supervisory_drivers.cpp
     src/audio/announcement_service.cpp
+    src/database/database_message_service.cpp
     src/demo/demo_control.cpp
     src/http/http_server.cpp
     src/scheduler/request_scheduler.cpp

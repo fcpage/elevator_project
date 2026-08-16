@@ -1,0 +1,9 @@
+// PLACE THIS INCLUDE with the other CAN service includes in the branch's
+// existing main.cpp. It picks the real CAN service normally and the localhost
+// simulator bridge only in a simulator build.
+#include "supervisory/can/runtime_can_service.hpp"
+
+// PLACE THIS where the main currently constructs cCanCommsService.
+// Keep the existing canConfig and canExchange variables; do not add a second
+// main() or alter the application's control/database startup order.
+cRuntimeCanService commsService(canConfig, canExchange);
