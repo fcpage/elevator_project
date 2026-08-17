@@ -22,7 +22,7 @@ namespace project6::supervisory
 {
 
 struct sDBServiceConfig {
-    const char*    url      = "tcp://127.0.0.1:3306";
+    const char*    url      = "tcp://100.102.199.65:3306";
     sql::SQLString user     = "pi";
     sql::SQLString password = "ese";
     sql::SQLString database = "elevatorg1";
