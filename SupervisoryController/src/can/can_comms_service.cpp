@@ -22,6 +22,18 @@ constexpr std::size_t kMaximumReadsPerCycle = 32;
 constexpr std::size_t kMaximumWritesPerCycle = 16;
 constexpr std::chrono::milliseconds kIdleDelay{1}; // Not a timeout! See application file.
 
+[[nodiscard]] sCanLogRecord makeCanLogRecord(
+    const ecCanLogDirection direction,
+    const sCanFrame& frame)
+{
+    const auto now = std::chrono::system_clock::now().time_since_epoch();
+    return {
+        static_cast<std::uint64_t>(
+            std::chrono::duration_cast<std::chrono::milliseconds>(now).count()),
+        direction,
+        frame};
+}
+
 void recordFault(sCanExchange& exchange, const ecCanCommsFaultReason reason)
 {
     ecCanCommsFaultReason expected = ecCanCommsFaultReason::None;
@@ -111,6 +123,8 @@ void cCanCommsService::run(const std::stop_token stopToken) const noexcept
 
                 didWork = true;
                 exchange_.receivedFrameCount.fetch_add(1);
+                static_cast<void>(exchange_.canLogRecords.tryPush(
+                    makeCanLogRecord(ecCanLogDirection::Received, frame)));
 
                 // We try and decode the Hb frame first since we only need to check the first bit.
                 // Upon failure, we immediately know it's not an internal message and is decoded
@@ -166,6 +180,8 @@ void cCanCommsService::run(const std::stop_token stopToken) const noexcept
                 }
 
                 didWork = true;
+                static_cast<void>(exchange_.canLogRecords.tryPush(
+                    makeCanLogRecord(ecCanLogDirection::Transmitted, *pendingTransmit)));
                 pendingTransmit.reset();
                 exchange_.transmittedFrameCount.fetch_add(1);
             }

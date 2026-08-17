@@ -1,0 +1,14 @@
+# Temporary Phase 2 substitute for the incomplete GUI/database connection.
+# Build with -DSUPERVISORY_ENABLE_DEMO_MODES=ON and set
+# SUPERVISORY_DEMO_CONTROL_FILE to a copy of this file.
+#
+# mode_bits: 0=normal, 1=maintenance, 2=Sabbath, 3=maintenance+Sabbath.
+mode_bits=0
+
+# Milliseconds between generated Sabbath floor requests.
+sabbath_stop_ms=10000
+
+# Add a new maintenance request by changing the token and floor.
+# The request is one-shot per unique token.
+# maintenance_request_id=first-maintenance-job
+# maintenance_floor=2

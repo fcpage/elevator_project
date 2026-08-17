@@ -19,9 +19,11 @@ namespace
 
 constexpr std::size_t kMaximumEventsPerCycle = 16;
 constexpr std::chrono::milliseconds kCommsProgressTimeout{250};
-constexpr std::chrono::milliseconds kDatabaseProgressTimeout{250};
-constexpr std::chrono::seconds kNodeHbInterval{4};
-constexpr std::chrono::seconds kNodeHbReplyWindow{3};
+// Keep these values aligned with the rev3 FSM design and control-loop tests:
+// a supervisory request is sent every 3 seconds and nodes have 1 second to
+// complete the reply window. This was already a dev-branch mismatch.
+constexpr std::chrono::seconds kNodeHbInterval{3};
+constexpr std::chrono::seconds kNodeHbReplyWindow{1};
 
 std::optional<std::uint8_t> nodeHbMaskFromSourceId(const std::uint16_t sourceId)
 {
@@ -81,12 +83,24 @@ void logNodeHbError(const std::uint16_t sourceId, const std::uint8_t nodeMask)
 } // namespace
 
 cSupervisoryApplication::cSupervisoryApplication(
-    sCanExchange& canExchange,
+    sCanExchange& exchange,
     sDBMessageExchange& databaseExchange,
-    const ecNodeHbFailureMode nodeHbFailureMode)
-    : canExchange_(canExchange), databaseExchange_(databaseExchange), 
-    nodeHbFailureMode_(nodeHbFailureMode)
+    const ecNodeHbFailureMode nodeHbFailureMode,
+    cAnnouncementService* announcementService)
+    : canExchange_(exchange), announcementService_(announcementService),
+      databaseExchange_(databaseExchange), nodeHbFailureMode_(nodeHbFailureMode)
 {
+}
+
+bool cSupervisoryApplication::enqueueAdapterEvent(const sSupervisoryEvent& event)
+{
+    return adapterEvents_.tryPush(event);
+}
+
+void cSupervisoryApplication::setSabbathStopDuration(
+    const std::chrono::milliseconds duration)
+{
+    appStateMachine_.setSabbathStopDuration(duration);
 }
 
 // Main Loop
@@ -96,16 +110,20 @@ ecOperationStatus cSupervisoryApplication::runControlCycle(
     checkCommsHealth(elapsedMs);
     checkDatabaseHealth(elapsedMs);
 
-    // Drain can queue
+    // Test-only adapter events and CAN events share the same control path.
     for (std::size_t count = 0; count < kMaximumEventsPerCycle; ++count)
     {
         sSupervisoryEvent event{};
+        if (adapterEvents_.tryPop(event))
+        {
+            processControlEvent(event);
+            continue;
+        }
         if (!canExchange_.receivedEvents.tryPop(event))
         {
             break;
         }
-        appStateMachine_.handleEvent(event);
-        publishPendingFrame();
+        processControlEvent(event);
     }
 
     // Drain database queue
@@ -116,19 +134,42 @@ ecOperationStatus cSupervisoryApplication::runControlCycle(
         {
             break;
         }
-        appStateMachine_.handleEvent(event);
+        processControlEvent(event);
         publishSnapshot();
     }
 
     sSupervisoryEvent timerEvent{};
     timerEvent.type = ecEventType::TimerTick;
     timerEvent.timestampMs = elapsedMs;
-    appStateMachine_.handleEvent(timerEvent);
-    publishPendingFrame();
+    processControlEvent(timerEvent);
 
     processNodeHbCycle(elapsedMs);
 
     return ecOperationStatus::Ok;
+}
+
+void cSupervisoryApplication::processControlEvent(const sSupervisoryEvent& event)
+{
+    const sSupervisoryStateSnapshot before = appStateMachine_.snapshot();
+    appStateMachine_.handleEvent(event);
+    publishPendingFrame();
+    publishArrivalAnnouncement(before);
+}
+
+void cSupervisoryApplication::publishArrivalAnnouncement(
+    const sSupervisoryStateSnapshot& before)
+{
+    if (announcementService_ == nullptr)
+    {
+        return;
+    }
+
+    const sSupervisoryStateSnapshot after = appStateMachine_.snapshot();
+    if (before.controlState != ecSupervisoryControlState::Arrived &&
+        after.controlState == ecSupervisoryControlState::Arrived)
+    {
+        static_cast<void>(announcementService_->submit(after.currentFloor));
+    }
 }
 
 sSupervisoryStateSnapshot cSupervisoryApplication::snapshot() const
@@ -172,8 +213,7 @@ void cSupervisoryApplication::publishPendingFrame()
 }
 
 void cSupervisoryApplication::publishSnapshot() {
-    if (const std::optional<sSupervisoryStateSnapshot> snapshot = appStateMachine_.snapshot();
-        snapshot.has_value() && !databaseExchange_.writableSnapshots.tryPush(*snapshot))
+    if (!databaseExchange_.writableSnapshots.tryPush(appStateMachine_.snapshot()))
     {
         faultDatabase(ecDBServiceFaultReason::OutboundQueueFull);
     }
@@ -234,16 +274,11 @@ void cSupervisoryApplication::checkCommsHealth(
 void cSupervisoryApplication::checkDatabaseHealth(
     const std::chrono::milliseconds elapsedMs)
 {
+    static_cast<void>(elapsedMs);
     // Duplicate event. Return.
     if (isControlFaultLatched_)
     {
         return;
-    }
-
-    // Else if it is the same value the comms are hanging, add the elapsed ms.
-    else if (databaseExchange_.databaseState.load() == ecDBServiceState::Running)
-    {
-        staleDatabaseProgressElapsed_ += elapsedMs;
     }
 
     // Check for standard comm failures
@@ -252,8 +287,8 @@ void cSupervisoryApplication::checkDatabaseHealth(
     const bool didDropEvent = droppedEvents != lastDatabaseDroppedEventCount_;
     const bool didTransmitFail = writeFailures != lastDatabaseWriteFailureCount_;
 
-    lastCommsDroppedEventCount_ = droppedEvents;
-    lastCommsTransmitFailureCount_ = writeFailures;
+    lastDatabaseDroppedEventCount_ = droppedEvents;
+    lastDatabaseWriteFailureCount_ = writeFailures;
 
     if (didDropEvent)
     {
@@ -270,10 +305,6 @@ void cSupervisoryApplication::checkDatabaseHealth(
             reason == ecDBServiceFaultReason::None
                 ? ecDBServiceFaultReason::ThreadFailure
                 : reason);
-    }
-    else if (staleDatabaseProgressElapsed_ >= kDatabaseProgressTimeout)
-    {
-        faultDatabase(ecDBServiceFaultReason::DatabaseProgressTimeout);
     }
 }
 void cSupervisoryApplication::processNodeHbCycle(
@@ -424,7 +455,7 @@ void cSupervisoryApplication::faultControl(const ecCanCommsFaultReason reason)
 
     sSupervisoryEvent event{};
     event.type = ecEventType::Fault;
-    appStateMachine_.handleEvent(event);
+    processControlEvent(event);
 }
 
 void cSupervisoryApplication::faultComms(const ecCanCommsFaultReason reason)
@@ -459,7 +490,7 @@ void cSupervisoryApplication::faultComms(const ecCanCommsFaultReason reason)
 
     sSupervisoryEvent event{};
     event.type = ecEventType::Fault;
-    appStateMachine_.handleEvent(event);
+    processControlEvent(event);
 }
 
 void cSupervisoryApplication::faultDatabase(const ecDBServiceFaultReason reason)
@@ -474,23 +505,9 @@ void cSupervisoryApplication::faultDatabase(const ecDBServiceFaultReason reason)
     isControlFaultLatched_ = true;
     
     std::cerr << "supervisory_controller: Database service faulted (Reason: " << reason << ")\n";
-    // Try and restart with default configuration.
-    const sDBServiceConfig databaseConfig;
-    sDBMessageExchange databaseExchange;
-    cDBMessageService databaseService(databaseConfig, databaseExchange);
-
-    if (const ecOperationStatus status = databaseService.start(); status != ecOperationStatus::Ok)
-    {
-        std::cerr << "supervisory_controller: Database service restart failed." << std::endl;
-    }
-    else {
-        std::clog << "supervisory_controller: Recovery successful. Database service restarted." << std::endl;
-        return;
-    }
-
     sSupervisoryEvent event{};
     event.type = ecEventType::Fault;
-    appStateMachine_.handleEvent(event);
+    processControlEvent(event);
 }
 
 }

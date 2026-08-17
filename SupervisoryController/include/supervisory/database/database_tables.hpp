@@ -17,6 +17,8 @@ struct sDBInboundSnapshot {
     // std::time_t  date; TODO: add these (not sure which methods support this)
     // std::time_t  time;
     std::uint8_t requestedFloor;
+    /** guiRequests.remote: 0 normal, 1 maintenance, 3 Sabbath. */
+    std::uint8_t remoteMode;
 };
 
 struct sDBOutboundSnapshot {

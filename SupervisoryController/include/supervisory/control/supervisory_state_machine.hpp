@@ -9,6 +9,7 @@
 #pragma once
 
 #include <cstdint>
+#include <chrono>
 #include <memory>
 #include <optional>
 
@@ -62,6 +63,9 @@ struct sSupervisoryStateSnapshot
 
     /** Latched fault flag that drives the machine into Faulted. */
     bool isFaulted = false;
+
+    /** Latest database/demo mode bits applied by the control loop. */
+    std::uint8_t modeBits = 0;
 };
 
 /**
@@ -94,6 +98,9 @@ public:
      * @param event Event produced by CAN, timer, or fault handling code.
      */
     void handleEvent(const sSupervisoryEvent& event);
+
+    /** Configures the Sabbath stop interval used by the demo/runtime policy. */
+    void setSabbathStopDuration(std::chrono::milliseconds duration);
 
     /**
      * @brief Returns the latest public state snapshot.

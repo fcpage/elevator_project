@@ -38,6 +38,31 @@ option(
     ON
 )
 
+option(
+    SUPERVISORY_ENABLE_DEMO_MODES
+    "Read demo_control.txt as a temporary database integration seam."
+    OFF
+)
+
+option(
+    SUPERVISORY_BUILD_SIMULATOR
+    "Use the localhost simulator CAN transport instead of SocketCAN."
+    OFF
+)
+
+option(
+    SUPERVISORY_ENABLE_MINIAUDIO
+    "Enable real miniaudio/PulseAudio playback."
+    OFF
+)
+
+set(
+    SUPERVISORY_MINIAUDIO_INCLUDE_DIR
+    "${CMAKE_CURRENT_LIST_DIR}/../include"
+    CACHE PATH
+    "Directory containing miniaudio.h when real audio is enabled."
+)
+
 if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/src/main.cpp")
     set(SUPERVISORY_ROOT "${CMAKE_CURRENT_LIST_DIR}")
 elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../src/main.cpp")
@@ -53,6 +78,7 @@ else()
     )
 endif()
 
+# find_package(PulseAudio REQUIRED)
 find_package(Threads REQUIRED)
 
 add_executable(supervisory_controller
@@ -65,14 +91,37 @@ add_executable(supervisory_controller
     "${SUPERVISORY_ROOT}/src/drivers/supervisory_drivers.cpp"
     "${SUPERVISORY_ROOT}/src/http/http_server.cpp"
     "${SUPERVISORY_ROOT}/src/scheduler/request_scheduler.cpp"
+    "${SUPERVISORY_ROOT}/src/audio/announcement_service.cpp"
     "${SUPERVISORY_ROOT}/src/database/database_message_service.cpp"
 )
+
+if(SUPERVISORY_BUILD_SIMULATOR)
+    target_sources(supervisory_controller PRIVATE
+        "${SUPERVISORY_ROOT}/src/sim/simulator_can_service.cpp")
+    target_compile_definitions(supervisory_controller PRIVATE
+        SUPERVISORY_USE_SIMULATOR_CAN=1)
+endif()
 
 target_include_directories(supervisory_controller
     PRIVATE
         "${SUPERVISORY_ROOT}/include"
         "${CMAKE_CURRENT_SOURCE_DIR}/../../Common/"
 )
+
+if(SUPERVISORY_ENABLE_MINIAUDIO)
+    if(NOT EXISTS "${SUPERVISORY_MINIAUDIO_INCLUDE_DIR}/miniaudio.h")
+        message(FATAL_ERROR
+            "SUPERVISORY_ENABLE_MINIAUDIO requires miniaudio.h in "
+            "SUPERVISORY_MINIAUDIO_INCLUDE_DIR. Set it to the directory "
+            "containing miniaudio.h.")
+    endif()
+    target_include_directories(supervisory_controller PRIVATE ${SUPERVISORY_MINIAUDIO_INCLUDE_DIR})
+    target_compile_definitions(supervisory_controller PRIVATE SUPERVISORY_ENABLE_MINIAUDIO=1)
+endif()
+
+if(SUPERVISORY_ENABLE_DEMO_MODES)
+    target_compile_definitions(supervisory_controller PRIVATE SUPERVISORY_ENABLE_DEMO_MODES=1)
+endif()
 
 target_compile_features(supervisory_controller PRIVATE cxx_std_20)
 
@@ -93,6 +142,25 @@ target_link_libraries(supervisory_controller PRIVATE
     resolv
     mysqlcppconn
 )
+
+if(SUPERVISORY_ENABLE_MINIAUDIO)
+    target_link_libraries(supervisory_controller PRIVATE pulse)
+endif()
+
+set(SUPERVISORY_AUDIO_DIR "${SUPERVISORY_ROOT}/audio")
+if(EXISTS "${SUPERVISORY_AUDIO_DIR}")
+    file(GLOB SUPERVISORY_AUDIO_ASSETS CONFIGURE_DEPENDS
+        "${SUPERVISORY_AUDIO_DIR}/floor1.wav"
+        "${SUPERVISORY_AUDIO_DIR}/floor2.wav"
+        "${SUPERVISORY_AUDIO_DIR}/floor3.wav")
+    if(SUPERVISORY_AUDIO_ASSETS)
+        add_custom_command(TARGET supervisory_controller POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:supervisory_controller>/audio"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                ${SUPERVISORY_AUDIO_ASSETS}
+                "$<TARGET_FILE_DIR:supervisory_controller>/audio")
+    endif()
+endif()
 
 if(SUPERVISORY_ENABLE_AUTO_ARRIVAL)
     target_compile_definitions(supervisory_controller PRIVATE

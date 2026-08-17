@@ -20,6 +20,34 @@ option(
     OFF
 )
 
+option(
+    SUPERVISORY_ENABLE_DEMO_MODES
+    "Read demo_control.txt as a temporary database integration seam."
+    OFF
+)
+
+# Simulator integration: selects the localhost CAN bridge for the normal SA
+# entry point. It does not create a simulator-specific executable.
+option(
+    SUPERVISORY_BUILD_SIMULATOR
+    "Build supervisory_controller with the localhost simulator CAN transport."
+    OFF
+)
+
+option(
+    SUPERVISORY_ENABLE_MINIAUDIO
+    "Enable real miniaudio/ALSA playback; otherwise log demo announcements."
+    OFF
+)
+
+set(
+    SUPERVISORY_MINIAUDIO_INCLUDE_DIR
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    CACHE PATH
+    "Directory containing miniaudio.h when real audio is enabled."
+)
+
+find_package(PulseAudio REQUIRED)
 find_package(Threads REQUIRED)
 
 set(SUPERVISORY_COMMON_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../Common")
@@ -31,8 +59,12 @@ add_library(project6_supervisory
     src/can/socket_can_adapter.cpp
     src/control/supervisory_state_machine.cpp
     src/drivers/supervisory_drivers.cpp
+    src/audio/announcement_service.cpp
+    src/database/database_message_service.cpp
+    src/demo/demo_control.cpp
     src/http/http_server.cpp
     src/scheduler/request_scheduler.cpp
+    src/sim/simulator_can_service.cpp
 )
 
 target_include_directories(project6_supervisory
@@ -41,10 +73,33 @@ target_include_directories(project6_supervisory
         "${SUPERVISORY_COMMON_DIR}"
 )
 
+if(SUPERVISORY_ENABLE_MINIAUDIO)
+    if(NOT EXISTS "${SUPERVISORY_MINIAUDIO_INCLUDE_DIR}/miniaudio.h")
+        message(FATAL_ERROR
+            "SUPERVISORY_ENABLE_MINIAUDIO requires miniaudio.h in "
+            "SUPERVISORY_MINIAUDIO_INCLUDE_DIR. Set it to the directory "
+            "containing miniaudio.h.")
+    endif()
+    target_include_directories(project6_supervisory PRIVATE ${SUPERVISORY_MINIAUDIO_INCLUDE_DIR})
+    target_compile_definitions(project6_supervisory PRIVATE SUPERVISORY_ENABLE_MINIAUDIO=1)
+endif()
+
+if(SUPERVISORY_ENABLE_DEMO_MODES)
+    target_compile_definitions(project6_supervisory PRIVATE SUPERVISORY_ENABLE_DEMO_MODES=1)
+endif()
+
 target_link_libraries(project6_supervisory
     PUBLIC
+        ${CMAKE_DL_LIBS}
         Threads::Threads
+        PulseAudio::PulseAudio
+        m
 )
+
+if(WIN32)
+    # simulator_can_service uses the native localhost socket API on Windows.
+    target_link_libraries(project6_supervisory PUBLIC ws2_32)
+endif()
 
 if(SUPERVISORY_ENABLE_AUTO_ARRIVAL)
     target_compile_definitions(project6_supervisory
@@ -67,6 +122,12 @@ target_link_libraries(supervisory_controller
     PRIVATE
         project6_supervisory
 )
+
+if(SUPERVISORY_BUILD_SIMULATOR)
+    # Used only by the normal supervisory_controller target in simulator runs.
+    target_compile_definitions(supervisory_controller
+        PRIVATE SUPERVISORY_USE_SIMULATOR_CAN=1)
+endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/sim/simulator_supervisor_main.cpp")
     add_executable(supervisory_simulator_adapter
@@ -155,6 +216,7 @@ target_link_libraries(supervisory_can_comms_service_tests
 add_executable(supervisory_control_loop_tests
     tests/control_loop_tests.cpp
     src/app/supervisory_application.cpp
+    src/audio/announcement_service.cpp
     src/can/can_comms_service.cpp
     src/can/can_protocol.cpp
     src/can/socket_can_adapter.cpp
@@ -171,6 +233,24 @@ target_include_directories(supervisory_control_loop_tests
 target_link_libraries(supervisory_control_loop_tests
     PRIVATE
         Threads::Threads
+)
+
+add_executable(supervisory_modes_audio_tests
+    tests/modes_audio_tests.cpp
+    src/app/supervisory_application.cpp
+    src/audio/announcement_service.cpp
+    src/can/can_comms_service.cpp
+    src/control/supervisory_state_machine.cpp
+    src/drivers/supervisory_drivers.cpp
+    src/can/can_protocol.cpp
+    src/can/socket_can_adapter.cpp
+    src/scheduler/request_scheduler.cpp
+)
+
+target_include_directories(supervisory_modes_audio_tests
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        "${SUPERVISORY_COMMON_DIR}"
 )
 
 add_test(
@@ -201,6 +281,11 @@ add_test(
 add_test(
     NAME supervisory_control_loop_tests
     COMMAND supervisory_control_loop_tests
+)
+
+add_test(
+    NAME supervisory_modes_audio_tests
+    COMMAND supervisory_modes_audio_tests
 )
 
 set(ESEPP_EXECUTABLE

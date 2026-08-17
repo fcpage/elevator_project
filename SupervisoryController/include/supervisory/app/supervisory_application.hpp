@@ -10,9 +10,12 @@
 
 #include <chrono>
 #include <cstdint>
+#include <fstream>
 
 #include "supervisory/can/can_comms_service.hpp"
+#include "supervisory/audio/announcement_service.hpp"
 #include "supervisory/common/result.hpp"
+#include "supervisory/common/spsc_queue.hpp"
 #include "supervisory/control/supervisory_state_machine.hpp"
 #include "supervisory/database/database_message_service.hpp"
 
@@ -57,9 +60,21 @@ public:
      *        heartbeat verification window.
      */
     explicit cSupervisoryApplication(
-        sCanExchange& canExchange,
+        sCanExchange& exchange,
         sDBMessageExchange& databaseExchange,
-        ecNodeHbFailureMode nodeHbFailureMode = ecNodeHbFailureMode::FaultControl);
+        ecNodeHbFailureMode nodeHbFailureMode = ecNodeHbFailureMode::FaultControl,
+        cAnnouncementService* announcementService = nullptr);
+
+    /**
+     * Queues an adapter event for the next control cycle.
+     *
+     * Test adapters use this seam; production mode updates arrive through the
+     * database exchange.
+     */
+    [[nodiscard]] bool enqueueAdapterEvent(const sSupervisoryEvent& event);
+
+    /** Sets the demo/runtime Sabbath interval without changing the FSM API. */
+    void setSabbathStopDuration(std::chrono::milliseconds duration);
 
     /**
      * @brief Applies bounded queued input, advances time, and publishes output.
@@ -77,6 +92,8 @@ public:
 private:
     /** @brief Moves a generated frame to COMMS. */
     void publishPendingFrame();
+    void processControlEvent(const sSupervisoryEvent& event);
+    void publishArrivalAnnouncement(const sSupervisoryStateSnapshot& before);
     /** @brief Moves a generated state machine snapshot to database. */
     void publishSnapshot();
     /** @brief Detects COMMS failure or timeout. */
@@ -109,6 +126,10 @@ private:
 
     /** Shared COMMS exchange. */
     sCanExchange& canExchange_;
+    /** Optional output side service; control remains valid without audio. */
+    cAnnouncementService* announcementService_ = nullptr;
+    /** Adapter events share the same bounded control-cycle path as CAN events. */
+    cSpscQueue<sSupervisoryEvent, 16> adapterEvents_;
     /** Shared DATABASE exchange. */
     sDBMessageExchange& databaseExchange_;
     /** CONTROL-owned state machine. */

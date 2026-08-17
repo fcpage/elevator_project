@@ -159,7 +159,7 @@ enum class ecDoorCommand
     Close
 };
 
-enum class CanMessageType
+enum class ecCanMessageType
 {
     /** Outbound command produced by the supervisory controller. */
     SupervisorCommand,
@@ -183,7 +183,7 @@ enum class CanMessageType
 struct sDecodedCanMessage
 {
     /** Semantic message category selected from the source CAN ID. */
-    CanMessageType type = CanMessageType::CarFloorRequest;
+    ecCanMessageType type = ecCanMessageType::CarFloorRequest;
 
     /** Original sender identifier retained for diagnostics and validation. */
     std::uint16_t sourceId = 0;

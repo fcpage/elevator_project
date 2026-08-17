@@ -1,0 +1,5 @@
+# Automatically selected by scripts/build_rpi.sh --maintenance.
+# The GUI/database integration will eventually write these values instead.
+mode_bits=1
+maintenance_request_id=demo-maintenance-request
+maintenance_floor=2

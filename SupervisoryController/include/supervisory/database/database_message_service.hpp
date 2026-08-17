@@ -108,6 +108,7 @@ private:
     sql::Connection*        connection_;
     const sDBServiceConfig& config_;
     std::size_t guiRequestsLastIndex_ = 0;
+    std::uint8_t guiRequestsLastRemoteMode_ = 0;
     // Prepared statments
     const char* writeSnapshotStmtQuery_ = "\
         UPDATE elevatorNetwork\
@@ -141,6 +142,8 @@ private:
     /** @brief convert inbound snapshot to supervisory event to be sent to control thread */
     [[nodiscard]] 
     std::optional<sSupervisoryEvent> inboundSnapshotToSupervisoryEvent(sDBInboundSnapshot& snap) const;
+    /** Maps the GUI's persisted remote-mode value to supervisory mode bits. */
+    [[nodiscard]] std::optional<std::uint8_t> remoteModeToModeBits(std::uint8_t remoteMode) const;
     /** @brief convert supervisory event to outbound snapshot to be written to database */
     [[nodiscard]] 
     std::optional<sDBOutboundSnapshot> supervisoryStateToOutboundSnapshot(sSupervisoryStateSnapshot& state) const;

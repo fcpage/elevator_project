@@ -188,7 +188,7 @@ std::optional<sDecodedCanMessage> decodeCanFrame(const sCanFrame& frame, const s
             return std::nullopt;
         }
 
-        message.type = CanMessageType::ElevatorStatus;
+        message.type = ecCanMessageType::ElevatorStatus;
         message.floor = floor;
         message.statusBit = (payload & config.statusOrEnableMask) != 0;
         return message;
@@ -202,7 +202,7 @@ std::optional<sDecodedCanMessage> decodeCanFrame(const sCanFrame& frame, const s
             return std::nullopt;
         }
 
-        message.type = CanMessageType::CarFloorRequest;
+        message.type = ecCanMessageType::CarFloorRequest;
         message.floor = floor;
         message.statusBit = (payload & config.statusOrEnableMask) != 0;
         return message;
@@ -215,7 +215,7 @@ std::optional<sDecodedCanMessage> decodeCanFrame(const sCanFrame& frame, const s
             return std::nullopt;
         }
 
-        message.type = CanMessageType::FloorModuleRequest;
+        message.type = ecCanMessageType::FloorModuleRequest;
         message.floor = floorFromFloorControllerId(frame.id, config);
         return message;
     }
@@ -253,7 +253,7 @@ std::optional<sSupervisoryEvent> toSupervisoryEvent(const sDecodedCanMessage& me
 
     switch (message.type)
     {
-        case CanMessageType::ElevatorStatus:
+        case ecCanMessageType::ElevatorStatus:
         {
             if (!message.floor.has_value())
             {
@@ -265,7 +265,7 @@ std::optional<sSupervisoryEvent> toSupervisoryEvent(const sDecodedCanMessage& me
             return event;
         }
 
-        case CanMessageType::CarFloorRequest:
+        case ecCanMessageType::CarFloorRequest:
         {
             if (!message.floor.has_value())
             {
@@ -277,7 +277,7 @@ std::optional<sSupervisoryEvent> toSupervisoryEvent(const sDecodedCanMessage& me
             return event;
         }
 
-        case CanMessageType::FloorModuleRequest:
+        case ecCanMessageType::FloorModuleRequest:
         {
             if (!message.floor.has_value())
             {
@@ -289,7 +289,7 @@ std::optional<sSupervisoryEvent> toSupervisoryEvent(const sDecodedCanMessage& me
             return event;
         }
 
-        case CanMessageType::SupervisorCommand:
+        case ecCanMessageType::SupervisorCommand:
         {
             return std::nullopt;
         }
