@@ -151,19 +151,35 @@ void cDBMessageService::run(const std::stop_token& stopToken) noexcept {
             std::optional<sDBInboundSnapshot> maybeInSnap = readSnapshot();
             if(!maybeInSnap.has_value()) 
             {
-                exchange_.droppedEventCount.fetch_add(1);
                 recordFault(exchange_, ecDBServiceFaultReason::FailedRead);
-                continue;
             }
-            sDBInboundSnapshot snap = maybeInSnap.value();
-            if (snap.remoteMode != guiRequestsLastRemoteMode_)
+            else
             {
-                if (const auto modeBits = remoteModeToModeBits(snap.remoteMode); modeBits.has_value())
+                sDBInboundSnapshot snap = *maybeInSnap;
+                if (snap.remoteMode != guiRequestsLastRemoteMode_)
                 {
-                    sSupervisoryEvent modeEvent{};
-                    modeEvent.type = ecEventType::ModeUpdate;
-                    modeEvent.modeBits = *modeBits;
-                    if (!exchange_.readEvents.tryPush(modeEvent))
+                    if (const auto modeBits = remoteModeToModeBits(snap.remoteMode); modeBits.has_value())
+                    {
+                        sSupervisoryEvent modeEvent{};
+                        modeEvent.type = ecEventType::ModeUpdate;
+                        modeEvent.modeBits = *modeBits;
+                        if (!exchange_.readEvents.tryPush(modeEvent))
+                        {
+                            exchange_.droppedEventCount.fetch_add(1);
+                            recordFault(exchange_, ecDBServiceFaultReason::InboundQueueFull);
+                        }
+                        else
+                        {
+                            exchange_.readCount.fetch_add(1);
+                            guiRequestsLastRemoteMode_ = snap.remoteMode;
+                        }
+                    }
+                }
+
+                if (const std::optional<sSupervisoryEvent> event = inboundSnapshotToSupervisoryEvent(snap);
+                    event.has_value())
+                {
+                    if (!exchange_.readEvents.tryPush(*event))
                     {
                         exchange_.droppedEventCount.fetch_add(1);
                         recordFault(exchange_, ecDBServiceFaultReason::InboundQueueFull);
@@ -171,22 +187,8 @@ void cDBMessageService::run(const std::stop_token& stopToken) noexcept {
                     else
                     {
                         exchange_.readCount.fetch_add(1);
-                        guiRequestsLastRemoteMode_ = snap.remoteMode;
                     }
                 }
-            }
-            std::optional<sSupervisoryEvent> maybeEvent = inboundSnapshotToSupervisoryEvent(snap);
-            if(!maybeEvent.has_value())
-            {
-                continue;
-            }
-            sSupervisoryEvent event = maybeEvent.value();
-            if(!exchange_.readEvents.tryPush(event)) 
-            {
-                exchange_.droppedEventCount.fetch_add(1);         
-                recordFault(exchange_, ecDBServiceFaultReason::InboundQueueFull);
-            } else {
-                exchange_.readCount.fetch_add(1);
             }
 
             /*** Write ***/
@@ -197,17 +199,21 @@ void cDBMessageService::run(const std::stop_token& stopToken) noexcept {
                 {
                     exchange_.writeFailureCount.fetch_add(1);
                     recordFault(exchange_, ecDBServiceFaultReason::FailedWrite);
-                    continue;
                 }
-                sDBOutboundSnapshot outSnap = maybeOutSnap.value();
-                if(!writeSnapshot(outSnap))
+                else if(!writeSnapshot(*maybeOutSnap))
                 {
                     exchange_.writeFailureCount.fetch_add(1);
                     recordFault(exchange_, ecDBServiceFaultReason::FailedWrite);
-                    continue;
+                }
+                else
+                {
+                    exchange_.writeCount.fetch_add(1);
                 }
             }
 
+            // Always throttle: both a stale GUI row and a database failure are
+            // normal retry states, not reasons to hammer the database or starve
+            // the CAN/control workers.
             std::chrono::milliseconds delay{1000};
             std::this_thread::sleep_for(delay);
         }

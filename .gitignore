@@ -5,6 +5,8 @@ SupervisoryController/modern_engineering_cpp_style_guide.md
 SupervisoryController/src/sim
 SupervisoryController/src/tests
 SupervisoryController/build-rpi/
+SupervisoryController/build-*/
+SupervisoryController/cmake-build-*/
 SupervisoryController/out/
 SupervisoryController/.vs/
 FloorController/build/
@@ -21,6 +23,11 @@ html
 *.exe
 *.pdb
 *.obj
+*.o
+*.a
+*.so
+*.dll
+*.lib
 *.tlog
 *.ilk
 *.exe.recipe

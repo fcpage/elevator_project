@@ -495,19 +495,18 @@ void cSupervisoryApplication::faultComms(const ecCanCommsFaultReason reason)
 
 void cSupervisoryApplication::faultDatabase(const ecDBServiceFaultReason reason)
 {
-    if (isControlFaultLatched_)
+    if (isDatabaseFaultLatched_)
     {
         return;
     }
 
     ecDBServiceFaultReason expected = ecDBServiceFaultReason::None;
     static_cast<void>(databaseExchange_.faultReason.compare_exchange_strong(expected, reason));
-    isControlFaultLatched_ = true;
-    
+    isDatabaseFaultLatched_ = true;
+
+    // The database supplies optional operator requests and persistence. Its
+    // availability must not stop the independent CAN safety/heartbeat path.
     std::cerr << "supervisory_controller: Database service faulted (Reason: " << reason << ")\n";
-    sSupervisoryEvent event{};
-    event.type = ecEventType::Fault;
-    processControlEvent(event);
 }
 
 }

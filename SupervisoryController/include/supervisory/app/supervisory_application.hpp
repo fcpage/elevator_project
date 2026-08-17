@@ -121,7 +121,7 @@ private:
     void faultControl(ecCanCommsFaultReason reason);
     /** @brief Latches a COMMS fault into CONTROL. */
     void faultComms(ecCanCommsFaultReason reason);
-    /** @brief Latches a Database fault into CONTROL. */
+    /** @brief Records a database fault without interrupting CAN/control. */
     void faultDatabase(ecDBServiceFaultReason reason);
 
     /** Shared COMMS exchange. */
@@ -164,6 +164,8 @@ private:
     ecNodeHbFailureMode nodeHbFailureMode_ = ecNodeHbFailureMode::FaultControl;
     /** Prevents duplicate fault events. */
     bool isControlFaultLatched_ = false;
+    /** Prevents one database outage from repeatedly logging the same fault. */
+    bool isDatabaseFaultLatched_ = false;
 };
 
 } // namespace project6::supervisory

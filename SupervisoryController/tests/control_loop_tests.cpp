@@ -51,10 +51,11 @@ int main()
     using namespace project6::supervisory;
 
     sCanExchange exchange;
+    sDBMessageExchange databaseExchange;
     exchange.commsState.store(ecCanCommsState::Running);
     exchange.commsProgress.store(1);
 
-    cSupervisoryApplication application(exchange);
+    cSupervisoryApplication application(exchange, databaseExchange);
 
     sSupervisoryEvent request{};
     request.type = ecEventType::CanFloorRequest;
@@ -110,7 +111,7 @@ int main()
     sCanExchange heartbeatExchange;
     heartbeatExchange.commsState.store(ecCanCommsState::Running);
     heartbeatExchange.commsProgress.store(1);
-    cSupervisoryApplication heartbeatApplication(heartbeatExchange);
+    cSupervisoryApplication heartbeatApplication(heartbeatExchange, databaseExchange);
 
     markCommsProgress(heartbeatExchange);
     require(
@@ -154,7 +155,7 @@ int main()
     sCanExchange allReplyExchange;
     allReplyExchange.commsState.store(ecCanCommsState::Running);
     allReplyExchange.commsProgress.store(1);
-    cSupervisoryApplication allReplyApplication(allReplyExchange);
+    cSupervisoryApplication allReplyApplication(allReplyExchange, databaseExchange);
 
     markCommsProgress(allReplyExchange);
     require(allReplyApplication.runControlCycle(3s) == ecOperationStatus::Ok,
@@ -190,7 +191,7 @@ int main()
     sCanExchange missedReplyExchange;
     missedReplyExchange.commsState.store(ecCanCommsState::Running);
     missedReplyExchange.commsProgress.store(1);
-    cSupervisoryApplication missedReplyApplication(missedReplyExchange);
+    cSupervisoryApplication missedReplyApplication(missedReplyExchange, databaseExchange);
 
     markCommsProgress(missedReplyExchange);
     require(missedReplyApplication.runControlCycle(3s) == ecOperationStatus::Ok,
@@ -224,7 +225,7 @@ int main()
     sCanExchange nodeErrorExchange;
     nodeErrorExchange.commsState.store(ecCanCommsState::Running);
     nodeErrorExchange.commsProgress.store(1);
-    cSupervisoryApplication nodeErrorApplication(nodeErrorExchange);
+    cSupervisoryApplication nodeErrorApplication(nodeErrorExchange, databaseExchange);
 
     require(nodeErrorExchange.receivedNodeHbMessages.tryPush(
         sNodeHbMessage{ecNodeHb::Error, kFloorTwoControllerCanId, 0x87}),
@@ -245,7 +246,10 @@ int main()
     sCanExchange logOnlyExchange;
     logOnlyExchange.commsState.store(ecCanCommsState::Running);
     logOnlyExchange.commsProgress.store(1);
-    cSupervisoryApplication logOnlyApplication(logOnlyExchange, ecNodeHbFailureMode::LogOnly);
+    cSupervisoryApplication logOnlyApplication(
+        logOnlyExchange,
+        databaseExchange,
+        ecNodeHbFailureMode::LogOnly);
 
     markCommsProgress(logOnlyExchange);
     require(logOnlyApplication.runControlCycle(3s) == ecOperationStatus::Ok,
@@ -260,6 +264,55 @@ int main()
     require(
         logOnlyApplication.canHealth().missedNodeHbReplyMask == kExpectedNodeHbReplyMask,
         "log-only node heartbeat timeout was not reported");
+
+    sCanExchange databaseIsolationCanExchange;
+    sDBMessageExchange databaseIsolationExchange;
+    databaseIsolationCanExchange.commsState.store(ecCanCommsState::Running);
+    databaseIsolationCanExchange.commsProgress.store(1);
+    cSupervisoryApplication databaseIsolationApplication(
+        databaseIsolationCanExchange,
+        databaseIsolationExchange);
+
+    // A database problem must not stop the independent CAN heartbeat path.
+    databaseIsolationExchange.droppedEventCount.fetch_add(1);
+    markCommsProgress(databaseIsolationCanExchange);
+    require(
+        databaseIsolationApplication.runControlCycle(10ms) == ecOperationStatus::Ok,
+        "database isolation setup cycle failed");
+    require(
+        databaseIsolationApplication.snapshot().controlState != ecSupervisoryControlState::Faulted,
+        "database fault stopped control before heartbeat scheduling");
+
+    markCommsProgress(databaseIsolationCanExchange);
+    require(
+        databaseIsolationApplication.runControlCycle(2990ms) == ecOperationStatus::Ok,
+        "database isolation heartbeat request cycle failed");
+    require(
+        databaseIsolationCanExchange.transmitFrames.tryPop(command),
+        "database fault prevented heartbeat request publication");
+
+    require(databaseIsolationCanExchange.receivedNodeHbMessages.tryPush(
+        sNodeHbMessage{ecNodeHb::Ok, kCarControllerCanId, 0x84}),
+        "database isolation car heartbeat reply setup failed");
+    require(databaseIsolationCanExchange.receivedNodeHbMessages.tryPush(
+        sNodeHbMessage{ecNodeHb::Ok, kFloorOneControllerCanId, 0x84}),
+        "database isolation floor 1 heartbeat reply setup failed");
+    require(databaseIsolationCanExchange.receivedNodeHbMessages.tryPush(
+        sNodeHbMessage{ecNodeHb::Ok, kFloorTwoControllerCanId, 0x84}),
+        "database isolation floor 2 heartbeat reply setup failed");
+    require(databaseIsolationCanExchange.receivedNodeHbMessages.tryPush(
+        sNodeHbMessage{ecNodeHb::Ok, kFloorThreeControllerCanId, 0x84}),
+        "database isolation floor 3 heartbeat reply setup failed");
+    markCommsProgress(databaseIsolationCanExchange);
+    require(
+        databaseIsolationApplication.runControlCycle(10ms) == ecOperationStatus::Ok,
+        "database isolation heartbeat reply cycle failed");
+    require(
+        !databaseIsolationApplication.canHealth().isNodeHbReplyWindowOpen,
+        "database fault prevented heartbeat reply processing");
+    require(
+        databaseIsolationApplication.snapshot().controlState != ecSupervisoryControlState::Faulted,
+        "database fault stopped control after heartbeat replies");
 
     return 0;
 }
