@@ -233,10 +233,10 @@ std::optional<sDBInboundSnapshot> cDBMessageService::readSnapshot()
         std::unique_ptr<sql::Statement> statement{connection_->createStatement()};
         std::unique_ptr<sql::ResultSet> result{
             statement->executeQuery(
-                "SELECT `index`, requestedFloor, remote FROM guiRequests ORDER BY `index` DESC LIMIT 1;")};
+                "SELECT `index`, floor, remote FROM guiRequests ORDER BY `index` DESC LIMIT 1;")};
         if (result->next()) {
             index = result->getUInt("index");
-            requestedFloor = result->getUInt("requestedFloor");
+            requestedFloor = result->getUInt("floor");
             remoteMode = result->getUInt("remote");
         }
     } catch (const sql::SQLException& exception) {
