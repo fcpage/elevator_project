@@ -123,10 +123,7 @@ private:
             carRequestFloor2 = ?,\
             carRequestFloor3 = ?,\
             doors = ?\
-        WHERE `index` = (\
-            SELECT MAX(`index`)\
-            FROM elevatorNetwork\
-        );";
+        WHERE `index` = 1;";
     std::unique_ptr<sql::PreparedStatement> writeSnapshotStmt_;
     // thread data
     sDBMessageExchange& exchange_;
