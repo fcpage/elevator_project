@@ -53,7 +53,7 @@ option(
 option(
     SUPERVISORY_ENABLE_MINIAUDIO
     "Enable real miniaudio/PulseAudio playback."
-    OFF
+    ON
 )
 
 set(
