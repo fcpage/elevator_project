@@ -122,7 +122,7 @@ private:
             carRequestFloor1 = ?,\
             carRequestFloor2 = ?,\
             carRequestFloor3 = ?,\
-            doorsOpen = ?\
+            doors = ?\
         WHERE `index` = (\
             SELECT MAX(`index`)\
             FROM elevatorNetwork\

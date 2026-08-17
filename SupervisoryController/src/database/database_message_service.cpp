@@ -317,7 +317,7 @@ cDBMessageService::supervisoryStateToOutboundSnapshot(sSupervisoryStateSnapshot&
             .carRequestFloor1 = state.targetFloor == 1 ? true : false,
             .carRequestFloor2 = state.targetFloor == 2 ? true : false,
             .carRequestFloor3 = state.targetFloor == 3 ? true : false,
-            .doorsOpen = state.isDoorOpen,
+            .doors = state.isDoorOpen,
         };
     }
     return snap;
@@ -332,7 +332,7 @@ bool cDBMessageService::writeSnapshot(sDBOutboundSnapshot snap) const {
         writeSnapshotStmt_->setBoolean(5, snap.carRequestFloor1);
         writeSnapshotStmt_->setBoolean(6, snap.carRequestFloor2);
         writeSnapshotStmt_->setBoolean(7, snap.carRequestFloor3);
-        writeSnapshotStmt_->setBoolean(8, snap.doorsOpen);
+        writeSnapshotStmt_->setBoolean(8, snap.doors);
         writeSnapshotStmt_->executeUpdate();
     } catch (sql::SQLException& e) {
         /*  handles these:

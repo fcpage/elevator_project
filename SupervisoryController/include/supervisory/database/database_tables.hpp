@@ -32,7 +32,7 @@ struct sDBOutboundSnapshot {
     bool carRequestFloor1;
     bool carRequestFloor2;
     bool carRequestFloor3;
-    bool doorsOpen;
+    bool doors;
 };
 
 
@@ -53,7 +53,7 @@ static inline std::ostream& operator<<(std::ostream& os, const sDBOutboundSnapsh
         << "\tcarRequestFloor1 = " << snap.carRequestFloor1 << '\n'
         << "\tcarRequestFloor2 = " << snap.carRequestFloor2 << '\n'
         << "\tcarRequestFloor3 = " << snap.carRequestFloor3 << '\n'
-        << "\tdoorsOpen = " << snap.doorsOpen << '\n'
+        << "\tdoors = " << snap.doors << '\n'
         << "};\n";
     return os;
 }
