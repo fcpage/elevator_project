@@ -45,8 +45,14 @@ option(
 )
 
 option(
+    SUPERVISORY_BUILD_SIMULATOR
+    "Use the localhost simulator CAN transport instead of SocketCAN."
+    OFF
+)
+
+option(
     SUPERVISORY_ENABLE_MINIAUDIO
-    "Enable real miniaudio/ALSA playback."
+    "Enable real miniaudio/PulseAudio playback."
     OFF
 )
 
@@ -89,6 +95,13 @@ add_executable(supervisory_controller
     "${SUPERVISORY_ROOT}/src/database/database_message_service.cpp"
 )
 
+if(SUPERVISORY_BUILD_SIMULATOR)
+    target_sources(supervisory_controller PRIVATE
+        "${SUPERVISORY_ROOT}/src/sim/simulator_can_service.cpp")
+    target_compile_definitions(supervisory_controller PRIVATE
+        SUPERVISORY_USE_SIMULATOR_CAN=1)
+endif()
+
 target_include_directories(supervisory_controller
     PRIVATE
         "${SUPERVISORY_ROOT}/include"
@@ -125,11 +138,14 @@ target_compile_options(supervisory_controller PRIVATE
 
 target_link_libraries(supervisory_controller PRIVATE
     Threads::Threads
-    pulse
     atomic
     resolv
     mysqlcppconn
 )
+
+if(SUPERVISORY_ENABLE_MINIAUDIO)
+    target_link_libraries(supervisory_controller PRIVATE pulse)
+endif()
 
 set(SUPERVISORY_AUDIO_DIR "${SUPERVISORY_ROOT}/audio")
 if(EXISTS "${SUPERVISORY_AUDIO_DIR}")

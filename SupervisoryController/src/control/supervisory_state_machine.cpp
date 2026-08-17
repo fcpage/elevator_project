@@ -1018,13 +1018,20 @@ void cSupervisoryStateMachineAPI::handleEvent(const sSupervisoryEvent& event)
         event.type == ecEventType::CanCarRequest ||
         event.type == ecEventType::MaintenanceFloorRequest)
     {
-        state.scheduler.enqueueEvent(event);
+        const bool maintenanceModeActive = (state.modeBits & kModeMaintenance) != 0;
+        // Maintenance mode is an input lock-out, not merely a dispatch gate.
+        // Discard normal input received while active so it cannot execute later
+        // when the GUI switches to another mode.
+        if (!maintenanceModeActive || event.type == ecEventType::MaintenanceFloorRequest)
+        {
+            state.scheduler.enqueueEvent(event);
+        }
 
         // A passenger request temporarily takes the controller out of
         // Sabbath-only scheduling.  Keep the Sabbath bit set so this is a
         // service interruption, not a mode change; it resumes after normal
         // car, floor, and web queues are drained.
-        if (isNormalFloorRequest(event.type) &&
+        if (!maintenanceModeActive && isNormalFloorRequest(event.type) &&
             (state.modeBits & kModeSabbath) != 0 &&
             (state.modeBits & kModeMaintenance) == 0)
         {

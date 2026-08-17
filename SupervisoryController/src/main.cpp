@@ -98,7 +98,19 @@ int main(const int argumentCount, char* arguments[])
         kDefaultCanBitrateBitsPerSecond,
         kDefaultCanRestartMs,
         kConfigureCanInterfaceOnInitialize};
-    const sDBServiceConfig dbConfig{};
+    const std::string databaseUrl =
+        environmentValue("ELEVATOR_DB_URL", "tcp://127.0.0.1:3306");
+    const std::string databaseUser =
+        environmentValue("ELEVATOR_DB_USER", "pi");
+    const std::string databasePassword =
+        environmentValue("ELEVATOR_DB_PASSWORD", "ese");
+    const std::string databaseSchema =
+        environmentValue("ELEVATOR_DB_SCHEMA", "elevatorg1");
+    const sDBServiceConfig dbConfig{
+        databaseUrl.c_str(),
+        databaseUser,
+        databasePassword,
+        databaseSchema};
     sDBMessageExchange dbExchange;
     sCanExchange canExchange;
     // Keep the normal application entry point; only the transport is selected

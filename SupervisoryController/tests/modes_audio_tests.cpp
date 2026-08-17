@@ -82,6 +82,14 @@ void testStateMachineModes()
         maintenanceMachine.snapshot().controlState == ecSupervisoryControlState::Idle,
         "maintenance mode served a normal request");
 
+    maintenanceMachine.handleEvent(mode(0));
+    maintenanceMachine.handleEvent(tick(std::chrono::milliseconds{1}));
+    require(
+        maintenanceMachine.snapshot().controlState == ecSupervisoryControlState::Idle,
+        "maintenance mode retained a normal request after being cleared");
+
+    maintenanceMachine.handleEvent(mode(kModeMaintenance));
+
     maintenanceMachine.handleEvent(request(ecEventType::MaintenanceFloorRequest, 2));
     maintenanceMachine.handleEvent(tick(std::chrono::milliseconds{1}));
     require(
