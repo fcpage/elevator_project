@@ -8,77 +8,108 @@
 
 #include <assert.h>
 #define __RX_QUEUE_C
+#include "basic_defs.h"
 #include "RxQueue.h"
-
-#define RX_QUEUE_ASSERT_INIT \
-    do { \
-        assert(queue != 0); \
-        assert(queue->capacity != 0); \
-        assert(queue->storageSize != 0); \
-        assert(queue->data != NULL); \
-    } while(0);
 
 struct RxQueue {
     u8 capacity;
-    u8 storageSize;
-    CanRxFrame* data __attribute__((counted_by(storageSize)));
-    volatile u8 head;
+    u8 head;
     volatile u8 tail;
     volatile u32 droppedFrameCount;
+    CanRxFrame* data ;
 };
 
-static u8 advanceRxQueueIndex(RxQueue* queue, const u8 index)
-{
-    RX_QUEUE_ASSERT_INIT;
+static bool hasError = false;
+static RxQueue rxQueue = {0};
 
-    return (u8)((index + 1U) % queue->storageSize);
+static inline bool rxQueueIsFull(RxQueue* queue)
+{
+    if(queue == 0 
+    || queue->capacity == 0 
+    || queue->data == NULL
+    ) return (hasError = true);
+
+    return queue->tail >= queue->capacity;
 }
 
-void initRxQueue(RxQueue* queue) {
-    *queue = (RxQueue){
+static inline bool rxQueueIsEmpty(RxQueue* queue)
+{
+    if(queue == 0 
+    || queue->capacity == 0 
+    || queue->data == NULL
+    ) return (hasError = true);
+
+    return queue->tail == queue->head;
+}
+
+bool rxQueueHasFrame(RxQueue* queue) {
+    return queue->tail > 0;
+}
+
+bool rxQueueGetDroppedFrameCount(RxQueue* queue) {
+    return queue->droppedFrameCount;
+}
+
+bool rxQueueHasError() { return hasError; }
+
+RxQueue* initRxQueue() {
+    rxQueue = (RxQueue){
         .capacity = __rxQueueCapacity,
-        .storageSize = __rxQueueCapacity + 1,
         .data = __rxQueueDataPtr,
         .droppedFrameCount = 0,
         .head = 0,
         .tail = 0,
     };
+    return &rxQueue;
 }
 
 bool rxQueueTryPush(RxQueue* queue, CanRxFrame frame)
 {
-    const u8 tail = queue->tail;
-    if (tail == queue->head)
+    assert(queue != NULL);
+    assert(queue->capacity != 0);
+    assert(queue->data != NULL);
+
+    if (rxQueueIsFull(queue))
     {
+        ++queue->droppedFrameCount;
         return false;
     }
 
+    queue->data[queue->tail] = frame;
     __DMB();
-    *frame = queue->data[tail];
-    __DMB();
-    queue->tail = advanceRxQueueIndex(queue, tail);
+    queue->tail++;
+
     return true;
 }
 
 bool rxQueueTryPop(RxQueue* queue, CanRxFrame* frame)
 {
-    const u8 tail = queue->tail;
-    if (tail == queue->head)
+    assert(queue != NULL);
+    assert(queue->capacity != 0);
+    assert(queue->data != NULL);
+
+    if (rxQueueIsEmpty(queue))
     {
         return false;
     }
 
     __DMB();
-    *frame = queue->data[tail];
+    *frame = queue->data[queue->tail];
     __DMB();
-    queue->tail = advanceRxQueueIndex(queue, tail);
+    queue->tail--;
     return true;
 }
 
-u8 rxQueueGetSize(RxQueue* queue)
+u8 rxQueueGetNumberOfElements(RxQueue* queue)
 {
-    RX_QUEUE_ASSERT_INIT;
+    if(queue == 0 
+    || queue->capacity == 0 
+    || queue->data == NULL
+    ) {
+        hasError = true;
+        return 0;
+    }
 
-    return queue->capacity;
+    return queue->tail;
 }
 

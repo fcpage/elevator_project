@@ -20,10 +20,13 @@ typedef struct {
 
 typedef struct RxQueue RxQueue;
 
-void initRxQueue(RxQueue* queue);
+RxQueue* initRxQueue();
 bool rxQueueTryPush(RxQueue* queue, CanRxFrame frame);
 bool rxQueueTryPop(RxQueue* queue, CanRxFrame* frameOut);
-u8   rxQueueGetCapacity(RxQueue* queue);
+u8   rxQueueGetNumberOfElements(RxQueue* queue);
+bool rxQueueHasFrame(RxQueue* queue);
+bool rxQueueGetDroppedFrameCount(RxQueue* queue);
+bool rxQueueHasError();
 
 /*** RxQueue Internal data initialization ***/
 

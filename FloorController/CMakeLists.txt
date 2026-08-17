@@ -100,6 +100,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
     Core/Src/usermain.c
     Core/Src/stdio_redirect.c
+    Core/Src/RxQueue.c
 )
 
 # Add include paths

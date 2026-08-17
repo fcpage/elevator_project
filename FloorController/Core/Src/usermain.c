@@ -1,22 +1,23 @@
 /**
-******************************************************************************** 
+********************************************************************************
 * @file     : usermain.c
 * @brief    : User main file (avoids overwritting auto-generated code)
 * By        : Nigel Sinclair & Ryan Pratt
-******************************************************************************** 
+********************************************************************************
 */
 
 // PSA: ONLY EVER INCLUDE THIS YOU WILL REGRET INCLUDING OTHER HAL HEADERS
-#include "stm32f3xx_hal.h" 
+#include "stm32f3xx_hal.h"
+#include "stm32f3xx_hal_can.h"
 
 #define RX_QUEUE_CAPACITY 8
 #include "RxQueue.h"
 
 enum FloorButtons {
     NO_BUTTON_PRESSED	= 0,
-    FL1_BUTTON_PRESSED  = 1, 
-    FL2_BUTTON_PRESSED  = 2, 
-    FL3_BUTTON_PRESSED  = 3, 
+    FL1_BUTTON_PRESSED  = 1,
+    FL2_BUTTON_PRESSED  = 2,
+    FL3_BUTTON_PRESSED  = 3,
     BLUE_BUTTON_PRESSED	= 4,
 };
 
@@ -26,47 +27,49 @@ enum FloorButtons {
 #include "debug_wrappers.h"
 
 /* HAL Handles defined in main.c */
-extern CAN_HandleTypeDef  hcan; 
-extern UART_HandleTypeDef huart; 
+extern CAN_HandleTypeDef  hcan;
+extern UART_HandleTypeDef huart;
 
 CAN_TxHeaderTypeDef		TxHeader;		// TxHeader is a variable of type CAN_TxHeaderTypeDef
 
 static u8	TxData[8];		// 8 bytes of data per frame
+CanRxFrame	RxData;		// 8 bytes of data per frame
 static u32	TxMailbox;
+RxQueue*    rxQueue;
 static volatile u8 BUTTON = NO_BUTTON_PRESSED;		// Initial value is that no BUTTON has been pressed
 
 #ifndef NODE_ID
 #define NODE_ID NODE_ID_CC
 #endif
 
-typedef struct { 
-    GPIO_TypeDef* led_port; 
+typedef struct {
+    GPIO_TypeDef* led_port;
     u16           led_pin;
     u8            msg;
 } FloorData;
 
 static const FloorData event_lookup[] = {
     { /* NO_BUTTON_PRESSED   */ },
-    /* FL1_BUTTON_PRESSED  */ 
-    { 
-        .led_port = FL1_IND_LED_GPIO_Port, 
+    /* FL1_BUTTON_PRESSED  */
+    {
+        .led_port = FL1_IND_LED_GPIO_Port,
         .led_pin  = FL1_IND_LED_Pin,
         .msg      = (NODE_ID == NODE_ID_CC) ? CC_REQ_FLOOR_1 : FC_FLOOR_REQ,
     },
     /* FL2_BUTTON_PRESSED  */
-    { 
-        .led_port = FL2_IND_LED_GPIO_Port, 
+    {
+        .led_port = FL2_IND_LED_GPIO_Port,
         .led_pin  = FL2_IND_LED_Pin,
         .msg      = (NODE_ID == NODE_ID_CC) ? CC_REQ_FLOOR_2 : FC_FLOOR_REQ,
     },
     /* FL3_BUTTON_PRESSED  */
-    { 
+    {
         .led_port = FL3_IND_LED_GPIO_Port,
         .led_pin  = FL3_IND_LED_Pin,
         .msg      = (NODE_ID == NODE_ID_CC) ? CC_REQ_FLOOR_3 : FC_FLOOR_REQ,
     },
     /* BLUE_BUTTON_PRESSED */
-    {  
+    {
         .led_port = LD2_GPIO_Port,
         .led_pin  = LD2_Pin,
         .msg      = FC_FLOOR_REQ,
@@ -96,10 +99,10 @@ static void handleRxFrame(const CanRxFrame* frame)
         }
         case SC_POS_FLOOR_1: [[ fallthrough ]];
         case SC_POS_FLOOR_2: [[ fallthrough ]];
-        case SC_POS_FLOOR_3: 
+        case SC_POS_FLOOR_3:
         {
             dbglog(LVL1, "Received floor status message: %u\n", payload);
-            /* Floor number is indicated by the lower two bits in the node ID 
+            /* Floor number is indicated by the lower two bits in the node ID
              * and the MSG (checks if the elevator is at our floor) */
             if( (payload & 0b11) == (NODE_ID & 0b11) ) {
                 HAL_GPIO_WritePin(floor->led_port, floor->led_pin, GPIO_PIN_SET);
@@ -114,14 +117,22 @@ static void handleRxFrame(const CanRxFrame* frame)
 }
 
 void user_main(void) {
-    CanRxFrame frame;
-    RxQueue* rxQueue;
+
+    // CanRxFrame frame;
+
+    // if(rxQueueHasError()) {
+    //     dbglog(LVL3, "CAN Health check: \n"
+    //                  "\tDropped frames: %u\n"
+    //                  "\tHas frame: %s\n",
+    //            rxQueueGetDroppedFrameCount(rxQueue),
+    //            rxQueueHasFrame(rxQueue) ? "true" : "false");
+    // }
 
     /*** Receive ***/
-    while (rxQueueTryPop(rxQueue, &frame))
-    {
-        handleRxFrame(&frame);
-    }
+    // while (rxQueueTryPop(rxQueue, &frame))
+    // {
+        handleRxFrame(&RxData);
+    // }
 
     /*** Transmit ***/
     if (BUTTON) {
@@ -150,28 +161,30 @@ void user_main(void) {
  * @param:  none
  * @return: none
  */
-void user_init(void) { }
+void user_init(void) { 
+    // rxQueue = initRxQueue();
+}
 
 /**
  * @brief:  All user CAN initialization gets put here (called from main.c in USER CODE CAN_Init 2)
  * @param:  none
  * @return: none
  */
-void user_CAN_init(void) { 
+void user_CAN_init(void) {
 	/* *** Set up CAN Rx filters *** */
 
     /* Configure filter 0 to direct everything to FIFO 0 */
     // This is one of the 13 filters - can create more filters - this one will be number 0
 	CAN_FilterTypeDef filter = {
         .FilterBank = 0,							// This is filter number 0
-        /* Set FilterIdHigh bits by choosing an ID and aligning the bits in the filter register 
-         * with the receive register by shifting << 5  
+        /* Set FilterIdHigh bits by choosing an ID and aligning the bits in the filter register
+         * with the receive register by shifting << 5
          * (See Second lecture in CAN series - last few slides) */
-        .FilterIdHigh = 0x0100 << 5,      			
-        /* Same as example in lecture 
-         * (this gives a range of ID's that will be accepted of between 0x100 and 0x103). 
+        .FilterIdHigh = 0x0100 << 5,
+        /* Same as example in lecture
+         * (this gives a range of ID's that will be accepted of between 0x100 and 0x103).
          * Must also align the bits in the Mask register with those in the receive register. */
-        .FilterMaskIdHigh = 0xFFC << 5,				
+        .FilterMaskIdHigh = 0xFFC << 5,
         .FilterFIFOAssignment = CAN_FILTER_FIFO0,
         .FilterMode = CAN_FILTERMODE_IDMASK, 		// uses mask mode (so can set range of IDs)
         .FilterScale = CAN_FILTERSCALE_32BIT,		// Use 32 bit filters (doesn't really matter if we use 16 or 32 bit since we are using mask)
@@ -209,23 +222,15 @@ void user_CAN_init(void) {
 // This is called when the interrupt for FIFO0 is triggered.
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
-	CanRxFrame frame;
-	if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &frame.header, frame.data) != HAL_OK)
+	// CanRxFrame frame;
+	if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxData.header, RxData.data) != HAL_OK)
 	{
 		panic("Failed to get message in Rx callback");
 	}
 
-    const u8 head = RxQueueHead;
-    const u8 nextHead = advanceRxQueueIndex(head);
-    if (nextHead == RxQueueTail)
-    {
-        ++DroppedRxFrameCount;
-        return;
-    }
-
-    RxQueue[head] = frame;
-    __DMB();
-    RxQueueHead = nextHead;
+    // if(rxQueueTryPush(rxQueue, frame)) {
+    //     dbglog(LVL1, "Rx message queue full");
+    // }
 }
 
 // Override the HAL_GPIO Callback -- 1. light up LED2 and 2. Transmit message when the blue button is pushed
