@@ -42,3 +42,62 @@ sudo xdg-open http://localhost/g1server/index.html  #open the index so we can ch
 wait_fn #wait a minute
 sudo reboot #reboot
 exit #exit for good measure
+
+#!/bin/env bash​
+
+##Elevator Project server setup script for RPi.​
+​
+
+sudo apt-get update && sudo apt-get upgrade -y ​
+
+sudo apt-get install net-tools -y openssh -y openssh-server -y ufw -y sudo apt-get install lamp-server^ || (sudo apt-get update &&\​
+
+sudo apt-get upgrade -y &&\​
+
+sudo apt-get install apache2 -y &&\​
+
+sudo a2enmod rewrite) ​
+
+sudo mkdir /var/www/html/g1server && sudo chmod -R 660 /var/www/html/g1server cd /var/www/html/g1server || return ​
+
+sudo touch index.html && sudo tee -a index.html << POM  ​
+
+<!DOCTYPE html>​
+
+<html>​
+
+  <head>​
+
+    <title>Group 1 Elevator Server</title>​
+
+    </head>​
+
+    <body>​
+
+      <h1>Going Up</h1​
+
+      <p>Please stand clear of the door!</p>​
+
+    </body>​
+
+<html>​
+
+POM​
+
+sudo service apache2 restart  ​
+
+sudo systemctl enable --now ufw ​
+
+sudo systemctl enable --now ssh ​
+
+sudo ufw allow ssh  ​
+
+sudo systemctl status ssh ​
+
+sudo ufw status ​
+
+sudo xdg-open http://localhost/g1server/index.html  ​
+
+sudo reboot ​
+
+exit ​
